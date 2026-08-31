@@ -119,68 +119,73 @@ export default function ExamResultPage() {
         </div>
 
         {/* 1. Score Cards Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-              Rata-rata Skor UTBK
-            </span>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-3xl sm:text-4xl font-black text-navy font-mono">
-                {result.totalScore}
+        <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                Rata-rata Skor UTBK
               </span>
-              <span className="text-xs font-semibold text-slate-400">/ 1000</span>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-3xl sm:text-4xl font-black text-navy font-mono">
+                  {result.totalScore}
+                </span>
+                <span className="text-xs font-semibold text-slate-400">/ 1000</span>
+              </div>
+              <div className="mt-2 text-xs font-semibold text-emerald-600 flex items-center space-x-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>+138.5 di atas rerata nasional</span>
+              </div>
             </div>
-            <div className="mt-2 text-xs font-semibold text-emerald-600 flex items-center space-x-1">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+138.5 di atas rerata nasional</span>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-              Persentil Nasional
-            </span>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-3xl sm:text-4xl font-black text-amber-500 font-mono">
-                {result.percentileRank}%
+            <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                Persentil Nasional
               </span>
-              <span className="text-xs font-semibold text-slate-400">Top Tier</span>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-3xl sm:text-4xl font-black text-amber-500 font-mono">
+                  {result.percentileRank}%
+                </span>
+                <span className="text-xs font-semibold text-slate-400">Top Tier</span>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                Lebih tinggi dari 97.2% peserta se-Indonesia
+              </p>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
-              Lebih tinggi dari 97.2% peserta se-Indonesia
-            </p>
-          </div>
 
-          <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-              Akurasi Jawaban
-            </span>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-3xl sm:text-4xl font-black text-emerald-600 font-mono">
-                {Math.round((result.totalCorrect / (result.totalCorrect + result.totalIncorrect + result.totalUnanswered)) * 100)}%
+            <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                Akurasi Jawaban
               </span>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-3xl sm:text-4xl font-black text-emerald-600 font-mono">
+                  {Math.round((result.totalCorrect / (result.totalCorrect + result.totalIncorrect + result.totalUnanswered)) * 100)}%
+                </span>
+              </div>
+              <div className="mt-2 text-xs text-slate-500 space-x-1">
+                <span className="text-emerald-700 font-bold">{result.totalCorrect} Benar</span> •{' '}
+                <span className="text-rose-600">{result.totalIncorrect} Salah</span> •{' '}
+                <span className="text-slate-400">{result.totalUnanswered} Kosong</span>
+              </div>
             </div>
-            <div className="mt-2 text-xs text-slate-500 space-x-1">
-              <span className="text-emerald-700 font-bold">{result.totalCorrect} Benar</span> •{' '}
-              <span className="text-rose-600">{result.totalIncorrect} Salah</span> •{' '}
-              <span className="text-slate-400">{result.totalUnanswered} Kosong</span>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-              Status Rasionalisasi
-            </span>
-            <div className="mt-1">
-              <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Pilihan 1 AMAN (UI)</span>
+            <div className="bg-white rounded-3xl p-5 shadow-elevated border border-slate-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                Status Rasionalisasi
               </span>
+              <div className="mt-1">
+                <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Pilihan 1 AMAN (UI)</span>
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                Pilihan 2 STEI ITB dalam Zona Kompetitif
+              </p>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
-              Pilihan 2 STEI ITB dalam Zona Kompetitif
-            </p>
           </div>
+          <p className="text-[10px] text-slate-400 italic mt-2 text-right">
+            *Data ilustrasi — perhitungan aktual akan disesuaikan skala data riil bimbel.
+          </p>
         </div>
 
         {/* 2. Target PTN Rationalization Analysis Section */}
@@ -267,97 +272,108 @@ export default function ExamResultPage() {
               );
             })}
           </div>
+
+          <div className="pt-2 border-t border-slate-100 flex justify-end">
+            <span className="text-[10px] text-slate-400 italic">
+              *Data ilustrasi — perhitungan aktual akan disesuaikan skala data riil bimbel.
+            </span>
+          </div>
         </div>
 
         {/* 3. Recharts Visualizations: Radar Chart & Subtest Bar Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Radar Chart: 7 Subtest Performance */}
-          <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  Radar Kompetensi 7 Subtest UTBK
-                </h3>
-                <p className="text-xs text-slate-500">Skor Siswa vs Rata-rata Nasional</p>
+        <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Radar Chart: 7 Subtest Performance */}
+            <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Radar Kompetensi 7 Subtest UTBK
+                  </h3>
+                  <p className="text-xs text-slate-500">Skor Siswa vs Rata-rata Nasional</p>
+                </div>
+                <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
+                  IRT Normalized
+                </span>
               </div>
-              <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
-                IRT Normalized
-              </span>
+
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart data={radarData} outerRadius="75%">
+                    <PolarGrid stroke="#e2e8f0" />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 11 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 1000]} stroke="#cbd5e1" />
+                    <Radar
+                      name="Skor Anda"
+                      dataKey="skorSiswa"
+                      stroke="#2563eb"
+                      fill="#3b82f6"
+                      fillOpacity={0.45}
+                    />
+                    <Radar
+                      name="Rerata Nasional"
+                      dataKey="rataNasional"
+                      stroke="#f59e0b"
+                      fill="#fbbf24"
+                      fillOpacity={0.25}
+                    />
+                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#0f172a',
+                        color: '#ffffff',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                      }}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
-            <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={radarData} outerRadius="75%">
-                  <PolarGrid stroke="#e2e8f0" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 11 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 1000]} stroke="#cbd5e1" />
-                  <Radar
-                    name="Skor Anda"
-                    dataKey="skorSiswa"
-                    stroke="#2563eb"
-                    fill="#3b82f6"
-                    fillOpacity={0.45}
-                  />
-                  <Radar
-                    name="Rerata Nasional"
-                    dataKey="rataNasional"
-                    stroke="#f59e0b"
-                    fill="#fbbf24"
-                    fillOpacity={0.25}
-                  />
-                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      color: '#ffffff',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                    }}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
+            {/* Bar Chart: Subtest Score Details */}
+            <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Distribusi Nilai Per Subtest
+                  </h3>
+                  <p className="text-xs text-slate-500">Pencapaian skor pada masing-masing bidang</p>
+                </div>
+                <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">
+                  7 Subtest Lengkap
+                </span>
+              </div>
+
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={radarData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                    <XAxis
+                      dataKey="subject"
+                      tick={{ fill: '#64748b', fontSize: 10 }}
+                      angle={-25}
+                      textAnchor="end"
+                    />
+                    <YAxis domain={[0, 1000]} tick={{ fill: '#64748b', fontSize: 11 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#0f172a',
+                        color: '#ffffff',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                      }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: '11px' }} />
+                    <Bar dataKey="skorSiswa" name="Skor Anda" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="rataNasional" name="Rerata Nasional" fill="#e2e8f0" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
-
-          {/* Bar Chart: Subtest Score Details */}
-          <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  Distribusi Nilai Per Subtest
-                </h3>
-                <p className="text-xs text-slate-500">Pencapaian skor pada masing-masing bidang</p>
-              </div>
-              <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">
-                7 Subtest Lengkap
-              </span>
-            </div>
-
-            <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={radarData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                  <XAxis
-                    dataKey="subject"
-                    tick={{ fill: '#64748b', fontSize: 10 }}
-                    angle={-25}
-                    textAnchor="end"
-                  />
-                  <YAxis domain={[0, 1000]} tick={{ fill: '#64748b', fontSize: 11 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      color: '#ffffff',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: '11px' }} />
-                  <Bar dataKey="skorSiswa" name="Skor Anda" fill="#2563eb" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="rataNasional" name="Rerata Nasional" fill="#e2e8f0" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <p className="text-[10px] text-slate-400 italic mt-2 text-right">
+            *Data ilustrasi — perhitungan aktual akan disesuaikan skala data riil bimbel.
+          </p>
         </div>
 
         {/* 4. Tentor Feedback & Strategy Notes */}

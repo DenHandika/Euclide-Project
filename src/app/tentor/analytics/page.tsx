@@ -68,43 +68,48 @@ export default function TentorAnalyticsPage() {
         </div>
 
         {/* 1. Metric Overview Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              Rerata Skor IRT Seluruh Siswa
-            </span>
-            <div className="text-3xl font-black text-navy font-mono">
-              718.4 <span className="text-xs font-medium text-slate-400 font-sans">/ 1000</span>
+        <div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                Rerata Skor IRT Seluruh Siswa
+              </span>
+              <div className="text-3xl font-black text-navy font-mono">
+                718.4 <span className="text-xs font-medium text-slate-400 font-sans">/ 1000</span>
+              </div>
+              <div className="mt-2 text-xs font-semibold text-emerald-600 flex items-center space-x-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>+168 Poin di atas Rata-rata BPPP Nasional</span>
+              </div>
             </div>
-            <div className="mt-2 text-xs font-semibold text-emerald-600 flex items-center space-x-1">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+168 Poin di atas Rata-rata BPPP Nasional</span>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              Subtest Paling Unggul
-            </span>
-            <div className="text-xl font-bold text-slate-900">
-              Pengetahuan Kuantitatif (PK)
+            <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                Subtest Paling Unggul
+              </span>
+              <div className="text-xl font-bold text-slate-900">
+                Pengetahuan Kuantitatif (PK)
+              </div>
+              <div className="mt-2 text-xs text-blue-600 font-semibold">
+                Rata-rata 765 Poin (Akurasi 86.4%)
+              </div>
             </div>
-            <div className="mt-2 text-xs text-blue-600 font-semibold">
-              Rata-rata 765 Poin (Akurasi 86.4%)
-            </div>
-          </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              Subtest Butuh Drilling Ekstra
-            </span>
-            <div className="text-xl font-bold text-rose-600">
-              Pemahaman Bacaan & Menulis (PBM)
-            </div>
-            <div className="mt-2 text-xs text-rose-600 font-semibold">
-              Rata-rata 680 Poin (Waktu 72s per Soal)
+            <div className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                Subtest Butuh Drilling Ekstra
+              </span>
+              <div className="text-xl font-bold text-rose-600">
+                Pemahaman Bacaan & Menulis (PBM)
+              </div>
+              <div className="mt-2 text-xs text-rose-600 font-semibold">
+                Rata-rata 680 Poin (Waktu 72s per Soal)
+              </div>
             </div>
           </div>
+          <p className="text-[10px] text-slate-400 italic mt-2 text-right">
+            *Data ilustrasi — perhitungan aktual akan disesuaikan skala data riil bimbel.
+          </p>
         </div>
 
         {/* 2. Recharts Bar Chart: Euclide vs Nasional */}
@@ -178,6 +183,12 @@ export default function TentorAnalyticsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex justify-end">
+            <span className="text-[10px] text-slate-400 italic">
+              *Data ilustrasi — perhitungan aktual akan disesuaikan skala data riil bimbel.
+            </span>
           </div>
         </div>
       </div>
