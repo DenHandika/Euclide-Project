@@ -311,9 +311,9 @@ export default function CBTExamPlayerPage() {
         <div className="flex items-center space-x-2">
           <div
             className={`flex items-center space-x-1.5 px-3 py-1 border transition-colors ${
-              timerSeconds <= 120
+              timerSeconds <= 60
                 ? 'bg-[#FBEBEA] border-[#D0342C] text-[#D0342C] animate-pulse font-bold'
-                : timerSeconds <= 600
+                : timerSeconds <= 300
                 ? 'bg-[#FDF3E3] border-[#EFA93B] text-[#C8831A] font-bold'
                 : 'bg-[#FAFAF7] border-[#13224E] text-[#13224E] font-semibold'
             }`}

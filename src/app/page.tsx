@@ -45,9 +45,9 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left: Value Proposition */}
             <div className="lg:col-span-5 space-y-5">
-              <div className="inline-flex items-center space-x-2 text-xs font-mono text-[#1B3B8C] border-b border-[#1B3B8C]/40 pb-1 mb-1">
+              <div className="inline-flex items-center space-x-2 px-2.5 py-1 bg-[#FAFAF7] border border-[#13224E] text-[10px] font-mono text-[#13224E] uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#1B8A5A]" />
-                <span>Naskah Simulasi UTBK-SNBT • Standar IRT 2026</span>
+                <span>NASKAH CBT TERSTANDARISASI SNBT 2026</span>
               </div>
 
               <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#13224E] leading-[1.18]">
@@ -256,8 +256,8 @@ export default function LandingPage() {
                   Portal Peserta Ujian & Rasionalisasi SNBT
                 </h3>
               </div>
-              <span className="font-mono text-[11px] text-[#1B8A5A] font-semibold bg-[#EAF7F0] px-2.5 py-0.5 border border-[#1B8A5A]/30">
-                Modul Utama Siswa
+              <span className="font-mono text-[10px] text-[#1B8A5A] font-bold bg-[#EAF7F0] px-2 py-0.5 border border-[#1B8A5A]/30">
+                MODUL UTAMA SISWA
               </span>
             </div>
 
@@ -382,8 +382,8 @@ export default function LandingPage() {
               href="/tryouts"
               className="text-xs font-mono font-medium text-[#1B3B8C] hover:underline flex items-center space-x-1"
             >
-              <span>Lihat Semua ({tryouts.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>LIHAT SEMUA ({tryouts.length})</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
