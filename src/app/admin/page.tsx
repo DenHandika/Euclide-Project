@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-2 text-xs text-emerald-600 font-semibold flex items-center space-x-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Beban Server Stabil (0.05s)</span>
+              <span>Sesi Ujian Aktif Lancar</span>
             </div>
           </div>
 

@@ -233,15 +233,15 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="text-2xl sm:text-3xl font-extrabold text-blue-600">7 Subtest</div>
-              <div className="text-xs text-slate-500 mt-0.5">Format Resmi UTBK-SNBT</div>
+              <div className="text-xs text-slate-500 mt-0.5">Format Standar SNBT</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600">0.05s</div>
-              <div className="text-xs text-slate-500 mt-0.5">Latensi Render KaTeX</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600">4 Format</div>
+              <div className="text-xs text-slate-500 mt-0.5">OMR, Ceklis, Isian & Esai</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-500">99.9%</div>
-              <div className="text-xs text-slate-500 mt-0.5">Reliabilitas Sesi Ujian</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-amber-500">2 Pilihan</div>
+              <div className="text-xs text-slate-500 mt-0.5">Rasionalisasi Kuota PTN</div>
             </div>
           </div>
         </div>

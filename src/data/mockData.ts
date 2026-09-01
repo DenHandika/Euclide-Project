@@ -326,12 +326,12 @@ export const MOCK_TRYOUTS: Tryout[] = [
     id: 'to-utbk-national-01',
     code: 'EUC-SNBT-2026-N01',
     title: 'Simulasi Akbar UTBK-SNBT 2026 Seri 1 (Grand Tryout)',
-    description: 'Format resmi SNBT BPPP terbaru dengan 7 Subtest lengkap, IRT scoring, dan rasionalisasi peluang PTN otomatis.',
+    description: 'Format resmi SNBT BPPP terbaru dengan 7 Subtest lengkap, Skor Tertimbang Subtest, dan rasionalisasi peluang PTN otomatis.',
     totalDurationMinutes: 195,
     totalQuestions: 160,
     badge: 'Official Grand TO',
     targetDate: '15 Maret 2026',
-    participantsCount: 4820,
+    participantsCount: 642,
     averageScore: 684.5,
     subtests: SUBTEST_CONFIGS,
     questions: MOCK_QUESTIONS,
@@ -345,7 +345,7 @@ export const MOCK_TRYOUTS: Tryout[] = [
     totalQuestions: 40,
     badge: 'Spesialis Kuantitatif',
     targetDate: 'Tersedia Sekarang',
-    participantsCount: 1940,
+    participantsCount: 580,
     averageScore: 642.0,
     subtests: [
       SUBTEST_CONFIGS[1], // PK
@@ -362,7 +362,7 @@ export const MOCK_TRYOUTS: Tryout[] = [
     totalQuestions: 50,
     badge: 'Literasi Unggulan',
     targetDate: 'Tersedia Sekarang',
-    participantsCount: 1210,
+    participantsCount: 495,
     averageScore: 710.2,
     subtests: [
       SUBTEST_CONFIGS[4], // Lit Indo

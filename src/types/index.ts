@@ -115,7 +115,7 @@ export interface ExamSession {
 export interface SubtestScoreResult {
   subtestId: SubtestId;
   subtestName: string;
-  score: number; // 0 - 1000 standard UTBK IRT
+  score: number; // 0 - 1000 standard skor tertimbang UTBK
   maxPossibleScore: number;
   correctCount: number;
   incorrectCount: number;

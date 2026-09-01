@@ -109,7 +109,7 @@ export function Footer() {
               </li>
               <li>
                 <span className="text-white font-medium block">Kedokteran Priority</span>
-                <span className="text-[11px] text-slate-500">Target Passing Grade 740+</span>
+                <span className="text-[11px] text-slate-500">Target Passing Grade 740+ (Contoh Target Referensi FK UI)</span>
               </li>
               <li>
                 <span className="text-white font-medium block">Drilling Kuantitatif & MTK</span>
