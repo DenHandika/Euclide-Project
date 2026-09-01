@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import MathRenderer from '@/components/common/MathRenderer';
 import {
-  ResponsiveContainer,
+  Radar,
   RadarChart,
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  Radar,
+  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
@@ -19,48 +19,36 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import confetti from 'canvas-confetti';
 import {
+  Award,
+  BookOpen,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
+  XCircle,
+  HelpCircle,
+  TrendingUp,
   RotateCcw,
-  Target,
   ArrowRight,
+  Sparkles,
+  User,
+  GraduationCap,
+  FileCheck2,
+  Layers,
+  Percent,
 } from 'lucide-react';
 
 export default function ExamResultPage() {
   const params = useParams();
   const tryoutId = (params?.id as string) || 'to-utbk-national-01';
   const { getExamResult, tryouts } = useApp();
+  const [filterReview, setFilterReview] = useState<'all' | 'math' | 'wrong'>('all');
 
   const result = getExamResult(tryoutId);
   const tryout = tryouts.find((t) => t.id === tryoutId) || tryouts[0];
 
-  const [filterReview, setFilterReview] = useState<'all' | 'math'>('all');
-  const [expandedSolutions, setExpandedSolutions] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    try {
-      confetti({
-        particleCount: 60,
-        spread: 60,
-        origin: { y: 0.6 },
-      });
-    } catch (e) {}
-  }, []);
-
-  const toggleExpand = (qId: string) => {
-    setExpandedSolutions((prev) => ({
-      ...prev,
-      [qId]: !prev[qId],
-    }));
-  };
-
   const radarData = result.subtestResults.map((st) => ({
     subject: st.subtestName.replace('Penalaran', 'Pen.').replace('Pengetahuan', 'Peng.'),
     skorSiswa: st.score,
-    rataNasional: st.nationalAverage,
+    rataAngkatan: st.nationalAverage,
     fullMark: 1000,
   }));
 
@@ -70,37 +58,35 @@ export default function ExamResultPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* 1. Official Examination Evaluation Sheet Header */}
-        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E4E4DC] pb-4">
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <span className="w-2.5 h-2.5 bg-[#13224E]" />
-                <span className="font-mono text-xs font-bold uppercase text-[#13224E]">
-                  LEMBAR HASIL UJIAN CBT & EVALUASI RASIONALISASI PTN
-                </span>
+    <div className="min-h-screen bg-[#F8FAFC] py-10 font-sans text-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* 1. Official Evaluation Header Card */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 bg-blue-50 border border-blue-200/80 rounded-full text-xs font-semibold text-blue-700">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Lembar Hasil Ujian CBT & Evaluasi Rasionalisasi PTN</span>
               </div>
-              <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
                 {result.tryoutTitle}
               </h1>
-              <p className="text-xs font-mono text-[#637096]">
-                Peserta: <strong className="text-[#13224E]">{result.userName}</strong> • Tanggal Uji: {result.date} • Model: Item Response Theory (IRT)
+              <p className="text-xs text-slate-500 font-mono">
+                Peserta: <strong className="text-slate-800">{result.userName}</strong> • Tanggal Uji: {result.date} • Metodologi: Skor Tertimbang Subtest UTBK
               </p>
             </div>
 
-            <div className="flex items-center space-x-2 font-mono text-xs">
+            <div className="flex items-center space-x-2 text-xs font-bold">
               <Link
                 href={`/exam/${tryoutId}`}
-                className="inline-flex items-center space-x-1 bg-[#FAFAF7] hover:bg-[#F3F3ED] text-[#13224E] px-3 py-2 border border-[#CECEC2] transition"
+                className="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-4 py-2.5 rounded-xl transition"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Ulangi Ujian</span>
               </Link>
               <Link
                 href="/tryouts"
-                className="inline-flex items-center space-x-1 bg-[#1B3B8C] hover:bg-[#274DB8] text-white px-3.5 py-2 transition"
+                className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4.5 py-2.5 rounded-xl shadow-xs transition"
               >
                 <span>Katalog Tryout</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -109,208 +95,203 @@ export default function ExamResultPage() {
           </div>
 
           {/* 2. Key Score Cards Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
-            <div className="bg-[#FAFAF7] border border-[#E4E4DC] p-4 font-mono">
-              <span className="text-[10px] uppercase text-[#637096] block mb-1">
-                Rata-rata Skor UTBK
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-slate-50 p-5 rounded-xl border border-slate-200/70">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                Rata-rata Skor Tertimbang
               </span>
               <div className="flex items-baseline space-x-1.5">
-                <span className="text-3xl font-bold text-[#13224E]">
+                <span className="text-3xl font-extrabold text-slate-900">
                   {result.totalScore}
                 </span>
-                <span className="text-xs text-[#9EABC7]">/ 1000</span>
+                <span className="text-xs text-slate-400 font-mono">/ 1000</span>
               </div>
-              <div className="mt-1 text-[11px] text-[#1B8A5A] font-semibold">
-                +138.5 di atas rerata nasional
+              <div className="mt-1 text-xs text-emerald-600 font-bold">
+                +138.5 di atas rata-rata angkatan
               </div>
             </div>
 
-            <div className="bg-[#FAFAF7] border border-[#E4E4DC] p-4 font-mono">
-              <span className="text-[10px] uppercase text-[#637096] block mb-1">
-                Persentil Nasional
+            <div className="bg-slate-50 p-5 rounded-xl border border-slate-200/70">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                Peringkat Internal Bimbel
               </span>
               <div className="flex items-baseline space-x-1.5">
-                <span className="text-3xl font-bold text-[#C8831A]">
+                <span className="text-3xl font-extrabold text-amber-600">
                   {result.percentileRank}%
                 </span>
-                <span className="text-xs text-[#9EABC7]">Top Tier</span>
+                <span className="text-xs text-slate-400 font-mono">Top Tier</span>
               </div>
-              <p className="mt-1 text-[11px] text-[#637096]">
-                Desil atas peserta se-Indonesia
+              <p className="mt-1 text-xs text-slate-600">
+                Top 5% dari 650 siswa angkatan
               </p>
             </div>
 
-            <div className="bg-[#FAFAF7] border border-[#E4E4DC] p-4 font-mono">
-              <span className="text-[10px] uppercase text-[#637096] block mb-1">
-                Akurasi Jawaban
+            <div className="bg-slate-50 p-5 rounded-xl border border-slate-200/70">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                Akurasi Jawaban Benar
               </span>
               <div className="flex items-baseline space-x-1.5">
-                <span className="text-3xl font-bold text-[#1B3B8C]">
-                  {Math.round((result.totalCorrect / (result.totalCorrect + result.totalIncorrect + result.totalUnanswered)) * 100)}%
+                <span className="text-3xl font-extrabold text-blue-600">
+                  {result.totalCorrect}
                 </span>
+                <span className="text-xs text-slate-400 font-mono">/ 20 Butir</span>
               </div>
-              <div className="mt-1 text-[11px] text-[#637096]">
-                <span className="text-[#1B8A5A] font-semibold">{result.totalCorrect} Benar</span> •{' '}
-                <span className="text-[#D0342C] font-semibold">{result.totalIncorrect} Salah</span>
-              </div>
+              <p className="mt-1 text-xs text-slate-600">
+                {result.totalIncorrect} Salah • {result.totalUnanswered} Kosong
+              </p>
             </div>
 
-            <div className="bg-[#FAFAF7] border border-[#E4E4DC] p-4 font-mono">
-              <span className="text-[10px] uppercase text-[#637096] block mb-1">
-                Status Rasionalisasi
+            <div className="bg-slate-50 p-5 rounded-xl border border-slate-200/70">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                Peluang Lolos Pilihan 1
               </span>
-              <div className="mt-1">
-                <span className="inline-flex items-center space-x-1 px-2 py-0.5 text-xs font-bold bg-[#EAF7F0] text-[#126340] border border-[#1B8A5A]/30">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Pilihan 1 AMAN (UI)</span>
+              <div className="flex items-baseline space-x-1.5">
+                <span className="text-3xl font-extrabold text-emerald-600">
+                  88.5%
+                </span>
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full ml-1">
+                  Lolos
                 </span>
               </div>
-              <p className="mt-1 text-[10px] text-[#637096]">
-                Pilihan 2 STEI ITB Kompetitif
+              <p className="mt-1 text-xs text-slate-600">
+                Passing grade FK UI terlampaui
               </p>
             </div>
           </div>
-          <p className="text-[10px] text-[#9EABC7] italic mt-2 text-right font-mono">
-            *Data ilustrasi — perhitungan aktual akan disesuaikan skala data riil bimbel.
-          </p>
         </div>
 
-        {/* 3. Target PTN Rationalization Cards */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-5">
-          <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
-            <div>
-              <h2 className="font-serif text-lg font-bold text-[#13224E]">
-                Rasionalisasi Peluang Target PTN SNBT
-              </h2>
-              <p className="text-xs text-[#637096]">
-                Perbandingan skor capaian dengan ambang batas historis dan daya tampung SNBT.
-              </p>
+        {/* 3. Rasionalisasi Kelulusan PTN (Sesuai PRD: Lolos / Mendekati / Perlu Ditingkatkan) */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-5">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                <GraduationCap className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">
+                  Rasionalisasi Peluang Lolos PTN Impian
+                </h3>
+                <p className="text-xs text-slate-500">Perbandingan skor capaian tryout terhadap batas passing grade jurusan</p>
+              </div>
             </div>
-            <Target className="w-5 h-5 text-[#1B3B8C]" />
+            <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
+              Pilihan SNBT
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {result.ptnTargets.map((target, idx) => {
-              const isAman = target.status === 'aman';
-              const isKompetitif = target.status === 'kompetitif';
+              const isLolos = target.userScore >= target.targetScore;
+              const isMendekati = target.userScore >= target.targetScore - 35 && !isLolos;
+              const statusLabel = isLolos ? 'Lolos' : isMendekati ? 'Mendekati' : 'Perlu Ditingkatkan';
 
               return (
                 <div
                   key={idx}
-                  className={`p-4 border transition-all ${
-                    isAman
-                      ? 'border-[#1B8A5A] bg-[#FAFAF7]'
-                      : isKompetitif
-                      ? 'border-[#EFA93B] bg-[#FAFAF7]'
-                      : 'border-[#D0342C] bg-[#FAFAF7]'
+                  className={`p-5 rounded-xl border transition-all ${
+                    isLolos
+                      ? 'bg-emerald-50/40 border-emerald-200'
+                      : isMendekati
+                      ? 'bg-amber-50/40 border-amber-200'
+                      : 'bg-rose-50/40 border-rose-200'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2 font-mono text-[10px]">
-                    <span className="border border-[#CECEC2] bg-[#FFFFFF] px-1.5 py-0.5 font-semibold text-[#13224E]">
-                      PIL #{idx + 1}
-                    </span>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        PILIHAN KE-{idx + 1}
+                      </span>
+                      <h4 className="text-base font-bold text-slate-900">
+                        {target.ptnName}
+                      </h4>
+                      <p className="text-xs text-blue-700 font-semibold">{target.prodiName}</p>
+                    </div>
+
                     <span
-                      className={`font-bold px-2 py-0.5 ${
-                        isAman
-                          ? 'bg-[#EAF7F0] text-[#126340] border border-[#1B8A5A]/30'
-                          : isKompetitif
-                          ? 'bg-[#FDF3E3] text-[#C8831A] border border-[#EFA93B]/40'
-                          : 'bg-[#FDECEB] text-[#A6211A] border border-[#D0342C]/30'
+                      className={`text-xs font-bold px-3 py-1 rounded-full ${
+                        isLolos
+                          ? 'bg-emerald-600 text-white'
+                          : isMendekati
+                          ? 'bg-amber-500 text-slate-950 font-bold'
+                          : 'bg-rose-600 text-white'
                       }`}
                     >
-                      {isAman ? '🟢 Zona Aman (Lolos)' : isKompetitif ? '🟡 Zona Kompetitif' : '🔴 Zona Kritis'}
+                      {statusLabel}
                     </span>
                   </div>
 
-                  <h3 className="font-serif font-bold text-base text-[#13224E] leading-snug">
-                    {target.ptnName}
-                  </h3>
-                  <div className="text-xs font-medium text-[#1B3B8C] mb-3">{target.prodiName}</div>
-
-                  {/* Target vs User Score Box */}
-                  <div className="space-y-1 bg-[#FFFFFF] p-2.5 border border-[#E4E4DC] mb-3 font-mono text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-[#637096]">Skor Anda:</span>
-                      <span className="font-bold text-[#13224E]">{target.userScore}</span>
+                  <div className="grid grid-cols-3 gap-2 text-xs bg-white p-3 rounded-lg border border-slate-200/70 mb-3 text-center">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-mono">Skor Anda</span>
+                      <strong className="text-slate-900">{target.userScore}</strong>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#637096]">Target Passing:</span>
-                      <span className="text-[#13224E]">{target.targetScore}</span>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-mono">Target Skor</span>
+                      <strong className="text-slate-900">{target.targetScore}</strong>
                     </div>
-                    <div className="flex justify-between pt-1 border-t border-[#E4E4DC]">
-                      <span className="text-[#637096]">Margin:</span>
-                      <span
-                        className={`font-bold ${
-                          target.difference >= 0 ? 'text-[#1B8A5A]' : 'text-[#C8831A]'
-                        }`}
-                      >
-                        {target.difference >= 0 ? `+${target.difference}` : target.difference} Poin
-                      </span>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-mono">Selisih</span>
+                      <strong className={target.difference >= 0 ? 'text-emerald-600' : 'text-rose-600'}>
+                        {target.difference >= 0 ? `+${target.difference}` : target.difference}
+                      </strong>
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#637096] leading-relaxed mb-3">{target.advice}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed mb-3">{target.advice}</p>
 
-                  <div className="pt-2 border-t border-[#E4E4DC] flex items-center justify-between font-mono text-[10px] text-[#637096]">
-                    <span>Peluang: <strong className="text-[#13224E]">{target.chancePercentage}%</strong></span>
-                    <span>Kuota: <strong className="text-[#13224E]">{target.acceptanceQuota} Kursi</strong></span>
+                  <div className="pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
+                    <span>Estimasi Peluang: <strong className="text-slate-800">{target.chancePercentage}%</strong></span>
+                    <span>Daya Tampung: <strong className="text-slate-800">{target.acceptanceQuota} Kursi</strong></span>
                   </div>
                 </div>
               );
             })}
           </div>
-
-          <div className="pt-2 border-t border-[#E4E4DC] flex justify-end">
-            <span className="text-[10px] font-mono text-[#9EABC7] italic">
-              *Data ilustrasi — perhitungan aktual akan disesuaikan skala data riil bimbel.
-            </span>
-          </div>
         </div>
 
-        {/* 4. Recharts Visualizations: Radar Chart & Subtest Distribution */}
+        {/* 4. Visualizations: Radar Chart & Subtest Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Radar Chart: 7 Subtest Performance */}
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-3">
-            <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
+          {/* Radar Chart */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-card">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-serif font-bold text-base text-[#13224E]">
+                <h3 className="text-base font-bold text-slate-900">
                   Radar Kompetensi 7 Subtest UTBK
                 </h3>
-                <p className="text-xs text-[#637096]">Skor Siswa vs Rata-rata Nasional BPPP</p>
+                <p className="text-xs text-slate-500">Skor Siswa vs Rata-rata Angkatan Euclide</p>
               </div>
-              <span className="font-mono text-[9px] text-[#1B3B8C] bg-[#FAFAF7] border border-[#E4E4DC] px-2 py-0.5">
-                IRT NORMALIZED
+              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">
+                7 SUBTEST
               </span>
             </div>
 
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="70%">
-                  <PolarGrid stroke="#E4E4DC" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#13224E', fontSize: 10, fontFamily: 'Work Sans' }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 1000]} stroke="#CECEC2" />
+                  <PolarGrid stroke="#E2E8F0" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#334155', fontSize: 10 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 1000]} stroke="#CBD5E1" />
                   <Radar
                     name="Skor Anda"
                     dataKey="skorSiswa"
-                    stroke="#1B3B8C"
-                    fill="#1B3B8C"
-                    fillOpacity={0.35}
+                    stroke="#2563EB"
+                    fill="#3B82F6"
+                    fillOpacity={0.4}
                   />
                   <Radar
-                    name="Rerata Nasional"
-                    dataKey="rataNasional"
-                    stroke="#EFA93B"
-                    fill="#EFA93B"
+                    name="Rerata Angkatan"
+                    dataKey="rataAngkatan"
+                    stroke="#F59E0B"
+                    fill="#F59E0B"
                     fillOpacity={0.2}
                   />
-                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', fontFamily: 'Work Sans' }} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#13224E',
+                      backgroundColor: '#0F172A',
                       color: '#FFFFFF',
-                      borderRadius: '0px',
+                      borderRadius: '8px',
                       fontSize: '11px',
-                      fontFamily: 'JetBrains Mono',
                     }}
                   />
                 </RadarChart>
@@ -318,17 +299,17 @@ export default function ExamResultPage() {
             </div>
           </div>
 
-          {/* Bar Chart: Subtest Score Details */}
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-3">
-            <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
+          {/* Bar Chart */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-card">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-serif font-bold text-base text-[#13224E]">
+                <h3 className="text-base font-bold text-slate-900">
                   Distribusi Nilai Per Subtest
                 </h3>
-                <p className="text-xs text-[#637096]">Rincian pencapaian skor per bidang</p>
+                <p className="text-xs text-slate-500">Rincian pencapaian skor per bidang studi</p>
               </div>
-              <span className="font-mono text-[9px] text-[#13224E] bg-[#FAFAF7] border border-[#E4E4DC] px-2 py-0.5">
-                7 SUBTEST
+              <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
+                SKOR CAPAIAN
               </span>
             </div>
 
@@ -337,160 +318,143 @@ export default function ExamResultPage() {
                 <BarChart data={radarData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                   <XAxis
                     dataKey="subject"
-                    tick={{ fill: '#637096', fontSize: 9, fontFamily: 'Work Sans' }}
+                    tick={{ fill: '#64748B', fontSize: 9 }}
                     angle={-25}
                     textAnchor="end"
                   />
-                  <YAxis domain={[0, 1000]} tick={{ fill: '#637096', fontSize: 10, fontFamily: 'JetBrains Mono' }} />
+                  <YAxis domain={[0, 1000]} tick={{ fill: '#64748B', fontSize: 10 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#13224E',
+                      backgroundColor: '#0F172A',
                       color: '#FFFFFF',
-                      borderRadius: '0px',
+                      borderRadius: '8px',
                       fontSize: '11px',
-                      fontFamily: 'JetBrains Mono',
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: '11px', fontFamily: 'Work Sans' }} />
-                  <Bar dataKey="skorSiswa" name="Skor Anda" fill="#1B3B8C" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="rataNasional" name="Rerata Nasional" fill="#CECEC2" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="skorSiswa" name="Skor Anda" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="rataAngkatan" name="Rata-rata Angkatan" fill="#CBD5E1" radius={[4, 4, 0, 0]} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
         </div>
 
-        {/* 5. Tentor Strategy Notes (Ruled Sheet Style) */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-4">
-          <div className="flex items-center space-x-3 pb-3 border-b border-[#E4E4DC]">
-            <img
-              src={result.tentorFeedback.avatar}
-              alt="Tentor"
-              className="w-10 h-10 object-cover border border-[#13224E]"
-            />
+        {/* 5. Tentor Qualitative Feedback Card */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-4">
+          <div className="flex items-center space-x-3 border-b border-slate-100 pb-4">
+            <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+              DT
+            </div>
             <div>
-              <h3 className="font-serif font-bold text-base text-[#13224E]">{result.tentorFeedback.evaluator}</h3>
-              <p className="text-xs text-[#637096]">Ulasan Strategis & Catatan Tindak Lanjut Akademik</p>
+              <h3 className="text-base font-bold text-slate-900">
+                Catatan Evaluasi & Rencana Aksi Tentor
+              </h3>
+              <p className="text-xs text-slate-500">
+                Evaluator: <strong className="text-slate-800">{result.tentorFeedback.evaluator}</strong> • Pembimbing Spesialis UTBK
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-3.5 bg-[#FAFAF7] border border-[#E4E4DC]">
-              <span className="font-mono text-[9px] uppercase font-bold text-[#1B3B8C] block mb-1">
-                Kekuatan Utama:
-              </span>
-              <p className="text-xs text-[#13224E] leading-relaxed">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            <div className="p-4 bg-emerald-50/50 rounded-xl border border-emerald-200/70 space-y-1">
+              <div className="text-xs font-bold text-emerald-800 flex items-center space-x-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Kekuatan Utama Siswa:</span>
+              </div>
+              <p className="text-xs text-slate-700 leading-relaxed">
                 {result.tentorFeedback.strengths}
               </p>
             </div>
 
-            <div className="p-3.5 bg-[#FAFAF7] border border-[#E4E4DC]">
-              <span className="font-mono text-[9px] uppercase font-bold text-[#C8831A] block mb-1">
-                Aspek Ditingkatkan:
-              </span>
-              <p className="text-xs text-[#13224E] leading-relaxed">
+            <div className="p-4 bg-amber-50/50 rounded-xl border border-amber-200/70 space-y-1">
+              <div className="text-xs font-bold text-amber-800 flex items-center space-x-1.5">
+                <TrendingUp className="w-4 h-4 text-amber-600" />
+                <span>Area Perlu Peningkatan:</span>
+              </div>
+              <p className="text-xs text-slate-700 leading-relaxed">
                 {result.tentorFeedback.weaknesses}
               </p>
             </div>
+          </div>
 
-            <div className="p-3.5 bg-[#FAFAF7] border border-[#E4E4DC]">
-              <span className="font-mono text-[9px] uppercase font-bold text-[#1B8A5A] block mb-1">
-                Rencana Aksi 2 Pekan:
-              </span>
-              <p className="text-xs text-[#13224E] leading-relaxed">
-                {result.tentorFeedback.strategicActionPlan}
-              </p>
+          <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-200/70">
+            <div className="text-xs font-bold text-blue-900 mb-1">
+              Rekomendasi Strategis Sesi Bimbingan Berikutnya:
             </div>
+            <p className="text-xs text-slate-700 leading-relaxed">
+              {result.tentorFeedback.strategicActionPlan}
+            </p>
           </div>
         </div>
 
-        {/* 6. Detailed KaTeX Solutions */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E4DC] pb-3">
+        {/* 6. Question Review List with KaTeX Explanations */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
-              <h2 className="font-serif text-lg font-bold text-[#13224E]">
-                Pembahasan & Langkah KaTeX Lengkap
-              </h2>
-              <p className="text-xs text-[#637096]">
-                Pelajari metode penyelesaian cepat untuk butir soal pada simulasi berikutnya.
-              </p>
+              <h3 className="text-lg font-bold text-slate-900">
+                Pembahasan Lengkap & Kunci Jawaban
+              </h3>
+              <p className="text-xs text-slate-500">Telaah langkah pengerjaan dan pembahasan KaTeX per butir soal</p>
             </div>
 
-            <div className="flex items-center space-x-2 font-mono text-xs">
-              <button
-                onClick={() => setFilterReview('all')}
-                className={`px-2.5 py-1 border ${
-                  filterReview === 'all'
-                    ? 'bg-[#13224E] text-white border-[#13224E]'
-                    : 'bg-[#FAFAF7] text-[#637096] border-[#CECEC2]'
-                }`}
-              >
-                Semua Soal
-              </button>
-              <button
-                onClick={() => setFilterReview('math')}
-                className={`px-2.5 py-1 border ${
-                  filterReview === 'math'
-                    ? 'bg-[#13224E] text-white border-[#13224E]'
-                    : 'bg-[#FAFAF7] text-[#637096] border-[#CECEC2]'
-                }`}
-              >
-                Kuantitatif & MTK
-              </button>
+            <div className="flex items-center space-x-2 text-xs">
+              {[
+                { id: 'all', label: `Semua (${reviewQuestions.length})` },
+                { id: 'math', label: 'Matematika & Kuantitatif' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setFilterReview(tab.id as any)}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition ${
+                    filterReview === tab.id
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="space-y-3">
-            {reviewQuestions.map((q, idx) => {
-              const isExpanded = !!expandedSolutions[q.id];
-
-              return (
-                <div
-                  key={q.id}
-                  className="border border-[#E4E4DC] bg-[#FAFAF7] p-4 space-y-2.5"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center space-x-2 font-mono text-xs">
-                        <span className="font-bold text-[#13224E]">
-                          SOAL #{q.number || idx + 1}
-                        </span>
-                        <span className="text-[#637096] capitalize">
-                          [{q.subtestId.replace(/_/g, ' ')}]
-                        </span>
-                      </div>
-                      <div className="text-sm font-serif font-semibold text-[#13224E] pt-0.5">
-                        <MathRenderer content={q.question} />
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => toggleExpand(q.id)}
-                      className="inline-flex items-center space-x-1 text-xs font-mono font-medium text-[#1B3B8C] bg-[#FFFFFF] px-2.5 py-1 border border-[#CECEC2] shrink-0"
-                    >
-                      <span>{isExpanded ? 'Tutup Solusi' : 'Lihat Solusi'}</span>
-                      {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                    </button>
+          <div className="space-y-4">
+            {reviewQuestions.map((q, idx) => (
+              <div
+                key={q.id}
+                className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center font-mono font-bold text-xs">
+                      {idx + 1}
+                    </span>
+                    <span className="text-xs font-bold text-slate-800">
+                      Soal #{idx + 1} • {q.subtestId.replace(/_/g, ' ').toUpperCase()}
+                    </span>
                   </div>
 
-                  {isExpanded && (
-                    <div className="mt-2 p-3.5 bg-[#FFFFFF] border border-[#1B3B8C] text-xs text-[#13224E] space-y-2 animate-in fade-in">
-                      <div className="flex items-center justify-between pb-1.5 border-b border-[#E4E4DC] font-mono">
-                        <span className="font-bold text-[#1B8A5A]">
-                          Kunci: {Array.isArray(q.correctAnswer) ? q.correctAnswer.join(', ') : q.correctAnswer}
-                        </span>
-                        <span className="text-[#637096]">
-                          Bobot IRT: {q.maxScore} Poin
-                        </span>
-                      </div>
-                      <div className="leading-relaxed">
-                        <MathRenderer content={q.explanation} />
-                      </div>
-                    </div>
-                  )}
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">
+                    Kunci: {Array.isArray(q.correctAnswer) ? q.correctAnswer.join(', ') : q.correctAnswer}
+                  </span>
                 </div>
-              );
-            })}
+
+                <div className="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed">
+                  <MathRenderer content={q.question} />
+                </div>
+
+                {q.explanation && (
+                  <div className="p-3.5 bg-white rounded-lg border border-slate-200 space-y-1.5 text-xs">
+                    <span className="font-bold text-blue-700 block">
+                      Pembahasan Langkah Pengerjaan:
+                    </span>
+                    <div className="text-slate-700 leading-relaxed font-sans">
+                      <MathRenderer content={q.explanation} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>

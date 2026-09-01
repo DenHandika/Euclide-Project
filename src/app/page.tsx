@@ -13,6 +13,10 @@ import {
   Clock,
   Bookmark,
   CheckCircle2,
+  Sparkles,
+  Zap,
+  GraduationCap,
+  Users,
 } from 'lucide-react';
 import MathRenderer from '@/components/common/MathRenderer';
 
@@ -38,128 +42,116 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] font-sans text-[#13224E]">
-      {/* 1. Hero Section: Direct Live Exam Paper Preview */}
-      <section className="relative pt-10 pb-16 lg:pt-14 lg:pb-20 border-b border-[#E4E4DC] bg-[#FFFFFF]">
+    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 selection:bg-amber-100 selection:text-slate-900">
+      {/* 1. Hero Section: Modern, Impactful, Interactive EdTech Workspace */}
+      <section className="relative pt-12 pb-20 lg:pt-16 lg:pb-24 border-b border-slate-200/80 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left: Value Proposition */}
-            <div className="lg:col-span-5 space-y-5">
-              <div className="inline-flex items-center space-x-2 px-2.5 py-1 bg-[#FAFAF7] border border-[#13224E] text-[10px] font-mono text-[#13224E] uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1B8A5A]" />
-                <span>NASKAH CBT TERSTANDARISASI SNBT 2026</span>
+            <div className="lg:col-span-6 space-y-6">
+              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 bg-blue-50 border border-blue-200/80 rounded-full text-xs font-semibold text-blue-700 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Simulasi Standar SNBT 2026</span>
               </div>
 
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#13224E] leading-[1.18]">
-                Sistem CBT Tryout & Bimbingan Belajar{' '}
-                <span className="stabilo">Presisi Tinggi</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
+                Platform CBT Tryout & Manajemen Bimbel{' '}
+                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Terintegrasi
+                </span>
               </h1>
 
-              <p className="text-[#637096] text-sm sm:text-base leading-relaxed font-sans">
-                Dirancang khusus untuk simulasi UTBK-SNBT dengan formula matematika KaTeX bebas latensi, lembar jawaban OMR, dan kalkulasi rasionalisasi peluang PTN.
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl">
+                Sistem ujian berbasis komputer resmi dengan formula matematika KaTeX bebas latensi, navigasi lembar OMR cerdas, analitik rasionalisasi PTN, dan modul kasir SPP otomatis.
               </p>
 
-              {/* Key Highlights with OMR bullet points */}
-              <div className="space-y-2.5 pt-1">
-                <div className="flex items-start space-x-3">
-                  <span className="w-5 h-5 rounded-full bg-[#1B3B8C] text-white flex items-center justify-center text-[10px] font-mono font-bold shrink-0 mt-0.5">
-                    A
-                  </span>
-                  <span className="text-xs text-[#13224E] leading-snug">
-                    <strong>Player CBT Mobile-First:</strong> 4 format soal, timer otomatis per subtest, dan anti-cheat.
-                  </span>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <span className="w-5 h-5 rounded-full bg-[#1B3B8C] text-white flex items-center justify-center text-[10px] font-mono font-bold shrink-0 mt-0.5">
-                    B
-                  </span>
-                  <span className="text-xs text-[#13224E] leading-snug">
-                    <strong>Rasionalisasi Daya Saing:</strong> Pemetaan skor ke Passing Grade & kuota PTN Pilihan 1 & 2.
-                  </span>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <span className="w-5 h-5 rounded-full bg-[#1B3B8C] text-white flex items-center justify-center text-[10px] font-mono font-bold shrink-0 mt-0.5">
-                    C
-                  </span>
-                  <span className="text-xs text-[#13224E] leading-snug">
-                    <strong>Buku Kas & Import Excel:</strong> Rekonsiliasi SPP massal dengan file spreadsheet .xlsx.
-                  </span>
-                </div>
-              </div>
-
               {/* Action Buttons */}
-              <div className="pt-3 flex flex-col sm:flex-row items-center gap-3">
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-3.5">
                 <Link
                   href="/exam/to-utbk-national-01"
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-[#1B3B8C] hover:bg-[#274DB8] text-white text-xs font-medium px-5 py-3 border border-[#13224E] transition"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition"
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>Uji Coba CBT Lengkap</span>
                 </Link>
                 <Link
                   href="/tryouts"
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-[#FAFAF7] hover:bg-[#F3F3ED] text-[#13224E] border border-[#CECEC2] text-xs font-medium px-5 py-3 transition"
+                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-800 text-sm font-semibold px-5 py-3.5 rounded-xl transition"
                 >
-                  <span>Lihat Katalog Soal</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Katalog Paket Soal</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
+              </div>
+
+              {/* Micro Trust Indicators */}
+              <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-slate-500 border-t border-slate-100">
+                <div className="flex items-center space-x-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Anti-Curang Screen Lock</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Editor Rumus KaTeX Visual</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Import Excel SPP & Siswa</span>
+                </div>
               </div>
             </div>
 
-            {/* Right: Live Interactive CBT Exam Worksheet (Show Product Directly) */}
-            <div className="lg:col-span-7">
-              <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-5 sm:p-6 space-y-4">
-                {/* Worksheet Header Strip */}
-                <div className="flex items-center justify-between pb-3 border-b border-[#E4E4DC]">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-6 h-6 bg-[#13224E] text-white flex items-center justify-center font-mono font-bold text-xs">
+            {/* Right: Live Interactive CBT Exam Worksheet Preview */}
+            <div className="lg:col-span-6">
+              <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 shadow-card hover:shadow-card-hover transition-all duration-300">
+                {/* Worksheet Top Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                  <div className="flex items-center space-x-3">
+                    <span className="w-7 h-7 bg-slate-900 text-white rounded-lg flex items-center justify-center font-mono font-bold text-xs">
                       4
                     </span>
                     <div>
-                      <div className="text-xs font-serif font-bold text-[#13224E]">
+                      <div className="text-xs font-bold text-slate-900">
                         {heroQuestion.subtest}
                       </div>
-                      <div className="text-[10px] font-mono text-[#637096]">
-                        SOAL 04 DARI 20 • FORMAT PILIHAN GANDA (OMR)
+                      <div className="text-[11px] text-slate-500 font-mono">
+                        SOAL 04 DARI 20 • PILIHAN GANDA (OMR)
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1 px-2 py-0.5 bg-[#FAFAF7] border border-[#13224E] font-mono text-xs font-bold text-[#13224E]">
-                      <Clock className="w-3 h-3 text-[#1B3B8C]" />
+                    <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-100 rounded-lg font-mono text-xs font-bold text-slate-800">
+                      <Clock className="w-3.5 h-3.5 text-blue-600" />
                       <span>{heroQuestion.timeRemaining}</span>
                     </div>
 
                     <button
                       onClick={() => setHeroFlagged(!heroFlagged)}
-                      className={`flex items-center space-x-1 px-2 py-0.5 text-xs font-mono border transition ${
+                      className={`flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold rounded-lg border transition ${
                         heroFlagged
-                          ? 'bg-[#EFA93B] text-[#13224E] border-[#C8831A] font-bold'
-                          : 'bg-[#FAFAF7] text-[#637096] border-[#CECEC2]'
+                          ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold'
+                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
-                      title="Klik untuk mencoba tombol ragu-ragu"
+                      title="Uji coba tombol ragu-ragu"
                     >
-                      <Bookmark className={`w-3 h-3 ${heroFlagged ? 'fill-[#13224E]' : ''}`} />
+                      <Bookmark className={`w-3.5 h-3.5 ${heroFlagged ? 'fill-amber-900' : ''}`} />
                       <span className="hidden sm:inline">{heroFlagged ? 'Ragu' : 'Tandai Ragu'}</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Prompt with KaTeX Rendering */}
-                <div className="text-xs sm:text-sm font-serif font-semibold text-[#13224E] leading-relaxed pt-1">
+                {/* Prompt with MathRenderer */}
+                <div className="text-sm sm:text-base font-serif font-medium text-slate-900 leading-relaxed pt-3">
                   <MathRenderer content={heroQuestion.prompt} />
                 </div>
 
                 {/* Interactive OMR Options */}
-                <div className="space-y-2 pt-1">
-                  <div className="text-[10px] font-mono text-[#637096] uppercase flex items-center justify-between">
-                    <span>Klik bulatan OMR di bawah untuk mencoba:</span>
+                <div className="space-y-2.5 pt-3">
+                  <div className="text-[11px] font-semibold text-slate-500 flex items-center justify-between">
+                    <span>PILIH JAWABAN (BULATAN OMR):</span>
                     {heroSelectedOpt === 'B' && (
-                      <span className="text-[#1B8A5A] font-bold flex items-center space-x-1">
-                        <CheckCircle2 className="w-3 h-3" />
+                      <span className="text-emerald-600 font-bold flex items-center space-x-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Kunci Terpilih (Opsi B)</span>
                       </span>
                     )}
@@ -171,10 +163,10 @@ export default function LandingPage() {
                       <div
                         key={opt.id}
                         onClick={() => setHeroSelectedOpt(opt.id)}
-                        className={`flex items-start space-x-3 p-2.5 border cursor-pointer transition-all ${
+                        className={`flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition-all duration-150 ${
                           isSelected
-                            ? 'border-[#1B3B8C] bg-[#FAFAF7]'
-                            : 'border-[#E4E4DC] bg-[#FFFFFF] hover:border-[#CECEC2] hover:bg-[#FAFAF7]'
+                            ? 'border-blue-600 bg-blue-50/70 shadow-xs'
+                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
                         }`}
                       >
                         <span
@@ -184,7 +176,7 @@ export default function LandingPage() {
                         >
                           {opt.id}
                         </span>
-                        <div className="pt-0.5 text-xs text-[#13224E] leading-relaxed">
+                        <div className="pt-0.5 text-xs sm:text-sm text-slate-900 leading-relaxed font-sans">
                           <MathRenderer content={opt.text} />
                         </div>
                       </div>
@@ -192,25 +184,25 @@ export default function LandingPage() {
                   })}
                 </div>
 
-                {/* Mini OMR Navigator Bar at bottom */}
-                <div className="pt-3 border-t border-[#E4E4DC] flex items-center justify-between font-mono text-[10px]">
-                  <div className="flex items-center space-x-1 overflow-x-auto">
-                    <span className="text-[#637096] mr-1">Palet Soal:</span>
+                {/* Mini OMR Navigator Bar */}
+                <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center space-x-1.5 overflow-x-auto font-mono">
+                    <span className="text-slate-500 mr-1 text-[11px]">Palet Soal:</span>
                     {[1, 2, 3].map((n) => (
                       <span
                         key={n}
-                        className="w-5 h-5 rounded-full bg-[#1B3B8C] text-white flex items-center justify-center text-[9px] font-bold"
+                        className="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold"
                       >
                         {n}
                       </span>
                     ))}
-                    <span className="w-5 h-5 rounded-full bg-[#13224E] text-white ring-2 ring-[#13224E] ring-offset-1 flex items-center justify-center text-[9px] font-bold">
+                    <span className="w-6 h-6 rounded-md bg-slate-900 text-white ring-2 ring-blue-500 ring-offset-1 flex items-center justify-center text-[10px] font-bold">
                       4
                     </span>
                     {[5, 6, 7, 8].map((n) => (
                       <span
                         key={n}
-                        className="w-5 h-5 rounded-full border border-[#CECEC2] bg-[#FFFFFF] text-[#637096] flex items-center justify-center text-[9px]"
+                        className="w-6 h-6 rounded-md border border-slate-200 bg-white text-slate-600 flex items-center justify-center text-[10px]"
                       >
                         {n}
                       </span>
@@ -219,10 +211,10 @@ export default function LandingPage() {
 
                   <Link
                     href="/exam/to-utbk-national-01"
-                    className="inline-flex items-center space-x-1 text-[#1B3B8C] hover:underline font-semibold"
+                    className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-bold"
                   >
-                    <span>Masuk CBT Penuh</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <span>Masuk CBT</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
@@ -231,134 +223,161 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 2. Asymmetric Ruang Kerja Section (Siswa as Primary Spotlight, Tentor & Admin as Secondary) */}
-      <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-baseline justify-between border-b border-[#13224E] pb-2">
-          <div>
-            <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#13224E]">
-              Ruang Kerja Terintegrasi
-            </h2>
-            <p className="text-xs text-[#637096]">
-              Akses modul siswa untuk pelaksanaan ujian CBT, serta modul pengajar dan pengelola bimbel.
-            </p>
+      {/* 2. Key Metrics Bar */}
+      <section className="py-8 bg-slate-50 border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">650+</div>
+              <div className="text-xs text-slate-500 mt-0.5">Siswa Terdaftar Aktif</div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-blue-600">7 Subtest</div>
+              <div className="text-xs text-slate-500 mt-0.5">Format Resmi UTBK-SNBT</div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600">0.05s</div>
+              <div className="text-xs text-slate-500 mt-0.5">Latensi Render KaTeX</div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-amber-500">99.9%</div>
+              <div className="text-xs text-slate-500 mt-0.5">Reliabilitas Sesi Ujian</div>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* 3. Asymmetric Ruang Kerja Portals */}
+      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            Ruang Kerja Terintegrasi 3 Role
+          </h2>
+          <p className="text-sm text-slate-600 mt-1">
+            Dirancang khusus untuk kebutuhan peserta tryout, tentor pengoreksi esai, dan manajemen operasional bimbel.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Main Primary Card (8 Cols): Modul Siswa & Rasionalisasi PTN */}
-          <div className="lg:col-span-8 bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 space-y-5">
-            <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-3">
-              <div className="flex items-center space-x-2">
-                <span className="w-6 h-6 rounded-full bg-[#1B8A5A] text-white flex items-center justify-center text-xs font-mono font-bold">
-                  S
-                </span>
-                <h3 className="font-serif font-bold text-lg text-[#13224E]">
-                  Portal Peserta Ujian & Rasionalisasi SNBT
-                </h3>
+          {/* Main Primary Spotlight (8 Cols): Siswa Portal */}
+          <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-card hover:shadow-card-hover transition">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Portal Siswa & Rasionalisasi PTN
+                  </h3>
+                  <p className="text-xs text-slate-500">Simulasi CBT 4 Format Soal & Peta Peluang Kampus Impian</p>
+                </div>
               </div>
-              <span className="font-mono text-[10px] text-[#1B8A5A] font-bold bg-[#EAF7F0] px-2 py-0.5 border border-[#1B8A5A]/30">
-                MODUL UTAMA SISWA
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+                Modul Siswa
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#637096] leading-relaxed font-sans">
-              Pengalaman ujian terstandarisasi UTBK dengan timer per subtest otomatis, navigasi lembar jawaban OMR, anti-cheat keluar layar, dan hasil analitik peluang lolos PTN Pilihan 1 & 2.
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Pengalaman ujian terstandarisasi dengan countdown timer per subtest, navigasi palet soal docked, perlindungan anti-curang keluar layar, serta hasil evaluasi skor terhadap passing grade PTN Pilihan 1 & 2.
             </p>
 
             {/* Sub-feature boxes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <div className="p-3.5 bg-[#FAFAF7] border border-[#E4E4DC] space-y-1">
-                <div className="font-mono text-xs font-bold text-[#1B3B8C] flex items-center space-x-1.5">
-                  <span className="w-4 h-4 rounded-full bg-[#1B3B8C] text-white flex items-center justify-center text-[10px]">1</span>
-                  <span>4 Format Soal UTBK</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-1.5">
+                <div className="text-xs font-bold text-blue-700 flex items-center space-x-1.5">
+                  <Zap className="w-4 h-4" />
+                  <span>4 Tipe Soal Terstandarisasi</span>
                 </div>
-                <p className="text-xs text-[#637096] leading-relaxed">
-                  Pilihan ganda OMR, pilihan majemuk ceklis, isian singkat, dan esai penalaran ilmiah.
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Pilihan tunggal OMR, pilihan majemuk ceklis, isian singkat matematis, dan esai penalaran analitis.
                 </p>
               </div>
 
-              <div className="p-3.5 bg-[#FAFAF7] border border-[#E4E4DC] space-y-1">
-                <div className="font-mono text-xs font-bold text-[#1B8A5A] flex items-center space-x-1.5">
-                  <span className="w-4 h-4 rounded-full bg-[#1B8A5A] text-white flex items-center justify-center text-[10px]">2</span>
-                  <span>Analisis Zona Lolos PTN</span>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-1.5">
+                <div className="text-xs font-bold text-emerald-700 flex items-center space-x-1.5">
+                  <Award className="w-4 h-4" />
+                  <span>Rasionalisasi Passing Grade</span>
                 </div>
-                <p className="text-xs text-[#637096] leading-relaxed">
-                  Evaluasi skor capaian terhadap Passing Grade dan daya tampung resmi kuota PTN.
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Evaluasi skor capaian terhadap batas minimal jurusan PTN dengan visualisasi radar chart 7 subtest.
                 </p>
               </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-between font-mono text-xs">
-              <span className="text-[#637096]">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <span className="text-xs text-slate-500">
                 Akses demo: Siswa Raihan Pratama (Aktif)
               </span>
               <Link
                 href="/exam/to-utbk-national-01"
                 onClick={() => switchRole('siswa')}
-                className="inline-flex items-center space-x-1.5 bg-[#1B3B8C] hover:bg-[#274DB8] text-white px-4 py-2 font-medium transition"
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition"
               >
-                <span>Buka Lembar Ujian CBT</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Buka Simulasi CBT</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
 
-          {/* Secondary Column (4 Cols): Stacked Tentor & Super-Admin Cards */}
-          <div className="lg:col-span-4 space-y-5">
-            {/* Secondary Card 1: Tentor */}
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-5 space-y-3">
-              <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
-                <div className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-[#EFA93B] text-[#13224E] flex items-center justify-center text-[10px] font-mono font-bold">
-                    T
-                  </span>
-                  <h4 className="font-serif font-bold text-sm text-[#13224E]">
-                    Portal Pengajar & Tentor
-                  </h4>
+          {/* Secondary Stack (4 Cols): Tentor & Admin Portals */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Tentor Card */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-card hover:shadow-card-hover transition">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">
+                    <FileCheck2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900">
+                      Portal Tentor
+                    </h4>
+                    <span className="text-[11px] text-slate-500">Koreksi & Bank Soal</span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-mono text-[#C8831A] font-bold">
-                  Koreksi Esai
-                </span>
               </div>
-              <p className="text-xs text-[#637096] leading-relaxed">
-                Antrean penilaian lembar esai dengan rubrik slider (0–100) dan editor bank soal KaTeX dengan live preview.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Antrean koreksi berkas jawaban esai siswa dengan rubrik slider (0–100) dan editor visual matematika KaTeX.
               </p>
               <div className="pt-1">
                 <Link
                   href="/tentor/grading"
                   onClick={() => switchRole('tentor')}
-                  className="inline-flex items-center space-x-1 text-xs font-mono font-semibold text-[#C8831A] hover:underline"
+                  className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 hover:text-amber-800"
                 >
-                  <span>Antrean Koreksi Esai →</span>
+                  <span>Buka Koreksi Esai</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            {/* Secondary Card 2: Admin */}
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-5 space-y-3">
-              <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
-                <div className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-[#13224E] text-white flex items-center justify-center text-[10px] font-mono font-bold">
-                    A
-                  </span>
-                  <h4 className="font-serif font-bold text-sm text-[#13224E]">
-                    Portal Pengelola Bimbel
-                  </h4>
+            {/* Admin Card */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-card hover:shadow-card-hover transition">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-900 flex items-center justify-center font-bold text-xs">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900">
+                      Portal Admin & Owner
+                    </h4>
+                    <span className="text-[11px] text-slate-500">Kasir SPP & Roster</span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-mono text-[#13224E] font-bold">
-                  Buku Kas & SPP
-                </span>
               </div>
-              <p className="text-xs text-[#637096] leading-relaxed">
-                Import massal data pembayaran Excel (.xlsx), monitoring kapasitas kuota kelas, dan cetak kuitansi kasir resmi.
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Import massal data pembayaran & siswa (.xlsx), monitoring kapasitas kelas, dan pencatatan kuitansi resmi.
               </p>
               <div className="pt-1">
                 <Link
                   href="/admin/payments"
                   onClick={() => switchRole('admin')}
-                  className="inline-flex items-center space-x-1 text-xs font-mono font-semibold text-[#13224E] hover:underline"
+                  className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-900 hover:text-blue-600"
                 >
-                  <span>Import Excel SPP →</span>
+                  <span>Buka Modul Kasir SPP</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -366,72 +385,72 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. Tryout Booklet Catalog Section */}
-      <section className="py-12 bg-[#FFFFFF] border-t border-[#E4E4DC]">
+      {/* 4. Tryout Booklet Catalog Section */}
+      <section className="py-16 bg-white border-t border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-baseline justify-between border-b border-[#13224E] pb-2 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-8">
             <div>
-              <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#13224E]">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                 Katalog Naskah Simulasi CBT
               </h2>
-              <p className="text-xs text-[#637096]">
-                Pilihan paket tryout UTBK terstandarisasi dengan 7 subtest resmi.
+              <p className="text-sm text-slate-600 mt-1">
+                Paket tryout UTBK terstandarisasi dengan 7 subtest resmi SNBT.
               </p>
             </div>
             <Link
               href="/tryouts"
-              className="text-xs font-mono font-medium text-[#1B3B8C] hover:underline flex items-center space-x-1"
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center space-x-1"
             >
-              <span>LIHAT SEMUA ({tryouts.length})</span>
-              <ArrowRight className="w-3 h-3" />
+              <span>Lihat Semua Paket ({tryouts.length})</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {tryouts.map((to) => (
               <div
                 key={to.id}
-                className="bg-[#FAFAF7] border border-[#E4E4DC] p-5 flex flex-col justify-between hover:border-[#13224E] transition"
+                className="bg-slate-50/60 rounded-2xl border border-slate-200/80 p-6 flex flex-col justify-between hover:border-blue-500/50 hover:bg-white hover:shadow-card-hover transition-all duration-200"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2 font-mono text-[10px]">
-                    <span className="font-semibold text-[#13224E] border border-[#CECEC2] bg-[#FFFFFF] px-2 py-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-mono font-bold text-slate-800 bg-white px-2.5 py-1 rounded-md border border-slate-200">
                       {to.code}
                     </span>
-                    <span className="text-[#C8831A] bg-[#EFA93B]/20 px-2 py-0.5 font-bold">
+                    <span className="text-xs font-semibold text-amber-800 bg-amber-100/70 px-2.5 py-0.5 rounded-full">
                       {to.badge || 'Terbuka'}
                     </span>
                   </div>
 
-                  <h3 className="font-serif font-bold text-base text-[#13224E] mb-2 leading-snug">
+                  <h3 className="font-bold text-base text-slate-900 mb-2 leading-snug">
                     {to.title}
                   </h3>
-                  <p className="text-xs text-[#637096] mb-4 line-clamp-2">
+                  <p className="text-xs text-slate-600 mb-5 line-clamp-2">
                     {to.description}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs font-mono bg-[#FFFFFF] p-2.5 border border-[#E4E4DC] mb-4">
+                  <div className="grid grid-cols-2 gap-3 text-xs font-mono bg-white p-3 rounded-xl border border-slate-200/70 mb-5">
                     <div>
-                      <span className="text-[9px] text-[#9EABC7] block uppercase">Durasi</span>
-                      <span className="font-semibold text-[#13224E]">{to.totalDurationMinutes} Menit</span>
+                      <span className="text-[10px] text-slate-400 block uppercase">Durasi Total</span>
+                      <span className="font-bold text-slate-800">{to.totalDurationMinutes} Menit</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-[#9EABC7] block uppercase">Subtest</span>
-                      <span className="font-semibold text-[#13224E]">{to.subtests.length} Subtest</span>
+                      <span className="text-[10px] text-slate-400 block uppercase">Jumlah Subtest</span>
+                      <span className="font-bold text-slate-800">{to.subtests.length} Subtest</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#E4E4DC] flex items-center justify-between font-mono text-xs">
-                  <span className="text-[#637096] text-[11px]">
-                    {to.participantsCount.toLocaleString('id-ID')} peserta
+                <div className="pt-4 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 font-medium">
+                    {to.participantsCount.toLocaleString('id-ID')} Peserta
                   </span>
                   <Link
                     href={`/exam/${to.id}`}
-                    className="inline-flex items-center space-x-1 bg-[#1B3B8C] hover:bg-[#274DB8] text-white text-xs font-medium px-3 py-1.5 transition"
+                    className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg transition"
                   >
                     <span>Mulai Ujian</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>

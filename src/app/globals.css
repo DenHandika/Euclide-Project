@@ -5,112 +5,101 @@
 
 @layer base {
   body {
-    background-color: #FAFAF7;
-    color: #13224E;
-    font-family: 'Work Sans', system-ui, sans-serif;
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Spectral', Georgia, serif;
-    color: #13224E;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: #0F172A;
+    letter-spacing: -0.025em;
   }
 }
 
-/* Custom Scrollbar - Clean & Minimal */
+/* Custom Scrollbar - Sleek & Modern */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAFAF7;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D1C7;
-  border-radius: 2px;
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A8A89A;
+  background: #94A3B8;
 }
 
-/* Stabilo / Highlighter Utility */
+/* Stabilo / Highlight Accent */
 .stabilo {
-  background-color: rgba(239, 169, 59, 0.22);
-  color: #13224E;
+  background: linear-gradient(120deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.35) 100%);
+  color: #0F172A;
   padding: 0.1em 0.35em;
-  border-radius: 2px;
+  border-radius: 4px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
 
 .stabilo-strong {
-  background-color: rgba(239, 169, 59, 0.4);
-  color: #13224E;
+  background-color: rgba(245, 158, 11, 0.35);
+  color: #0F172A;
   font-weight: 600;
   padding: 0.1em 0.4em;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .stabilo-indigo {
-  background-color: rgba(27, 59, 140, 0.12);
-  color: #13224E;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #1E3A8A;
   padding: 0.1em 0.35em;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
-/* OMR Bubble Sheet Styles (Lembar Jawaban Komputer) */
+/* OMR Bubble Sheet Styles (Lembar Jawaban Komputer Modern) */
 .omr-bubble {
-  width: 2rem;
-  height: 2rem;
+  width: 2.1rem;
+  height: 2.1rem;
   border-radius: 9999px;
-  border: 1.5px solid #CECEC2;
+  border: 1.5px solid #CBD5E1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #13224E;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
   background-color: #FFFFFF;
-  transition: all 0.15s ease-in-out;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
 .omr-bubble:hover {
-  border-color: #1B3B8C;
-  background-color: #F3F3ED;
+  border-color: #2563EB;
+  color: #1E3A8A;
+  background-color: #EFF6FF;
+  transform: scale(1.04);
 }
 
 .omr-bubble-filled {
-  background-color: #1B3B8C !important;
-  border-color: #13224E !important;
+  background-color: #1E3A8A !important;
+  border-color: #1E3A8A !important;
   color: #FFFFFF !important;
+  box-shadow: 0 2px 6px rgba(30, 58, 138, 0.3);
 }
 
 .omr-bubble-flagged {
-  background-color: #EFA93B !important;
-  border-color: #C8831A !important;
-  color: #13224E !important;
-  font-weight: 700 !important;
-}
-
-/* Perforated / Tear-Off Lines */
-.border-perforated {
-  border-top: 1.5px dashed #D1D1C7;
-}
-
-.border-perforated-b {
-  border-bottom: 1.5px dashed #D1D1C7;
-}
-
-/* Examination Sheet Header Box */
-.exam-header-strip {
-  border: 1px solid #13224E;
-  background-color: #FFFFFF;
+  background-color: #F59E0B !important;
+  border-color: #D97706 !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
 }
 
 /* Anti-cheat text protection during CBT exam */
@@ -121,10 +110,10 @@
   -ms-user-select: none;
 }
 
-/* KaTeX custom sizing tweaks on paper canvas */
+/* KaTeX custom sizing tweaks */
 .katex-wrapper .katex {
-  font-size: 1.02em;
-  color: #13224E;
+  font-size: 1.05em;
+  color: #0F172A;
 }
 
 .katex-display {
