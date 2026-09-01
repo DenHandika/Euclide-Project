@@ -58,6 +58,7 @@ interface AppContextType {
   
   // Bank Soal
   addQuestion: (question: Omit<Question, 'id'>) => void;
+  addQuestionsBulk: (newQuestions: Omit<Question, 'id'>[]) => void;
   deleteQuestion: (id: string) => void;
   
   // Essay Grading
@@ -421,6 +422,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     showToast('Soal berhasil ditambahkan ke Bank Soal!', 'success');
   };
 
+  const addQuestionsBulk = (newQuestions: Omit<Question, 'id'>[]) => {
+    const formatted: Question[] = newQuestions.map((q, idx) => ({
+      ...q,
+      id: `q-bulk-${Date.now()}-${idx}`,
+      number: questions.length + idx + 1,
+    }));
+    const updated = [...formatted, ...questions];
+    setQuestions(updated);
+    saveState('euclide_questions', updated);
+    showToast(`${formatted.length} butir soal berhasil di-import massal ke Bank Soal!`, 'success');
+  };
+
   const deleteQuestion = (id: string) => {
     const updated = questions.filter((q) => q.id !== id);
     setQuestions(updated);
@@ -558,6 +571,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         examResults,
         getExamResult,
         addQuestion,
+        addQuestionsBulk,
         deleteQuestion,
         essaySubmissions,
         gradeEssay,
