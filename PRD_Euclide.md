@@ -76,11 +76,27 @@ Tidak ditemukan produk siap-pakai (Alphastude, SIAPPTN, TryoutPintar) yang menca
 - Antrean koreksi manual untuk essay (interface tentor: baca jawaban → beri skor 0–100 → feedback opsional)
 - Skor final siswa baru terkunci setelah semua komponen essay dinilai (jika ada campuran tipe soal)
 
-### 3.5 Sistem Passing-Grade Adaptif
-- Tabel referensi terpisah: `PTN`, `jurusan`, `skor_minimal`, `tahun_berlaku` — **dapat diedit admin/owner tanpa perlu deploy ulang**
-- Sistem membandingkan skor tryout siswa terhadap baris tabel ini → status: *lolos / mendekati / perlu ditingkatkan*
-- Siswa dapat memilih daftar PTN-jurusan yang diminati untuk dipantau
-- Histori beberapa tahun disimpan untuk melihat tren perubahan passing grade
+### 3.5 Sistem Passing-Grade & Rasionalisasi 4 Pilihan SNBT Dinamis
+- **Pemilihan 4 Pilihan Program Studi (Standar SNBT BPPP Terbaru):**
+  - Siswa dapat menentukan hingga **4 Pilihan Program Studi** (kombinasi Sarjana S1, Sarjana Terapan D4, dan Diploma D3) sebelum memulai simulasi ujian maupun diubah di profil target siswa.
+  - Aturan kombinasi pilihan mengikuti regulasi resmi SNPMB BPPP:
+    - *Pilihan 1:* Bebas (S1 / D4 / D3)
+    - *Pilihan 2:* Bebas (S1 / D4 / D3)
+    - *Pilihan 3:* Program Vokasi (D4 / D3)
+    - *Pilihan 4:* Program Vokasi (D3)
+    - *(Atau variasi 2 Akademik S1 + 2 Vokasi D4/D3).*
+- **Cakupan Basis Data Nasional (Universitas, Institut, & Politeknik Negeri):**
+  - Database referensi mencakup seluruh perguruan tinggi negeri di Indonesia (PTN Akademik & Politeknik Negeri Vokasi).
+  - Skema data referensi: `ptn_nama`, `jenjang (S1/D4/D3)`, `rumpun (Saintek/Soshum)`, `daya_tampung (kuota SIDATA PTN)`, `peminat_tahun_lalu`, `keketatan_persen`, `target_skor_historis`, `tahun_akademik_berlaku`.
+- **Pembaruan Data Dinamis per Tahun Ajaran:**
+  - Data referensi daya tampung dan skor target dipisahkan dari kode program.
+  - Admin/Owner dapat memperbarui atau mengimpor data PTN/Politeknik tahunan secara massal via **file Excel (.xlsx / CSV)** di setiap awal tahun ajaran baru tanpa perlu redeploy aplikasi.
+- **Evaluasi Rasionalisasi & Simulasi Interaktif (*What-If Analysis*):**
+  - Sistem membandingkan skor tertimbang hasil tryout siswa terhadap target passing grade ke-4 jurusan terpilih $\to$ status indikator:
+    - 🟢 **Lolos (Zona Aman):** Skor siswa $\ge$ Target Passing Grade.
+    - 🟡 **Mendekati (Zona Waspada):** Skor siswa terpaut $\le 35$ poin dari target.
+    - 🔴 **Perlu Peningkatan:** Skor siswa masih berada di bawah ambang batas.
+  - Di halaman hasil evaluasi, siswa dapat melakukan simulasi ganti jurusan secara bebas (*What-If Simulator*) untuk menguji peluang kelulusan pada kombinasi kampus dan program studi lainnya.
 
 > **Catatan metodologi (penting untuk ekspektasi klien):** MVP menggunakan sistem skor tertimbang manual (bobot ditentukan tentor), bukan kalibrasi statistik IRT seperti kompetitor besar. IRT butuh volume data respons yang jauh lebih besar dari basis 600–700 siswa untuk stabil secara statistik. Migrasi ke IRT bisa dipertimbangkan di fase lanjutan setelah data historis cukup besar.
 
@@ -171,6 +187,7 @@ Tidak ditemukan produk siap-pakai (Alphastude, SIAPPTN, TryoutPintar) yang menca
 - [x] **Hak akses bank soal antar-tentor:** $\to$ **Bersifat Terbuka/Kolaboratif di Internal Bimbel**. Semua tentor dan admin/owner bisa saling melihat dan menggunakan soal untuk menyusun paket tryout bersama.
 - [x] **Sifat kuota kelas:** $\to$ **Dinamis**. Sistem menghitung `jumlah_siswa_aktif < kapasitas_maksimal`. Jika ada siswa yang batal/keluar, slot kelas otomatis terbuka kembali secara real-time.
 - [x] **Ekspor PDF/Excel hasil tryout:** $\to$ **Wajib di Fase 2**. Sangat krusial bagi bimbel untuk membagikan rapor hasil tryout bergaya resmi (berlogo Euclide/Bimbel) ke grup WhatsApp orang tua siswa.
+- [x] **Rasionalisasi 4 Pilihan PTN & Basis Data Kampus Dinamis:** $\to$ **Wajib di MVP**. Mendukung pemilihan hingga 4 program studi (S1 Akademik & Vokasi D4/D3) sesuai regulasi resmi SNBT BPPP terbaru, dengan basis data seluruh Universitas, Institut, dan Politeknik Negeri yang dapat diperbarui secara dinamis via Excel (.xlsx/CSV) di setiap awal tahun ajaran baru.
 
 ---
 
