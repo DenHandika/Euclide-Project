@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Copy,
+  Download,
+  FileDown,
   Check,
   X,
   ArrowRight,
@@ -186,6 +188,34 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownloadWordTemplate = () => {
+    const fileHeader = `PANDUAN TEMPLATE IMPORT NASKAH SOAL EUCLIDE CBT
+======================================================
+PETUNJUK PENGISIAN UNTUK TENTOR / PENYUSUN SOAL:
+1. Gunakan tag [SOAL 1], [SOAL 2], dst untuk memisahkan nomor soal.
+2. Tag [SUBTEST] diisi id subtest (contoh: penalaran_matematika, penalaran_umum, literasi_indonesia).
+3. Tag [KESULITAN] diisi: Mudah, Sedang, atau Sukar.
+4. Pilihan jawaban diisi pada tag [A], [B], [C], [D], [E].
+5. Kunci jawaban ditulis pada tag [KUNCI] (misal: B).
+6. Pembahasan ditulis pada tag [PEMBAHASAN].
+7. Rumus matematika teks biasa (contoh: 3t^2 + 4t, sqrt(x), <=, >=) otomatis dikonversi ke KaTeX.
+
+------------------------------------------------------
+NASKAH SOAL:
+
+` + TEMPLATE_EXAMPLE;
+
+    const blob = new Blob([fileHeader], { type: 'application/msword;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'TEMPLATE_IMPORT_SOAL_EUCLIDE.doc';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -229,13 +259,22 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
 
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-[#FAFAF7] border border-[#E4E4DC] text-xs font-mono shrink-0">
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleDownloadWordTemplate}
+              className="px-2.5 py-1 bg-[#1B3B8C] hover:bg-[#274DB8] text-white font-bold transition flex items-center space-x-1.5 shadow-sm"
+              title="Download file Word .doc siap edit di Microsoft Word"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span>Unduh Template Word (.doc)</span>
+            </button>
             <button
               type="button"
               onClick={handleLoadSample}
               className="px-2.5 py-1 bg-[#FFFFFF] hover:bg-[#F3F3ED] text-[#13224E] border border-[#CECEC2] font-semibold transition"
             >
-              Muat Contoh Template
+              Muat Contoh
             </button>
             <button
               type="button"
@@ -243,7 +282,7 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
               className="px-2.5 py-1 bg-[#FFFFFF] hover:bg-[#F3F3ED] text-[#13224E] border border-[#CECEC2] transition flex items-center space-x-1"
             >
               {copied ? <Check className="w-3 h-3 text-[#1B8A5A]" /> : <Copy className="w-3 h-3" />}
-              <span>{copied ? 'Template Disalin!' : 'Salin Template'}</span>
+              <span>{copied ? 'Tersalin!' : 'Salin Teks'}</span>
             </button>
           </div>
 
