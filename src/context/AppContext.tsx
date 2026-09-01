@@ -181,9 +181,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogle = (email: string = 'raihan.pratama@siswa.euclide.edu'): boolean => {
-    // Check whitelist or default to active student
-    const matchedUser = MOCK_USERS.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    // Check whitelist in students or mock database
+    const allUsers = [...MOCK_USERS, ...students];
+    const matchedUser = allUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    
     if (matchedUser) {
+      if (matchedUser.role === 'siswa' && matchedUser.status !== 'active') {
+        showToast(`Login ditolak: Akun berstatus ${matchedUser.status.toUpperCase()} (Kewajiban SPP / Nonaktif). Hubungi Admin Bimbel.`, 'error');
+        return false;
+      }
+
       setCurrentUser(matchedUser);
       setCurrentRole(matchedUser.role);
       saveState('euclide_user', matchedUser);

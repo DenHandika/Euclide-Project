@@ -36,6 +36,7 @@ export default function CBTExamPlayerPage() {
     updateSubtestTimer,
     incrementViolations,
     submitExam,
+    showToast,
   } = useApp();
 
   const tryout = tryouts.find((t) => t.id === tryoutId) || tryouts[0];
@@ -111,6 +112,23 @@ export default function CBTExamPlayerPage() {
       if (document.hidden) {
         const count = incrementViolations(tryoutId);
         setAntiCheatModal({ isOpen: true, count });
+        if (count >= 3) {
+          showToast('Batas toleransi pelanggaran fokus layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
+          setTimeout(() => {
+            handleFinalSubmit();
+          }, 1500);
+        }
+      }
+    };
+
+    const handleWindowBlur = () => {
+      const count = incrementViolations(tryoutId);
+      setAntiCheatModal({ isOpen: true, count });
+      if (count >= 3) {
+        showToast('Batas toleransi pelanggaran fokus layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
+        setTimeout(() => {
+          handleFinalSubmit();
+        }, 1500);
       }
     };
 
@@ -119,10 +137,12 @@ export default function CBTExamPlayerPage() {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleWindowBlur);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleWindowBlur);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, [tryoutId]);
@@ -393,8 +413,12 @@ export default function CBTExamPlayerPage() {
       {/* ========================================================================= */}
       {/* 3. MAIN EXAMINATION CANVAS: SPLIT-PANE VIEW 2-KOLOM                       */}
       {/* ========================================================================= */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-between">
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-4 sm:p-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-between select-none">
+        <div
+          className="bg-[#FFFFFF] border border-[#13224E] p-4 sm:p-6 select-none"
+          onContextMenu={(e) => e.preventDefault()}
+          onCopy={(e) => e.preventDefault()}
+        >
           {/* Question Metadata Strip */}
           <div className="flex items-center justify-between pb-3 border-b border-[#E4E4DC] mb-5 font-mono text-xs">
             <div className="flex items-center space-x-2">

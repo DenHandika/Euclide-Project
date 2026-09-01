@@ -32,12 +32,15 @@ Tidak ditemukan produk siap-pakai (Alphastude, SIAPPTN, TryoutPintar) yang menca
 ## 3. Fitur Inti (Scope MVP)
 
 ### 3.1 Autentikasi & Manajemen Akun
-- Login terpisah untuk 4 role di atas
+- Login terpisah untuk **3 role** (Admin/Owner, Tentor, Siswa)
+- **Metode Login Siswa**:
+  - Login 1-klik via **Google Sign-In (OAuth)** yang disaring secara otomatis dengan *whitelist* database email siswa aktif di sistem
+  - Login manual dengan NIS / Email terdaftar
 - **Status akun siswa**: `aktif`, `nonaktif`, `lulus`, `cuti`
-  - Login ditolak jika status bukan `aktif`
+  - Login ditolak secara ketat jika status bukan `aktif`
   - Admin mengubah status secara manual dari panel kelola siswa
   - *(Opsional v1.1)* Auto-nonaktif via cron job berdasarkan `tanggal_berakhir_bimbel`
-- Data siswa tidak dihapus saat nonaktif/lulus — histori tryout & nilai tetap tersimpan untuk kebutuhan rekap
+- Data siswa tidak dihapus saat nonaktif/lulus — histori tryout & nilai tetap tersimpan permanen (*Read-Only*) untuk kebutuhan rekap angkatan dan arsip promosi
 
 ### 3.2 Bank Soal
 - Input soal oleh **tentor dan admin**
@@ -58,6 +61,15 @@ Tidak ditemukan produk siap-pakai (Alphastude, SIAPPTN, TryoutPintar) yang menca
 - Navigator soal dengan penanda "ragu-ragu"
 - Antarmuka berbeda per tipe soal (pilihan tunggal, checkbox, input teks, textarea essay)
 - Submit otomatis saat waktu habis
+
+#### 3.3.1 Protokol Keamanan & Anti-Curang (Khusus Smartphone & Desktop)
+- **Deteksi Kehilangan Fokus Layar (*Visibility Change / Blur Detection*):**
+  - Sistem mencatat dan memberi peringatan visual real-time jika peserta berpindah tab, membuka aplikasi lain (seperti ChatGPT/Google AI), meminimalkan browser, atau mengaktifkan mode *split-screen* di smartphone.
+  - Batas toleransi pelanggaran dapat dikonfigurasi (misal maks. 3 kali pelanggaran); jika melebihi batas, sesi ujian otomatis terkunci atau langsung di-submit paksa (*auto-submit on violation*).
+- **Proteksi Konten Soal:**
+  - Menonaktifkan seleksi teks (*disable text-selection / `user-select: none`*).
+  - Memblokir fungsi klik kanan (*disable context menu*) dan kombinasi tombol copy-paste (`Ctrl+C`, `Ctrl+V`, `Cmd+C`).
+  - Mode layar penuh (*fullscreen trigger*) yang mengunci interaksi selama sesi tryout berlangsung.
 
 ### 3.4 Penilaian
 - Auto-grading untuk 3 tipe soal objektif
@@ -80,10 +92,12 @@ Tidak ditemukan produk siap-pakai (Alphastude, SIAPPTN, TryoutPintar) yang menca
 
 ### 3.7 Manajemen Bimbel (akses Admin/Owner)
 - **Tentor**: profil, mapel yang diajar
-- **Jadwal kelas**: nama kelas, hari/jam, tentor pengampu, kapasitas kuota
+- **Jadwal kelas**: nama kelas, hari/jam, tentor pengampu, kapasitas kuota dinamis
 - **Pendaftaran siswa**: form daftar, validasi kuota (tolak otomatis jika kelas penuh), status menunggu/diterima
-- **Pembayaran manual**: admin mencatat setiap pembayaran tunai per siswa per bulan (siswa bayar langsung ke admin setelah sesi kelas — bukan payment gateway otomatis di MVP)
-- **Rekap & monitoring**: laporan siswa yang belum bayar bulan berjalan, riwayat tunggakan
+- **Pembayaran SPP**:
+  - **Pencatatan Manual Kasir**: admin mencatat setiap pembayaran tunai per siswa per bulan (siswa bayar langsung ke admin setelah sesi kelas)
+  - **Impor Massal Riwayat Pembayaran via Excel (.xlsx/CSV)**: admin dapat mengunggah spreadsheet rekonsiliasi pembayaran SPP lama/massal untuk mempercepat migrasi data awal tanpa harus menginput ratusan transaksi satu per satu
+- **Rekap & monitoring**: laporan siswa yang belum bayar bulan berjalan, riwayat tunggakan, dan cetak kuitansi resmi
 
 ### 3.8 Dashboard Ringkasan & Akses Tentor (Admin/Owner)
 - Statistik lintas kelas/tentor: jumlah siswa aktif, rata-rata skor per kelas, jumlah tryout berjalan, jumlah tunggakan pembayaran
@@ -164,8 +178,8 @@ Tidak ditemukan produk siap-pakai (Alphastude, SIAPPTN, TryoutPintar) yang menca
 
 | Fase | Cakupan |
 |---|---|
-| **Fase 1 (MVP)** | Autentikasi 4 role, bank soal, mesin tryout, penilaian (termasuk essay manual), passing-grade adaptif dasar |
-| **Fase 2** | Analisis per siswa lengkap, jadwal kelas, pendaftaran + kuota |
-| **Fase 3** | Pencatatan pembayaran manual + rekap, dashboard owner |
-| **Fase 4 (opsional, jangka panjang)** | Eksplorasi IRT, payment gateway otomatis, notifikasi WA/email |
+| **Fase 1 (MVP)** | Autentikasi 3 role (termasuk Google Sign-In), bank soal (Math visual & import Word), mesin tryout dengan anti-curang, penilaian (auto & essay manual), passing-grade adaptif dasar, import Excel siswa & pembayaran |
+| **Fase 2** | Analisis per siswa lengkap, jadwal kelas, pendaftaran + kuota dinamis, ekspor rapor PDF/Excel hasil tryout |
+| **Fase 3** | Pencatatan pembayaran manual + rekap kas lengkap, dashboard owner agregat |
+| **Fase 4 (opsional, jangka panjang)** | Eksplorasi IRT, payment gateway otomatis (QRIS/VA), notifikasi WA/email |
 

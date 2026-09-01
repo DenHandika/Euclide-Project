@@ -21,8 +21,10 @@ export default function LoginPage() {
   const handleGoogleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const emailToUse = customEmail.trim() || 'raihan.pratama@siswa.euclide.edu';
-    signInWithGoogle(emailToUse);
-    router.push('/tryouts');
+    const success = signInWithGoogle(emailToUse);
+    if (success) {
+      router.push('/tryouts');
+    }
   };
 
   const handleRoleQuickLogin = (role: 'admin' | 'tentor' | 'siswa', targetPath: string) => {
