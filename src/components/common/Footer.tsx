@@ -2,112 +2,120 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Compass, ShieldCheck, Heart, Sparkles, BookOpen, Layers, Award } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 text-xs py-10">
+    <footer className="bg-[#FFFFFF] border-t border-[#E4E4DC] text-[#637096] text-xs py-10 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand Col */}
-          <div className="space-y-3 md:col-span-1">
+          <div className="space-y-2.5 md:col-span-1">
             <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm">
+              <div className="w-6 h-6 bg-[#13224E] text-white flex items-center justify-center font-serif font-bold text-xs">
                 EU
               </div>
-              <span className="text-white font-extrabold text-base tracking-tight">EUCLIDE</span>
+              <span className="text-[#13224E] font-serif font-bold text-base tracking-tight">
+                EUCLIDE
+              </span>
             </div>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Platform Computer-Based Test (CBT) & Sistem Manajemen Bimbingan Belajar Modern Berbasis Analitika Terpadu UTBK-SNBT.
+            <p className="text-xs text-[#637096] leading-relaxed">
+              Sistem Computer-Based Test (CBT) & Manajemen Bimbingan Belajar Berbasis Analitika Rasionalisasi UTBK-SNBT.
             </p>
-            <div className="text-[11px] text-slate-500">
-              Vercel Ready • KaTeX Engine • IRT Scoring
+            <div className="text-[10px] font-mono text-[#9EABC7]">
+              Konsep Kertas Ujian Presisi • KaTeX Engine
             </div>
           </div>
 
-          {/* Modules Col */}
+          {/* Modul Siswa */}
           <div>
-            <h4 className="text-slate-200 font-bold text-xs uppercase tracking-wider mb-3">
+            <h4 className="font-serif font-bold text-xs text-[#13224E] uppercase tracking-wider mb-2.5">
               Modul Siswa
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-1.5 text-xs text-[#637096]">
               <li>
-                <Link href="/tryouts" className="hover:text-white transition">
+                <Link href="/tryouts" className="hover:text-[#13224E] transition">
                   Simulasi Akbar UTBK
                 </Link>
               </li>
               <li>
-                <Link href="/drilling" className="hover:text-white transition">
-                  Drilling Soal Kuantitatif
+                <Link href="/drilling" className="hover:text-[#13224E] transition">
+                  Modul Latihan Subtest
                 </Link>
               </li>
               <li>
-                <Link href="/exam/to-utbk-national-01/result" className="hover:text-white transition">
-                  Rasionalisasi Passing Grade SNBT
+                <Link href="/exam/to-utbk-national-01/result" className="hover:text-[#13224E] transition">
+                  Rasionalisasi Peluang PTN
                 </Link>
               </li>
               <li>
-                <Link href="/exam/to-utbk-national-01" className="hover:text-white transition">
-                  CBT Exam Player Mobile
+                <Link href="/exam/to-utbk-national-01" className="hover:text-[#13224E] transition">
+                  Player Ujian CBT
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Admin & Tentor Col */}
+          {/* Manajemen & Tentor */}
           <div>
-            <h4 className="text-slate-200 font-bold text-xs uppercase tracking-wider mb-3">
+            <h4 className="font-serif font-bold text-xs text-[#13224E] uppercase tracking-wider mb-2.5">
               Manajemen & Pengajar
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-1.5 text-xs text-[#637096]">
               <li>
-                <Link href="/admin" className="hover:text-white transition">
-                  Dashboard Keuangan & Kas
+                <Link href="/admin" className="hover:text-[#13224E] transition">
+                  Buku Kas & Ringkasan
                 </Link>
               </li>
               <li>
-                <Link href="/admin/payments" className="hover:text-white transition">
-                  Bulk Import SPP Excel (.xlsx)
+                <Link href="/admin/payments" className="hover:text-[#13224E] transition">
+                  Import Excel SPP (.xlsx)
                 </Link>
               </li>
               <li>
-                <Link href="/admin/classes" className="hover:text-white transition">
+                <Link href="/admin/classes" className="hover:text-[#13224E] transition">
                   Monitoring Kuota Batch
                 </Link>
               </li>
               <li>
-                <Link href="/tentor/grading" className="hover:text-white transition">
+                <Link href="/tentor/grading" className="hover:text-[#13224E] transition">
                   Koreksi Esai & Rubrik Nilai
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Quick Links */}
+          {/* Identitas Palet */}
           <div>
-            <h4 className="text-slate-200 font-bold text-xs uppercase tracking-wider mb-3">
-              Simulasi Demo
+            <h4 className="font-serif font-bold text-xs text-[#13224E] uppercase tracking-wider mb-2.5">
+              Sistem Desain
             </h4>
-            <p className="text-xs text-slate-400 mb-3">
-              Gunakan widget <strong>Demo Role Switcher</strong> di pojok kanan bawah untuk berganti peran seketika.
-            </p>
-            <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 text-amber-400 font-medium text-[11px]">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Light Mode Clean Standard</span>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center space-x-2">
+                <span className="w-3 h-3 rounded-full bg-[#13224E] border border-slate-300" />
+                <span className="font-mono text-[11px]">Ink Navy #13224E</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="w-3 h-3 rounded-full bg-[#1B3B8C]" />
+                <span className="font-mono text-[11px]">Indigo #1B3B8C</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="w-3 h-3 rounded-full bg-[#EFA93B]" />
+                <span className="font-mono text-[11px]">Amber Stabilo #EFA93B</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-slate-500 text-[11px]">
+        <div className="pt-6 border-t border-[#E4E4DC] flex flex-col sm:flex-row items-center justify-between text-[#9EABC7] text-[11px] font-mono">
           <div>
             © {new Date().getFullYear()} EUCLIDE EdTech System. All rights reserved.
           </div>
-          <div className="mt-2 sm:mt-0 flex items-center space-x-4">
-            <span>Inter Typography</span>
+          <div className="mt-2 sm:mt-0 flex items-center space-x-3">
+            <span>Spectral Serif</span>
             <span>•</span>
-            <span>SheetJS Excel Engine</span>
+            <span>JetBrains Mono</span>
             <span>•</span>
-            <span>Recharts Analytics</span>
+            <span>Work Sans</span>
           </div>
         </div>
       </div>

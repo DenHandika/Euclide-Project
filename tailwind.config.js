@@ -8,49 +8,52 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        euclide: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#0f172a',
+        paper: {
+          canvas: '#FAFAF7',
+          surface: '#FFFFFF',
+          muted: '#F3F3ED',
+          border: '#E4E4DC',
+          darkBorder: '#CECEC2',
         },
-        navy: {
-          light: '#2563EB',
-          DEFAULT: '#1E3A8A',
-          dark: '#0F172A',
+        ink: {
+          DEFAULT: '#13224E',
+          primary: '#13224E',
+          medium: '#2A3C72',
+          muted: '#637096',
+          faint: '#9EABC7',
         },
-        gold: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
+        indigo: {
+          DEFAULT: '#1B3B8C',
+          light: '#274DB8',
+          dark: '#132B66',
+        },
+        amber: {
+          DEFAULT: '#EFA93B',
+          highlight: '#EFA93B',
+          light: '#FDF3E3',
+          dark: '#C8831A',
         },
         crimson: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-        }
+          DEFAULT: '#D0342C',
+          alert: '#D0342C',
+          light: '#FDECEB',
+          dark: '#A6211A',
+        },
+        emerald: {
+          DEFAULT: '#1B8A5A',
+          light: '#EAF7F0',
+          dark: '#126340',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Spectral', 'Georgia', 'serif'],
+        sans: ['Work Sans', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
       },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.08)',
-        'elevated': '0 10px 25px -3px rgba(30, 58, 138, 0.1), 0 4px 6px -2px rgba(30, 58, 138, 0.05)',
-      }
+        'paper': '0 1px 3px 0 rgba(19, 34, 78, 0.05)',
+        'sheet': '0 4px 16px -2px rgba(19, 34, 78, 0.07)',
+      },
     },
   },
   plugins: [],

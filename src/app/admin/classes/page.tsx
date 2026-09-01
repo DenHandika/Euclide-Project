@@ -7,143 +7,112 @@ import {
   Layers,
   PlusCircle,
   Users,
-  MapPin,
-  Clock,
-  GraduationCap,
+  Edit2,
+  Calendar,
   Sparkles,
-  CheckCircle2,
-  AlertTriangle,
   X,
 } from 'lucide-react';
 
 export default function AdminClassesPage() {
-  const { batches, showToast } = useApp();
-  const [classList, setClassList] = useState<ClassBatch[]>(batches);
-  const [modalOpen, setModalOpen] = useState(false);
+  const { batches, updateBatchCapacity, showToast } = useApp();
+  const [editingBatch, setEditingBatch] = useState<ClassBatch | null>(null);
+  const [newCapacity, setNewCapacity] = useState<number>(30);
 
-  const [newBatch, setNewBatch] = useState<Omit<ClassBatch, 'id'>>({
-    name: 'SNBT Supercamp Gelombang 2',
-    program: 'SNBT Super Intensif',
-    room: 'Ruang Euclide Beta (Lt. 2)',
-    tutorName: 'Ahmad Fauzi, S.Si.',
-    currentStudents: 12,
-    maxCapacity: 25,
-    schedule: 'Selasa & Kamis (16.00 - 19.30 WIB)',
-    status: 'active',
-  });
-
-  const handleCreateBatch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const created: ClassBatch = {
-      ...newBatch,
-      id: `batch-${Date.now()}`,
-    };
-    setClassList([created, ...classList]);
-    setModalOpen(false);
-    showToast(`Batch ${created.name} berhasil dibuat!`, 'success');
+  const handleSaveCapacity = () => {
+    if (editingBatch) {
+      updateBatchCapacity(editingBatch.id, newCapacity);
+      setEditingBatch(null);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#13224E] pb-4">
           <div>
-            <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full mb-2">
-              <Layers className="w-3.5 h-3.5" />
-              <span>Manajemen Kapasitas & Rombongan Belajar</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Monitoring Kuota & Batch Bimbingan
+            <span className="font-mono text-[10px] font-bold uppercase text-[#1B3B8C] block mb-1">
+              MANAJEMEN RUANG & KUOTA KELAS
+            </span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
+              Monitoring Kapasitas Batch Bimbel
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Pantau rasio keterisian kursi kelas tatap muka, alokasi ruang belajar, dan jadwal tentor pengampu.
+            <p className="text-xs sm:text-sm text-[#637096] mt-0.5">
+              Alokasi kuota siswa per kelas, tutor penanggung jawab, dan ruang tatap muka.
             </p>
           </div>
-
-          <button
-            onClick={() => setModalOpen(true)}
-            className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-blue-600/20 transition"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>Tambah Batch Baru</span>
-          </button>
         </div>
 
-        {/* Classes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {classList.map((batch) => {
+        {/* Batch Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {batches.map((batch) => {
             const percentage = Math.round((batch.currentStudents / batch.maxCapacity) * 100);
             const isFull = percentage >= 100;
 
             return (
               <div
                 key={batch.id}
-                className="bg-white rounded-3xl p-6 shadow-elevated border border-slate-200 flex flex-col justify-between space-y-4"
+                className="bg-[#FFFFFF] border border-[#13224E] p-5 shadow-paper flex flex-col justify-between"
               >
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between font-mono text-[10px]">
+                    <span className="bg-[#FAFAF7] border border-[#CECEC2] px-2 py-0.5 font-semibold text-[#13224E]">
                       {batch.program}
                     </span>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      className={`font-bold px-2 py-0.5 ${
                         isFull
-                          ? 'bg-rose-100 text-rose-800 border border-rose-200'
-                          : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          ? 'bg-[#FDECEB] text-[#D0342C] border border-[#D0342C]/40'
+                          : 'bg-[#EAF7F0] text-[#126340] border border-[#1B8A5A]/30'
                       }`}
                     >
-                      {isFull ? 'Kapasitas Penuh' : 'Tersedia Kursi'}
+                      {isFull ? 'KAPASITAS PENUH' : 'TERSEDIA KURSI'}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900 leading-snug">
-                    {batch.name}
-                  </h3>
-
-                  <div className="space-y-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{batch.room}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <GraduationCap className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Tutor: {batch.tutorName}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="w-3.5 h-3.5 text-blue-500" />
-                      <span>{batch.schedule}</span>
-                    </div>
+                  <div>
+                    <h3 className="font-serif font-bold text-base text-[#13224E]">{batch.name}</h3>
+                    <p className="text-xs text-[#637096]">{batch.room} • Tutor: <strong className="text-[#13224E]">{batch.tutorName}</strong></p>
                   </div>
 
                   {/* Quota Progress */}
-                  <div className="space-y-1.5 pt-1">
-                    <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-500">Kuota Terisi:</span>
-                      <span className="text-slate-900 font-mono">
+                  <div className="space-y-1 font-mono text-xs bg-[#FAFAF7] p-3 border border-[#E4E4DC]">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-[#637096]">Keterisian Kursi:</span>
+                      <span className="font-bold text-[#13224E]">
                         {batch.currentStudents} / {batch.maxCapacity} ({percentage}%)
                       </span>
                     </div>
-                    <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                    <div className="w-full h-2 bg-[#E4E4DC] overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          isFull
-                            ? 'bg-rose-500'
-                            : percentage > 80
-                            ? 'bg-amber-500'
-                            : 'bg-emerald-500'
+                        className={`h-full transition-all ${
+                          isFull ? 'bg-[#D0342C]' : percentage > 80 ? 'bg-[#EFA93B]' : 'bg-[#1B8A5A]'
                         }`}
                         style={{ width: `${Math.min(100, percentage)}%` }}
                       />
                     </div>
                   </div>
+
+                  <div className="text-[11px] font-mono text-[#637096] flex items-center space-x-1">
+                    <Calendar className="w-3.5 h-3.5 text-[#1B3B8C]" />
+                    <span>Jadwal: {batch.schedule}</span>
+                  </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">Status: {batch.status.toUpperCase()}</span>
-                  <span className="font-bold text-blue-600 hover:underline cursor-pointer">
-                    Atur Siswa
+                <div className="mt-4 pt-3 border-t border-[#E4E4DC] flex items-center justify-between font-mono text-xs">
+                  <span className="text-[11px] text-[#637096]">
+                    Sisa: {Math.max(0, batch.maxCapacity - batch.currentStudents)} kursi
                   </span>
+                  <button
+                    onClick={() => {
+                      setEditingBatch(batch);
+                      setNewCapacity(batch.maxCapacity);
+                    }}
+                    className="inline-flex items-center space-x-1 text-[#1B3B8C] hover:underline font-semibold bg-[#FAFAF7] px-2 py-1 border border-[#CECEC2]"
+                  >
+                    <Edit2 className="w-3 h-3" />
+                    <span>Ubah Kuota</span>
+                  </button>
                 </div>
               </div>
             );
@@ -151,107 +120,56 @@ export default function AdminClassesPage() {
         </div>
       </div>
 
-      {/* Create Batch Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border border-slate-200 space-y-5 animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="text-base font-extrabold text-slate-900">Buka Batch Kelas Baru</h3>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1"
-              >
+      {/* Edit Capacity Modal */}
+      {editingBatch && (
+        <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4">
+          <div className="bg-[#FFFFFF] max-w-sm w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet font-sans">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
+              <h3 className="font-serif font-bold text-base text-[#13224E]">
+                Ubah Batas Kuota Kelas
+              </h3>
+              <button onClick={() => setEditingBatch(null)} className="text-[#637096]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateBatch} className="space-y-3 text-xs">
+            <div className="space-y-3 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Nama Batch / Kelas</label>
-                <input
-                  type="text"
-                  required
-                  value={newBatch.name}
-                  onChange={(e) => setNewBatch({ ...newBatch, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Program</label>
-                  <select
-                    value={newBatch.program}
-                    onChange={(e) => setNewBatch({ ...newBatch, program: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="SNBT Super Intensif">SNBT Super Intensif</option>
-                    <option value="Kedokteran Priority">Kedokteran Priority</option>
-                    <option value="Reguler Weekend">Reguler Weekend</option>
-                    <option value="Drilling UTBK 2026">Drilling UTBK 2026</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Maks. Kapasitas</label>
-                  <input
-                    type="number"
-                    required
-                    value={newBatch.maxCapacity}
-                    onChange={(e) => setNewBatch({ ...newBatch, maxCapacity: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 font-mono"
-                  />
-                </div>
+                <span className="text-[#637096] block font-mono">Nama Kelas:</span>
+                <span className="font-bold text-[#13224E] text-sm">{editingBatch.name}</span>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Ruangan / Lab</label>
+                <label className="block font-mono font-semibold text-[#13224E] mb-1">
+                  Kapasitas Maksimal Siswa (Kursi)
+                </label>
                 <input
-                  type="text"
-                  required
-                  value={newBatch.room}
-                  onChange={(e) => setNewBatch({ ...newBatch, room: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500"
+                  type="number"
+                  value={newCapacity}
+                  min={editingBatch.currentStudents}
+                  onChange={(e) => setNewCapacity(Number(e.target.value))}
+                  className="w-full px-3 py-2 bg-[#FAFAF7] border-2 border-[#13224E] font-mono text-base font-bold text-[#13224E] focus:outline-none"
                 />
+                <p className="text-[10px] font-mono text-[#637096] mt-1">
+                  *Tidak boleh kurang dari jumlah siswa terdaftar saat ini ({editingBatch.currentStudents} siswa).
+                </p>
               </div>
 
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Tutor Pengampu</label>
-                <input
-                  type="text"
-                  required
-                  value={newBatch.tutorName}
-                  onChange={(e) => setNewBatch({ ...newBatch, tutorName: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Jadwal Sesi</label>
-                <input
-                  type="text"
-                  required
-                  value={newBatch.schedule}
-                  onChange={(e) => setNewBatch({ ...newBatch, schedule: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+              <div className="pt-2 border-t border-[#E4E4DC] flex justify-end space-x-2 font-mono">
                 <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-600 bg-slate-100 hover:bg-slate-200 font-semibold"
+                  onClick={() => setEditingBatch(null)}
+                  className="px-3 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-[#637096]"
                 >
                   Batal
                 </button>
                 <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl text-white bg-blue-600 hover:bg-blue-700 font-bold shadow-md shadow-blue-600/20"
+                  onClick={handleSaveCapacity}
+                  className="px-4 py-1.5 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-semibold"
                 >
-                  Buka Kelas
+                  Simpan Perubahan
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

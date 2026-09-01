@@ -2,303 +2,188 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { SubtestId, QuestionType, Question } from '@/types';
 import { SUBTEST_CONFIGS } from '@/data/mockData';
+import { Question, SubtestId } from '@/types';
 import MathRenderer from '@/components/common/MathRenderer';
 import {
   Compass,
   PlusCircle,
-  Sparkles,
-  Layers,
-  Calculator,
+  Code,
   Eye,
   CheckCircle2,
   Trash2,
-  BookOpen,
+  X,
 } from 'lucide-react';
 
-export default function BankSoalPage() {
-  const { questions, addQuestion, showToast } = useApp();
+export default function AdminQuestionsPage() {
+  const { questions, addQuestion, deleteQuestion, showToast } = useApp();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [filterSubtest, setFilterSubtest] = useState<string>('all');
 
-  // Form State
-  const [subtestId, setSubtestId] = useState<SubtestId>('penalaran_matematika');
-  const [type, setType] = useState<QuestionType>('single_choice');
-  const [stimulus, setStimulus] = useState<string>(
-    'Diketahui sistem persamaan linear dua variabel dengan matriks koefisien $A = \\begin{pmatrix} 3 & 1 \\\\ 2 & 4 \\end{pmatrix}$.'
-  );
-  const [questionText, setQuestionText] = useState<string>(
-    'Tentukan nilai determinan $\\det(A)$ dan invers matriks $A^{-1}$!'
-  );
-  const [options, setOptions] = useState([
-    { id: 'A', text: '$\\det(A) = 10$, $A^{-1} = \\frac{1}{10}\\begin{pmatrix} 4 & -1 \\\\ -2 & 3 \\end{pmatrix}$' },
-    { id: 'B', text: '$\\det(A) = 14$, $A^{-1} = \\frac{1}{14}\\begin{pmatrix} 4 & 1 \\\\ 2 & 3 \\end{pmatrix}$' },
-    { id: 'C', text: '$\\det(A) = 8$, $A^{-1} = \\frac{1}{8}\\begin{pmatrix} 3 & -1 \\\\ -2 & 4 \\end{pmatrix}$' },
-    { id: 'D', text: '$\\det(A) = 10$, $A^{-1} = \\begin{pmatrix} 4 & -1 \\\\ -2 & 3 \\end{pmatrix}$' },
-    { id: 'E', text: '$\\det(A) = 6$, $A^{-1} = \\text{tidak terdefinisi}$' },
-  ]);
-  const [correctAnswer, setCorrectAnswer] = useState('A');
-  const [explanation, setExplanation] = useState<string>(
-    'Perhitungan determinan:\n$$\\det(A) = (3)(4) - (1)(2) = 12 - 2 = 10$$\nRumus invers matriks $2 \\times 2$:\n$$A^{-1} = \\frac{1}{\\det(A)} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix} = \\frac{1}{10}\\begin{pmatrix} 4 & -1 \\\\ -2 & 3 \\end{pmatrix}$$\nJawaban benar: **A**.'
-  );
-  const [difficulty, setDifficulty] = useState<'Mudah' | 'Sedang' | 'Sukar'>('Sedang');
+  const [formData, setFormData] = useState({
+    subtestId: 'penalaran_matematika' as SubtestId,
+    type: 'single_choice' as const,
+    stimulus: '',
+    question: 'Diberikan matriks $A = \\begin{pmatrix} 2 & x \\\\ 3 & 5 \\end{pmatrix}$. Jika $\\det(A) = 4$, maka nilai $x$ adalah...',
+    options: [
+      { id: 'A', text: '$x = 1$' },
+      { id: 'B', text: '$x = 2$' },
+      { id: 'C', text: '$x = 3$' },
+      { id: 'D', text: '$x = 4$' },
+      { id: 'E', text: '$x = 5$' },
+    ],
+    correctAnswer: 'B',
+    explanation: 'Perhitungan determinan: $$\\det(A) = (2)(5) - (3)(x) = 10 - 3x$$ Diketahui $\\det(A) = 4$, maka: $$10 - 3x = 4 \\implies 3x = 6 \\implies x = 2$$',
+    difficulty: 'Sedang' as const,
+    maxScore: 100,
+  });
 
-  // Math symbol helper insertion
-  const insertMathSnippet = (snippet: string) => {
-    setQuestionText((prev) => prev + ' ' + snippet);
+  const handleOptionTextChange = (index: number, text: string) => {
+    const newOptions = [...formData.options];
+    newOptions[index].text = text;
+    setFormData({ ...formData, options: newOptions });
   };
 
-  const handleSaveQuestion = (e: React.FormEvent) => {
+  const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newQ: Omit<Question, 'id'> = {
-      subtestId,
-      type,
+    const newQ: Question = {
+      id: `q-custom-${Date.now()}`,
+      subtestId: formData.subtestId,
       number: questions.length + 1,
-      stimulus,
-      question: questionText,
-      options: type === 'single_choice' || type === 'multi_select' ? options : undefined,
-      correctAnswer,
-      explanation,
-      maxScore: 40,
-      difficulty,
+      type: formData.type,
+      stimulus: formData.stimulus || undefined,
+      question: formData.question,
+      options: formData.options,
+      correctAnswer: formData.correctAnswer,
+      explanation: formData.explanation,
+      difficulty: formData.difficulty,
+      maxScore: formData.maxScore,
     };
 
     addQuestion(newQ);
+    setModalOpen(false);
+    showToast('Soal KaTeX baru berhasil disimpan ke Bank Soal!', 'success');
   };
 
+  const filteredQuestions = questions.filter((q) => {
+    if (filterSubtest === 'all') return true;
+    return q.subtestId === filterSubtest;
+  });
+
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#13224E] pb-4">
           <div>
-            <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-navy bg-blue-50 px-2.5 py-1 rounded-full mb-2">
-              <Compass className="w-3.5 h-3.5 text-blue-600" />
-              <span>Modul Bank Soal & KaTeX Formula Creator</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Bank Soal UTBK & Editor Formula KaTeX
+            <span className="font-mono text-[10px] font-bold uppercase text-[#1B3B8C] block mb-1">
+              ENGINE PEMBUAT SOAL MATEMATIKA & SAINS
+            </span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
+              Bank Soal KaTeX & Rumus Matematika
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Buat dan modifikasi butir soal sains, matriks, kalkulus, dan literasi dengan visualisasi rumus matematika real-time.
+            <p className="text-xs sm:text-sm text-[#637096] mt-0.5">
+              Kelola butir soal tryout dengan penulisan notasi LaTeX ($...$) dan preview instan client-side.
             </p>
           </div>
 
-          <div className="text-xs font-semibold bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
-            Total Bank Soal: <strong className="text-blue-600 font-mono text-sm">{questions.length}</strong> butir
-          </div>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center space-x-1.5 bg-[#13224E] hover:bg-[#1B3B8C] text-white text-xs font-mono px-3.5 py-2 transition"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-[#EFA93B]" />
+            <span>Buat Soal KaTeX Baru</span>
+          </button>
         </div>
 
-        {/* 2-Column Layout: Form on Left, Live Preview on Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left: Input Form */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-elevated border border-slate-200 space-y-5">
-            <h2 className="text-base font-extrabold text-slate-900 flex items-center space-x-2">
-              <PlusCircle className="w-5 h-5 text-blue-600" />
-              <span>Formulir Pembuatan Soal Baru</span>
-            </h2>
+        {/* Subtest Filter Tabs */}
+        <div className="flex items-center space-x-1.5 overflow-x-auto font-mono text-xs">
+          <button
+            onClick={() => setFilterSubtest('all')}
+            className={`px-3 py-1 border whitespace-nowrap transition ${
+              filterSubtest === 'all'
+                ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
+                : 'bg-[#FFFFFF] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
+            }`}
+          >
+            Semua Subtest ({questions.length})
+          </button>
+          {SUBTEST_CONFIGS.map((st) => (
+            <button
+              key={st.id}
+              onClick={() => setFilterSubtest(st.id)}
+              className={`px-3 py-1 border whitespace-nowrap transition ${
+                filterSubtest === st.id
+                  ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
+                  : 'bg-[#FFFFFF] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
+              }`}
+            >
+              {st.name.split(' ')[0]}
+            </button>
+          ))}
+        </div>
 
-            <form onSubmit={handleSaveQuestion} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Subtest UTBK</label>
-                  <select
-                    value={subtestId}
-                    onChange={(e) => setSubtestId(e.target.value as SubtestId)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500"
-                  >
-                    {SUBTEST_CONFIGS.map((st) => (
-                      <option key={st.id} value={st.id}>
-                        {st.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Format Soal</label>
-                  <select
-                    value={type}
-                    onChange={(e) => setType(e.target.value as QuestionType)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="single_choice">Pilihan Ganda (ABCDE)</option>
-                    <option value="multi_select">Pilihan Majemuk (Ceklis)</option>
-                    <option value="short_answer">Isian Singkat</option>
-                    <option value="essay">Esai Argumentatif</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Math Formula Shortcuts Toolbar */}
-              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                  ⚡ Shortcut Simbol & Rumus KaTeX:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => insertMathSnippet('$\\frac{a}{b}$')}
-                    className="px-2 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 font-mono text-[11px]"
-                  >
-                    Pecahan \frac&#123;a&#125;&#123;b&#125;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => insertMathSnippet('$\\sqrt{x}$')}
-                    className="px-2 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 font-mono text-[11px]"
-                  >
-                    Akar \sqrt&#123;x&#125;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => insertMathSnippet('$\\int_{0}^{2} f(x) \\, dx$')}
-                    className="px-2 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 font-mono text-[11px]"
-                  >
-                    Integral \int
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => insertMathSnippet('$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$')}
-                    className="px-2 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 font-mono text-[11px]"
-                  >
-                    Matriks 2x2
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => insertMathSnippet('$\\theta, \\alpha, \\pi$')}
-                    className="px-2 py-1 bg-white hover:bg-slate-100 rounded-lg border border-slate-300 font-mono text-[11px]"
-                  >
-                    Greek Simbol
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">
-                  Wacana / Konteks Stimulus (Opsional):
-                </label>
-                <textarea
-                  rows={2}
-                  value={stimulus}
-                  onChange={(e) => setStimulus(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 font-mono text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">
-                  Pertanyaan Utama (Mendukung $formula$):
-                </label>
-                <textarea
-                  rows={3}
-                  required
-                  value={questionText}
-                  onChange={(e) => setQuestionText(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 font-mono text-xs"
-                />
-              </div>
-
-              {/* Options Setup if Single Choice */}
-              {type === 'single_choice' && (
-                <div className="space-y-2">
-                  <label className="block font-semibold text-slate-700">Pilihan Jawaban (A-E):</label>
-                  {options.map((opt, i) => (
-                    <div key={opt.id} className="flex items-center space-x-2">
-                      <span className="w-6 font-bold text-center text-slate-700">{opt.id}</span>
-                      <input
-                        type="text"
-                        value={opt.text}
-                        onChange={(e) => {
-                          const updated = [...options];
-                          updated[i].text = e.target.value;
-                          setOptions(updated);
-                        }}
-                        className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  ))}
-
-                  <div className="pt-2 flex items-center space-x-2">
-                    <label className="font-semibold text-slate-700">Kunci Jawaban Benar:</label>
-                    <select
-                      value={correctAnswer as string}
-                      onChange={(e) => setCorrectAnswer(e.target.value)}
-                      className="px-3 py-1 bg-blue-50 border border-blue-300 rounded-lg font-bold text-blue-900"
-                    >
-                      {options.map((o) => (
-                        <option key={o.id} value={o.id}>
-                          Pilihan {o.id}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">
-                  Pembahasan / Solusi Konsep (KaTeX Supported):
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  value={explanation}
-                  onChange={(e) => setExplanation(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 font-mono text-xs"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-600/20 text-xs flex items-center justify-center space-x-2"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Simpan Soal ke Bank Soal</span>
-              </button>
-            </form>
-          </div>
-
-          {/* Right: Live Interactive KaTeX Preview */}
-          <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-elevated border border-slate-800 space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        {/* Questions List */}
+        <div className="space-y-4">
+          {filteredQuestions.map((q, idx) => (
+            <div
+              key={q.id}
+              className="bg-[#FFFFFF] border border-[#13224E] p-5 shadow-paper space-y-3"
+            >
+              <div className="flex items-start justify-between border-b border-[#E4E4DC] pb-2 font-mono text-xs">
                 <div className="flex items-center space-x-2">
-                  <Eye className="w-4 h-4 text-amber-400" />
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                    Live KaTeX Renderer Preview
-                  </h3>
-                </div>
-                <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full">
-                  Real-time
-                </span>
-              </div>
-
-              {stimulus && (
-                <div className="p-4 bg-slate-800/80 rounded-2xl border border-slate-700 text-xs text-slate-300">
-                  <span className="text-[10px] text-slate-400 font-bold block mb-1">
-                    Stimulus Wacana:
+                  <span className="font-bold bg-[#13224E] text-white px-2 py-0.5">
+                    #{idx + 1}
                   </span>
-                  <MathRenderer content={stimulus} />
+                  <span className="text-[#1B3B8C] font-semibold uppercase">
+                    [{q.subtestId.replace(/_/g, ' ')}]
+                  </span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 font-bold ${
+                      q.difficulty === 'Sukar'
+                        ? 'bg-[#FDECEB] text-[#D0342C]'
+                        : q.difficulty === 'Sedang'
+                        ? 'bg-[#FDF3E3] text-[#C8831A]'
+                        : 'bg-[#EAF7F0] text-[#126340]'
+                    }`}
+                  >
+                    {q.difficulty}
+                  </span>
                 </div>
-              )}
 
-              <div className="text-sm sm:text-base font-semibold text-white">
-                <MathRenderer content={questionText} />
+                <div className="flex items-center space-x-3">
+                  <span className="text-[#637096] text-[11px]">Bobot: {q.maxScore} Poin</span>
+                  <button
+                    onClick={() => deleteQuestion(q.id)}
+                    className="text-[#D0342C] hover:underline"
+                    title="Hapus Soal"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
-              {type === 'single_choice' && (
-                <div className="space-y-2 pt-2">
-                  {options.map((opt) => (
+              {/* Question Text */}
+              <div className="text-sm font-serif font-semibold text-[#13224E] leading-relaxed">
+                <MathRenderer content={q.question} />
+              </div>
+
+              {/* Options */}
+              {q.options && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {q.options.map((opt) => (
                     <div
                       key={opt.id}
-                      className={`p-3 rounded-xl border flex items-start space-x-3 text-xs ${
-                        opt.id === correctAnswer
-                          ? 'border-emerald-500 bg-emerald-950/40 text-emerald-200'
-                          : 'border-slate-800 bg-slate-800/50 text-slate-300'
+                      className={`p-2 border flex items-center space-x-2 ${
+                        opt.id === q.correctAnswer
+                          ? 'border-[#1B8A5A] bg-[#EAF7F0]/40'
+                          : 'border-[#E4E4DC] bg-[#FAFAF7]'
                       }`}
                     >
-                      <span className="font-bold">{opt.id}.</span>
-                      <div className="flex-1">
+                      <span className="font-mono font-bold w-5 h-5 bg-[#FFFFFF] border border-[#CECEC2] flex items-center justify-center text-[10px]">
+                        {opt.id}
+                      </span>
+                      <div className="text-[#13224E]">
                         <MathRenderer content={opt.text} />
                       </div>
                     </div>
@@ -306,20 +191,140 @@ export default function BankSoalPage() {
                 </div>
               )}
 
-              <div className="p-4 bg-slate-800/90 rounded-2xl border border-slate-700 text-xs text-slate-300">
-                <span className="font-bold text-amber-400 block mb-1">
-                  Preview Pembahasan & Rumus:
+              {/* Explanation */}
+              <div className="p-3 bg-[#FAFAF7] border border-[#E4E4DC] text-xs text-[#13224E] space-y-1">
+                <span className="font-mono text-[9px] uppercase font-bold text-[#1B3B8C] block">
+                  Pembahasan KaTeX:
                 </span>
-                <MathRenderer content={explanation} />
+                <MathRenderer content={q.explanation} />
               </div>
             </div>
-
-            <div className="text-[11px] text-slate-500 pt-4 border-t border-slate-800">
-              ⚡ KaTeX di-compile secara instan tanpa request server (0ms server latency).
-            </div>
-          </div>
+          ))}
         </div>
       </div>
+
+      {/* Modal Create Question */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#FFFFFF] max-w-2xl w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet font-sans my-8">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
+              <h3 className="font-serif font-bold text-base text-[#13224E]">
+                Editor Naskah Soal & Rumus KaTeX
+              </h3>
+              <button onClick={() => setModalOpen(false)} className="text-[#637096]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3 font-mono">
+                <div>
+                  <label className="block text-[#13224E] font-semibold mb-1">Subtest</label>
+                  <select
+                    value={formData.subtestId}
+                    onChange={(e) => setFormData({ ...formData, subtestId: e.target.value as any })}
+                    className="w-full p-2 bg-[#FAFAF7] border border-[#CECEC2] text-xs"
+                  >
+                    {SUBTEST_CONFIGS.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[#13224E] font-semibold mb-1">Tingkat Kesulitan</label>
+                  <select
+                    value={formData.difficulty}
+                    onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
+                    className="w-full p-2 bg-[#FAFAF7] border border-[#CECEC2] text-xs"
+                  >
+                    <option value="Mudah">Mudah</option>
+                    <option value="Sedang">Sedang</option>
+                    <option value="Sukar">Sukar</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-[#13224E] mb-1">
+                  Naskah Soal (Gunakan $rumus$ atau $$blok_rumus$$)
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={formData.question}
+                  onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+                  className="w-full p-2.5 bg-[#FAFAF7] border border-[#CECEC2] font-mono text-xs focus:outline-none focus:border-[#13224E]"
+                />
+              </div>
+
+              {/* Live Preview Box */}
+              <div className="p-3 bg-[#FAFAF7] border border-[#1B3B8C] space-y-1">
+                <span className="font-mono text-[9px] text-[#1B3B8C] uppercase font-bold block">
+                  Pratinjau Live KaTeX:
+                </span>
+                <div className="font-serif text-sm font-semibold text-[#13224E]">
+                  <MathRenderer content={formData.question || 'Ketik rumus di atas...'} />
+                </div>
+              </div>
+
+              {/* Options Inputs */}
+              <div className="space-y-2">
+                <label className="block font-semibold text-[#13224E]">Pilihan Jawaban (A-E)</label>
+                {formData.options.map((opt, idx) => (
+                  <div key={opt.id} className="flex items-center space-x-2 font-mono">
+                    <span className="w-6 h-6 bg-[#13224E] text-white flex items-center justify-center font-bold text-xs">
+                      {opt.id}
+                    </span>
+                    <input
+                      type="text"
+                      value={opt.text}
+                      onChange={(e) => handleOptionTextChange(idx, e.target.value)}
+                      className="flex-1 p-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-xs"
+                    />
+                    <input
+                      type="radio"
+                      name="correctRadio"
+                      checked={formData.correctAnswer === opt.id}
+                      onChange={() => setFormData({ ...formData, correctAnswer: opt.id })}
+                      className="w-4 h-4 text-[#1B8A5A]"
+                    />
+                    <span className="text-[10px] text-[#637096]">Kunci</span>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <label className="block font-semibold text-[#13224E] mb-1">
+                  Pembahasan Solusi Lengkap
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={formData.explanation}
+                  onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
+                  className="w-full p-2.5 bg-[#FAFAF7] border border-[#CECEC2] font-mono text-xs focus:outline-none"
+                />
+              </div>
+
+              <div className="pt-2 border-t border-[#E4E4DC] flex justify-end space-x-2 font-mono">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-3 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-[#637096]"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-semibold"
+                >
+                  Simpan ke Bank Soal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

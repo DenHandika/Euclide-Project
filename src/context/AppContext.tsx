@@ -58,6 +58,7 @@ interface AppContextType {
   
   // Bank Soal
   addQuestion: (question: Omit<Question, 'id'>) => void;
+  deleteQuestion: (id: string) => void;
   
   // Essay Grading
   essaySubmissions: EssaySubmission[];
@@ -67,6 +68,7 @@ interface AppContextType {
   batches: ClassBatch[];
   students: User[];
   payments: PaymentRecord[];
+  updateBatchCapacity: (batchId: string, maxCapacity: number) => void;
   toggleStudentStatus: (studentId: string, status: UserStatus) => void;
   addManualPayment: (payment: Omit<PaymentRecord, 'id' | 'invoiceNumber' | 'paidAt'>) => PaymentRecord;
   importPaymentsBulk: (rows: PaymentImportRow[]) => { importedCount: number; errorsCount: number };
@@ -419,6 +421,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     showToast('Soal berhasil ditambahkan ke Bank Soal!', 'success');
   };
 
+  const deleteQuestion = (id: string) => {
+    const updated = questions.filter((q) => q.id !== id);
+    setQuestions(updated);
+    saveState('euclide_questions', updated);
+    showToast('Soal berhasil dihapus dari Bank Soal.', 'info');
+  };
+
   const gradeEssay = (id: string, score: number, feedback: string) => {
     setEssaySubmissions((prev) => {
       const updated = prev.map((item) =>
@@ -518,6 +527,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   };
 
+  const updateBatchCapacity = (batchId: string, maxCapacity: number) => {
+    setBatches((prev) => {
+      const updated = prev.map((b) => (b.id === batchId ? { ...b, maxCapacity } : b));
+      saveState('euclide_batches', updated);
+      return updated;
+    });
+    showToast('Kapasitas kuota batch berhasil diperbarui!', 'success');
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -540,11 +558,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         examResults,
         getExamResult,
         addQuestion,
+        deleteQuestion,
         essaySubmissions,
         gradeEssay,
         batches,
         students,
         payments,
+        updateBatchCapacity,
         toggleStudentStatus,
         addManualPayment,
         importPaymentsBulk,

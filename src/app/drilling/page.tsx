@@ -2,19 +2,13 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { SUBTEST_CONFIGS, MOCK_QUESTIONS } from '@/data/mockData';
+import { SUBTEST_CONFIGS } from '@/data/mockData';
 import { SubtestId, Question } from '@/types';
 import MathRenderer from '@/components/common/MathRenderer';
 import {
-  Layers,
-  Sparkles,
   CheckCircle2,
   XCircle,
-  HelpCircle,
   ArrowRight,
-  Flame,
-  Clock,
-  BookOpen,
 } from 'lucide-react';
 
 export default function DrillingPage() {
@@ -24,12 +18,11 @@ export default function DrillingPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | string[]>('');
   const [showExplanation, setShowExplanation] = useState(false);
 
-  // Filter questions for the selected subtest or fallback
   const subtestQuestions = questions.filter((q) => q.subtestId === selectedSubtest);
   const currentQ: Question = subtestQuestions[activeQuestionIndex] || questions[0];
 
   const handleSelectOption = (optId: string) => {
-    if (showExplanation) return; // Locked once evaluated
+    if (showExplanation) return;
     if (currentQ.type === 'multi_select') {
       const currentList = Array.isArray(selectedAnswer) ? [...selectedAnswer] : [];
       if (currentList.includes(optId)) {
@@ -72,27 +65,24 @@ export default function DrillingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8">
+    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Hub Header */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-elevated border border-slate-200">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full mb-2">
-                <Flame className="w-3.5 h-3.5 text-amber-500" />
-                <span>Drilling Adaptif Tanpa Batas Waktu</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Modul Drilling & Pembahasan KaTeX
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Latihan soal harian per subtest dengan evaluasi rumus instan dan penjelasan konsep mendalam.
-              </p>
-            </div>
+        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 shadow-paper">
+          <div className="border-b border-[#E4E4DC] pb-3 mb-4">
+            <span className="font-mono text-[10px] text-[#637096] uppercase font-bold block mb-1">
+              MODUL LATIHAN ADAPTIF
+            </span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
+              Lembar Latihan Soal & Pembahasan KaTeX
+            </h1>
+            <p className="text-xs text-[#637096] mt-0.5">
+              Drilling per subtest dengan evaluasi rumus matematika instan dan penjelasan konsep.
+            </p>
           </div>
 
           {/* Subtest Selector Tabs */}
-          <div className="mt-6 flex items-center space-x-2 overflow-x-auto pb-2">
+          <div className="flex items-center space-x-1.5 overflow-x-auto font-mono text-xs">
             {SUBTEST_CONFIGS.map((st) => (
               <button
                 key={st.id}
@@ -102,97 +92,95 @@ export default function DrillingPage() {
                   setSelectedAnswer('');
                   setShowExplanation(false);
                 }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+                className={`px-3 py-1.5 border whitespace-nowrap transition ${
                   selectedSubtest === st.id
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
+                    : 'bg-[#FAFAF7] text-[#637096] border-[#E4E4DC] hover:border-[#13224E]'
                 }`}
               >
-                {st.name}
+                {st.name.split(' ')[0]}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Drilling Question Card */}
+        {/* Drilling Question Paper Worksheet */}
         {currentQ ? (
-          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-elevated border border-slate-200 space-y-6">
-            {/* Question Top Metadata */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 shadow-paper space-y-5">
+            {/* Top Metadata */}
+            <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-3 font-mono text-xs">
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
-                  Soal #{activeQuestionIndex + 1}
+                <span className="font-bold bg-[#13224E] text-white px-2.5 py-0.5">
+                  SOAL #{activeQuestionIndex + 1}
                 </span>
-                <span className="text-xs font-semibold text-slate-500 capitalize">
-                  Tipe: {currentQ.type.replace('_', ' ')}
+                <span className="text-[#637096] uppercase">
+                  Tipe: {currentQ.type.replace(/_/g, ' ')}
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 text-[10px]">
                 <span
-                  className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                  className={`font-bold px-2 py-0.5 ${
                     currentQ.difficulty === 'Sukar'
-                      ? 'bg-rose-100 text-rose-700'
+                      ? 'bg-[#FDECEB] text-[#D0342C]'
                       : currentQ.difficulty === 'Sedang'
-                      ? 'bg-amber-100 text-amber-700'
-                      : 'bg-emerald-100 text-emerald-700'
+                      ? 'bg-[#FDF3E3] text-[#C8831A]'
+                      : 'bg-[#EAF7F0] text-[#126340]'
                   }`}
                 >
-                  {currentQ.difficulty}
+                  Tingkat: {currentQ.difficulty}
                 </span>
-                <span className="text-xs font-medium text-slate-400">
+                <span className="text-[#637096]">
                   {subtestQuestions.length} Soal Tersedia
                 </span>
               </div>
             </div>
 
-            {/* Stimulus Context (if any) */}
+            {/* Stimulus Context */}
             {currentQ.stimulus && (
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-800 leading-relaxed">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                  Wacana / Konteks:
+              <div className="p-4 bg-[#FAFAF7] border border-[#E4E4DC] text-xs sm:text-sm text-[#13224E] leading-relaxed">
+                <span className="font-mono text-[9px] text-[#637096] uppercase font-bold block mb-1">
+                  [ WACANA / STIMULUS ]
                 </span>
                 <MathRenderer content={currentQ.stimulus} />
               </div>
             )}
 
-            {/* Prompt */}
-            <div className="text-sm sm:text-base font-medium text-slate-900 leading-relaxed">
+            {/* Question Prompt */}
+            <div className="text-sm sm:text-base font-serif font-semibold text-[#13224E] leading-relaxed pt-1">
               <MathRenderer content={currentQ.question} />
             </div>
 
-            {/* Options / Inputs based on Question Format */}
+            {/* Single Choice Format */}
             {currentQ.type === 'single_choice' && currentQ.options && (
-              <div className="space-y-3">
+              <div className="space-y-2.5 pt-2">
                 {currentQ.options.map((opt) => {
                   const isSelected = selectedAnswer === opt.id;
-                  let cardStyle = isSelected
-                    ? 'border-blue-600 bg-blue-50/70 text-blue-900 ring-2 ring-blue-500/20'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-800';
+                  let cardBorder = 'border-[#E4E4DC] bg-[#FFFFFF] hover:border-[#CECEC2] hover:bg-[#FAFAF7]';
 
                   if (showExplanation) {
                     if (opt.id === currentQ.correctAnswer) {
-                      cardStyle = 'border-emerald-500 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-500/20';
+                      cardBorder = 'border-[#1B8A5A] bg-[#EAF7F0]/40';
                     } else if (isSelected && opt.id !== currentQ.correctAnswer) {
-                      cardStyle = 'border-rose-500 bg-rose-50 text-rose-900 ring-2 ring-rose-500/20';
+                      cardBorder = 'border-[#D0342C] bg-[#FDECEB]/40';
                     }
+                  } else if (isSelected) {
+                    cardBorder = 'border-[#1B3B8C] bg-[#FAFAF7]';
                   }
 
                   return (
                     <div
                       key={opt.id}
                       onClick={() => handleSelectOption(opt.id)}
-                      className={`flex items-start space-x-3.5 p-3.5 rounded-2xl border cursor-pointer transition-all ${cardStyle}`}
+                      className={`flex items-start space-x-3 p-3 border cursor-pointer transition ${cardBorder}`}
                     >
                       <span
-                        className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                          isSelected
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-slate-100 text-slate-700 border border-slate-200'
+                        className={`omr-bubble shrink-0 ${
+                          isSelected ? 'omr-bubble-filled' : ''
                         }`}
                       >
                         {opt.id}
                       </span>
-                      <div className="pt-0.5 text-xs sm:text-sm leading-relaxed flex-1">
+                      <div className="pt-1 text-xs sm:text-sm leading-relaxed flex-1 text-[#13224E]">
                         <MathRenderer content={opt.text} />
                       </div>
                     </div>
@@ -201,44 +189,11 @@ export default function DrillingPage() {
               </div>
             )}
 
-            {currentQ.type === 'multi_select' && currentQ.options && (
-              <div className="space-y-3">
-                <div className="text-xs text-amber-700 font-semibold bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                  ℹ️ Soal Kotak-kotak: Pilih <strong>semua</strong> jawaban yang benar.
-                </div>
-                {currentQ.options.map((opt) => {
-                  const selectedArr = Array.isArray(selectedAnswer) ? selectedAnswer : [];
-                  const isChecked = selectedArr.includes(opt.id);
-
-                  return (
-                    <div
-                      key={opt.id}
-                      onClick={() => handleSelectOption(opt.id)}
-                      className={`flex items-start space-x-3.5 p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                        isChecked
-                          ? 'border-blue-600 bg-blue-50/70 text-blue-900 ring-2 ring-blue-500/20'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        readOnly
-                        className="mt-1 w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="text-xs sm:text-sm leading-relaxed flex-1">
-                        <MathRenderer content={opt.text} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
+            {/* Short Answer Format */}
             {currentQ.type === 'short_answer' && (
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-700">
-                  Ketik jawaban singkat Anda di bawah ini:
+              <div className="space-y-2 pt-2">
+                <label className="block text-xs font-mono font-semibold text-[#13224E]">
+                  Ketik jawaban Anda:
                 </label>
                 <input
                   type="text"
@@ -246,16 +201,16 @@ export default function DrillingPage() {
                   value={selectedAnswer as string}
                   onChange={(e) => setSelectedAnswer(e.target.value)}
                   disabled={showExplanation}
-                  className="w-full max-w-sm px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                  className="w-full max-w-sm px-3 py-2 bg-[#FAFAF7] border-2 border-[#13224E] font-mono text-sm font-bold text-[#13224E] focus:outline-none"
                 />
               </div>
             )}
 
-            {/* Evaluation Action Buttons */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            {/* Actions */}
+            <div className="flex items-center justify-between pt-4 border-t border-[#E4E4DC] font-mono text-xs">
               <button
                 onClick={() => handleNextQuestion()}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+                className="text-[#637096] hover:text-[#13224E]"
               >
                 Lewati Soal
               </button>
@@ -264,15 +219,14 @@ export default function DrillingPage() {
                 <button
                   onClick={handleCheckAnswer}
                   disabled={!selectedAnswer || (Array.isArray(selectedAnswer) && selectedAnswer.length === 0)}
-                  className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-blue-600/20 transition"
+                  className="bg-[#13224E] hover:bg-[#1B3B8C] disabled:opacity-40 text-white font-semibold px-4 py-2 transition"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Periksa Jawaban</span>
+                  Periksa Jawaban
                 </button>
               ) : (
                 <button
                   onClick={handleNextQuestion}
-                  className="inline-flex items-center space-x-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md transition"
+                  className="inline-flex items-center space-x-1.5 bg-[#1B3B8C] hover:bg-[#274DB8] text-white font-semibold px-4 py-2 transition"
                 >
                   <span>Soal Berikutnya</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -280,31 +234,31 @@ export default function DrillingPage() {
               )}
             </div>
 
-            {/* Live Explanation & KaTeX Pembahasan */}
+            {/* Explanation Box */}
             {showExplanation && (
-              <div className="mt-4 p-5 rounded-2xl bg-slate-900 text-white space-y-3 animate-in fade-in slide-in-from-bottom-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
+              <div className="mt-4 p-4 border border-[#13224E] bg-[#FAFAF7] space-y-2.5 animate-in fade-in">
+                <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2 font-mono text-xs">
+                  <div>
                     {isCorrect() ? (
-                      <span className="flex items-center space-x-1 text-emerald-400 font-bold text-xs">
+                      <span className="flex items-center space-x-1 text-[#1B8A5A] font-bold">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>Jawaban Anda BENAR! (+{currentQ.maxScore} Poin)</span>
+                        <span>Jawaban Anda BENAR (+{currentQ.maxScore} Poin)</span>
                       </span>
                     ) : (
-                      <span className="flex items-center space-x-1 text-rose-400 font-bold text-xs">
+                      <span className="flex items-center space-x-1 text-[#D0342C] font-bold">
                         <XCircle className="w-4 h-4" />
                         <span>Jawaban Anda Kurang Tepat</span>
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[#637096]">
                     Kunci: {Array.isArray(currentQ.correctAnswer) ? currentQ.correctAnswer.join(', ') : currentQ.correctAnswer}
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-slate-800 text-xs sm:text-sm text-slate-300">
-                  <span className="font-bold text-amber-400 block mb-1">
-                    Pembahasan Konsep (KaTeX Engine):
+                <div className="text-xs sm:text-sm text-[#13224E] leading-relaxed pt-1">
+                  <span className="font-mono text-[10px] uppercase font-bold text-[#1B3B8C] block mb-1">
+                    PEMBAHASAN FORMULA (KaTeX Engine):
                   </span>
                   <MathRenderer content={currentQ.explanation} />
                 </div>
@@ -312,8 +266,8 @@ export default function DrillingPage() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center text-slate-500">
-            Belum ada soal pada subtest ini. Silakan pilih subtest lain.
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-12 text-center text-[#637096]">
+            Belum ada soal pada subtest ini.
           </div>
         )}
       </div>

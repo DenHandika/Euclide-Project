@@ -10,26 +10,26 @@ export function ToastStack() {
   if (!toasts || toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-20 right-4 z-50 flex flex-col space-y-2 max-w-sm pointer-events-none">
+    <div className="fixed top-20 right-4 z-50 flex flex-col space-y-2 max-w-sm pointer-events-none font-sans text-xs">
       {toasts.map((toast) => {
-        let bg = 'bg-slate-900 text-white border-slate-700';
-        let icon = <Info className="w-4 h-4 text-blue-400 shrink-0" />;
+        let bg = 'bg-[#FFFFFF] text-[#13224E] border-[#13224E]';
+        let icon = <Info className="w-4 h-4 text-[#1B3B8C] shrink-0" />;
 
         if (toast.type === 'success') {
-          bg = 'bg-emerald-900/95 text-emerald-100 border-emerald-700';
-          icon = <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />;
+          bg = 'bg-[#FFFFFF] text-[#13224E] border-[#1B8A5A]';
+          icon = <CheckCircle2 className="w-4 h-4 text-[#1B8A5A] shrink-0" />;
         } else if (toast.type === 'error') {
-          bg = 'bg-rose-900/95 text-rose-100 border-rose-700';
-          icon = <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />;
+          bg = 'bg-[#FFFFFF] text-[#13224E] border-[#D0342C]';
+          icon = <AlertCircle className="w-4 h-4 text-[#D0342C] shrink-0" />;
         } else if (toast.type === 'warning') {
-          bg = 'bg-amber-900/95 text-amber-100 border-amber-700';
-          icon = <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />;
+          bg = 'bg-[#FFFFFF] text-[#13224E] border-[#EFA93B]';
+          icon = <AlertTriangle className="w-4 h-4 text-[#C8831A] shrink-0" />;
         }
 
         return (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center justify-between p-3.5 rounded-xl border shadow-xl backdrop-blur-md text-xs font-medium transition-all duration-300 animate-in slide-in-from-right-5 ${bg}`}
+            className={`pointer-events-auto flex items-center justify-between p-3 border-2 shadow-sheet text-xs font-medium transition-all animate-in slide-in-from-right-5 ${bg}`}
           >
             <div className="flex items-center space-x-2.5 mr-2">
               {icon}
@@ -37,7 +37,7 @@ export function ToastStack() {
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-white/60 hover:text-white p-1 rounded-lg hover:bg-white/10"
+              className="text-[#637096] hover:text-[#13224E] p-1"
             >
               <X className="w-3.5 h-3.5" />
             </button>
