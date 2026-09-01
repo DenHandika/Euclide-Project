@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { UserRole } from '@/types';
 import { MOCK_USERS } from '@/data/mockData';
@@ -16,8 +17,15 @@ import {
 import Link from 'next/link';
 
 export function RoleSwitcher() {
+  const pathname = usePathname();
+  const isExamScreen = pathname?.startsWith('/exam/') && !pathname?.includes('/result');
+
   const { currentRole, currentUser, switchRole, switchUser } = useApp();
   const [isOpen, setIsOpen] = useState(false);
+
+  if (isExamScreen) {
+    return null;
+  }
 
   const rolesConfig: {
     role: UserRole;

@@ -50,6 +50,11 @@ export function Navbar() {
 
   const isSuspended = currentUser.status === 'suspended';
   const isGraduated = currentUser.status === 'graduated';
+  const isExamScreen = pathname.startsWith('/exam/') && !pathname.includes('/result');
+
+  if (isExamScreen) {
+    return null;
+  }
 
   return (
     <>

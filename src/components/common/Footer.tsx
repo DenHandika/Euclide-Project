@@ -2,8 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+  const pathname = usePathname();
+  const isExamScreen = pathname?.startsWith('/exam/') && !pathname?.includes('/result');
+
+  if (isExamScreen) {
+    return null;
+  }
+
   return (
     <footer className="bg-[#FFFFFF] border-t border-[#E4E4DC] text-[#637096] text-xs py-10 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
