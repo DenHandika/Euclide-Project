@@ -78,8 +78,8 @@ export default function ExamResultPage() {
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <span className="w-2.5 h-2.5 bg-[#13224E]" />
-                <span className="font-mono text-xs font-bold uppercase text-[#13224E]">
-                  LEMBAR HASIL UJIAN CBT & EVALUASI RASIONALISASI PTN
+                <span className="font-mono text-xs font-semibold text-[#13224E]">
+                  Lembar Evaluasi Hasil Ujian CBT & Rasionalisasi PTN
                 </span>
               </div>
               <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
@@ -278,8 +278,8 @@ export default function ExamResultPage() {
                 </h3>
                 <p className="text-xs text-[#637096]">Skor Siswa vs Rata-rata Nasional BPPP</p>
               </div>
-              <span className="font-mono text-[9px] text-[#1B3B8C] bg-[#FAFAF7] border border-[#E4E4DC] px-2 py-0.5">
-                IRT NORMALIZED
+              <span className="font-mono text-[10px] text-[#1B3B8C] bg-[#FAFAF7] border border-[#E4E4DC] px-2 py-0.5">
+                Standar IRT
               </span>
             </div>
 
@@ -327,8 +327,8 @@ export default function ExamResultPage() {
                 </h3>
                 <p className="text-xs text-[#637096]">Rincian pencapaian skor per bidang</p>
               </div>
-              <span className="font-mono text-[9px] text-[#13224E] bg-[#FAFAF7] border border-[#E4E4DC] px-2 py-0.5">
-                7 SUBTEST
+              <span className="font-mono text-[10px] text-[#13224E] bg-[#FAFAF7] border border-[#E4E4DC] px-2 py-0.5">
+                7 Subtest
               </span>
             </div>
 
