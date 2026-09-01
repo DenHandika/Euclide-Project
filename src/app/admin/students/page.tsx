@@ -51,7 +51,7 @@ export default function AdminStudentsPage() {
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-4 flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-[#637096] absolute left-3 top-2.5" />
             <input
@@ -88,7 +88,7 @@ export default function AdminStudentsPage() {
         </div>
 
         {/* Students Table */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-sans">
               <thead>

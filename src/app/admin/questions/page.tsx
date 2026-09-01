@@ -198,7 +198,7 @@ export default function AdminQuestionsPage() {
           {filteredQuestions.map((q) => (
             <div
               key={q.id}
-              className="bg-[#FFFFFF] border-2 border-[#E4E4DC] hover:border-[#13224E] p-5 shadow-paper space-y-4 flex flex-col justify-between transition"
+              className="bg-[#FFFFFF] border-2 border-[#E4E4DC] hover:border-[#13224E] p-5 space-y-4 flex flex-col justify-between transition"
             >
               <div className="space-y-3">
                 {/* Meta Header */}
@@ -286,7 +286,7 @@ export default function AdminQuestionsPage() {
           className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4 overflow-y-auto font-sans"
           onPaste={handlePasteImage}
         >
-          <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet my-8 max-h-[92vh] overflow-y-auto">
+          <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border-2 border-[#13224E] space-y-4 my-8 max-h-[92vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[#E4E4DC]">
               <div>

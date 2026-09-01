@@ -198,7 +198,7 @@ export default function AdminPaymentsPage() {
           className={`border-2 border-dashed p-8 text-center cursor-pointer transition-all ${
             isDragging
               ? 'border-[#1B8A5A] bg-[#EAF7F0]'
-              : 'border-[#CECEC2] bg-[#FFFFFF] hover:border-[#13224E] shadow-paper'
+              : 'border-[#CECEC2] bg-[#FFFFFF] hover:border-[#13224E]'
           }`}
         >
           <input
@@ -235,7 +235,7 @@ export default function AdminPaymentsPage() {
 
         {/* 2. Spreadsheet Preview Table */}
         {parsedRows.length > 0 && (
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4 animate-in fade-in">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4 animate-in fade-in">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E4DC] pb-3">
               <div>
                 <h3 className="font-serif font-bold text-base text-[#13224E]">
@@ -306,7 +306,7 @@ export default function AdminPaymentsPage() {
         )}
 
         {/* 3. Existing Payment History Table */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
           <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#13224E]">
@@ -383,7 +383,7 @@ export default function AdminPaymentsPage() {
       {/* Manual Entry Modal */}
       {manualModalOpen && (
         <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] max-w-md w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet font-sans">
+          <div className="bg-[#FFFFFF] max-w-md w-full p-6 border-2 border-[#13224E] space-y-4 font-sans">
             <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
               <h3 className="font-serif font-bold text-base text-[#13224E]">
                 Entri Pembayaran Kasir Manual

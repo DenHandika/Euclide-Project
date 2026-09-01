@@ -612,7 +612,7 @@ export default function CBTExamPlayerPage() {
       {/* ========================================================================= */}
       {isPaletteOpen && (
         <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] max-w-xl w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet font-sans my-8">
+          <div className="bg-[#FFFFFF] max-w-xl w-full p-6 border-2 border-[#13224E] space-y-4 font-sans my-8">
             <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
               <div>
                 <h3 className="font-serif font-bold text-base text-[#13224E]">
@@ -696,7 +696,7 @@ export default function CBTExamPlayerPage() {
       {/* ========================================================================= */}
       {submitModalOpen && (
         <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] max-w-md w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet font-sans">
+          <div className="bg-[#FFFFFF] max-w-md w-full p-6 border-2 border-[#13224E] space-y-4 font-sans">
             <div className="flex items-center space-x-2 pb-2 border-b border-[#E4E4DC]">
               <Send className="w-4 h-4 text-[#1B3B8C]" />
               <h3 className="font-serif font-bold text-base text-[#13224E]">

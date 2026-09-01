@@ -29,7 +29,7 @@ export function ToastStack() {
         return (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center justify-between p-3 border-2 shadow-sheet text-xs font-medium transition-all animate-in slide-in-from-right-5 ${bg}`}
+            className={`pointer-events-auto flex items-center justify-between p-3 border-2 text-xs font-medium transition-all animate-in slide-in-from-right-5 ${bg}`}
           >
             <div className="flex items-center space-x-2.5 mr-2">
               {icon}

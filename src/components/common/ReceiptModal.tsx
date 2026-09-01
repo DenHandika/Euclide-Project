@@ -26,7 +26,7 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4">
-      <div className="bg-[#FFFFFF] max-w-lg w-full border-2 border-[#13224E] shadow-sheet p-6 space-y-5 font-sans">
+      <div className="bg-[#FFFFFF] max-w-lg w-full border-2 border-[#13224E] p-6 space-y-5 font-sans">
         {/* Modal Top Actions (Hidden on Print) */}
         <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-3 no-print">
           <div className="flex items-center space-x-2 font-mono text-xs font-bold text-[#13224E]">

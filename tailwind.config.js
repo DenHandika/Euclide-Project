@@ -51,8 +51,8 @@ module.exports = {
         mono: ['JetBrains Mono', 'Menlo', 'monospace'],
       },
       boxShadow: {
-        'paper': '0 1px 3px 0 rgba(19, 34, 78, 0.05)',
-        'sheet': '0 4px 16px -2px rgba(19, 34, 78, 0.07)',
+        'paper': 'none',
+        'sheet': 'none',
       },
     },
   },

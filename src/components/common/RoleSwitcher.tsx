@@ -77,7 +77,7 @@ export function RoleSwitcher() {
     <div className="fixed bottom-4 right-4 z-50 max-w-sm sm:max-w-md font-sans">
       {/* Expanded Control Box */}
       {isOpen && (
-        <div className="mb-2 bg-[#FFFFFF] border-2 border-[#13224E] shadow-sheet p-4 rounded-sm animate-in fade-in slide-in-from-bottom-2">
+        <div className="mb-2 bg-[#FFFFFF] border-2 border-[#13224E] p-4 rounded-sm animate-in fade-in slide-in-from-bottom-2">
           {/* Header */}
           <div className="flex items-center justify-between pb-2.5 border-b border-[#E4E4DC]">
             <div className="flex items-center space-x-2">
@@ -195,7 +195,7 @@ export function RoleSwitcher() {
       {/* Floating Pill Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 bg-[#13224E] hover:bg-[#1B3B8C] text-white px-3.5 py-2 border border-[#13224E] shadow-sheet transition text-xs font-mono"
+        className="flex items-center space-x-2 bg-[#13224E] hover:bg-[#1B3B8C] text-white px-3.5 py-2 border border-[#13224E] transition text-xs font-mono"
       >
         <span className="w-2 h-2 rounded-full bg-[#EFA93B]" />
         <span>Peran: <strong className="text-[#EFA93B] uppercase">{currentRole}</strong></span>

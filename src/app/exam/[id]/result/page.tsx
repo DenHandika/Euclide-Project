@@ -73,7 +73,7 @@ export default function ExamResultPage() {
     <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* 1. Official Examination Evaluation Sheet Header */}
-        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 shadow-paper">
+        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E4E4DC] pb-4">
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
@@ -176,7 +176,7 @@ export default function ExamResultPage() {
         </div>
 
         {/* 3. Target PTN Rationalization Cards */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-5 shadow-paper">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-5">
           <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#13224E]">
@@ -270,7 +270,7 @@ export default function ExamResultPage() {
         {/* 4. Recharts Visualizations: Radar Chart & Subtest Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Radar Chart: 7 Subtest Performance */}
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-3">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-3">
             <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
               <div>
                 <h3 className="font-serif font-bold text-base text-[#13224E]">
@@ -319,7 +319,7 @@ export default function ExamResultPage() {
           </div>
 
           {/* Bar Chart: Subtest Score Details */}
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-3">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-3">
             <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
               <div>
                 <h3 className="font-serif font-bold text-base text-[#13224E]">
@@ -361,7 +361,7 @@ export default function ExamResultPage() {
         </div>
 
         {/* 5. Tentor Strategy Notes (Ruled Sheet Style) */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-4 shadow-paper">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-4">
           <div className="flex items-center space-x-3 pb-3 border-b border-[#E4E4DC]">
             <img
               src={result.tentorFeedback.avatar}
@@ -405,7 +405,7 @@ export default function ExamResultPage() {
         </div>
 
         {/* 6. Detailed KaTeX Solutions */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-4 shadow-paper">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E4DC] pb-3">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#13224E]">

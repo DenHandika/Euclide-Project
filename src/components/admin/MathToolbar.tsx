@@ -60,7 +60,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
   ];
 
   return (
-    <div className="bg-[#FFFFFF] border border-[#13224E] p-2 space-y-2 shadow-sm font-sans">
+    <div className="bg-[#FFFFFF] border border-[#13224E] p-2 space-y-2 font-sans">
       {/* Category Tabs & Info */}
       <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-1.5 text-xs">
         <div className="flex items-center space-x-1 font-mono text-[11px]">

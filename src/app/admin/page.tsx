@@ -65,7 +65,7 @@ export default function AdminDashboardPage() {
 
         {/* 1. Executive Metrics Ledger Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-4">
             <span className="text-[10px] text-[#637096] uppercase block mb-1">
               Total Siswa Terdaftar
             </span>
@@ -77,7 +77,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-4">
             <span className="text-[10px] text-[#637096] uppercase block mb-1">
               Ujian Serentak (Live)
             </span>
@@ -89,7 +89,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-4">
             <span className="text-[10px] text-[#637096] uppercase block mb-1">
               Kas Terkumpul Bulan Ini
             </span>
@@ -101,7 +101,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-4">
             <span className="text-[10px] text-[#637096] uppercase block mb-1">
               Total Tunggakan SPP
             </span>
@@ -115,7 +115,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* 2. Batch Quota Section */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
           <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#13224E]">
@@ -191,7 +191,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* 3. Recent Payment Ledger Table */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
           <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#13224E]">

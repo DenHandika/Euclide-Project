@@ -54,7 +54,7 @@ export default function LoginPage() {
         </div>
 
         {/* Examination Registration Card */}
-        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 shadow-sheet space-y-6">
+        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 space-y-6">
           {/* Header strip */}
           <div className="border-b border-[#E4E4DC] pb-2 flex items-center justify-between font-mono text-[10px] text-[#637096]">
             <span>LEMBAR AUTENTIKASI PESERTA</span>

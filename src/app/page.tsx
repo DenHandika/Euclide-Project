@@ -110,7 +110,7 @@ export default function LandingPage() {
 
             {/* Right: Live Interactive CBT Exam Worksheet (Show Product Directly) */}
             <div className="lg:col-span-7">
-              <div className="bg-[#FFFFFF] border-2 border-[#13224E] shadow-sheet p-5 sm:p-6 space-y-4">
+              <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-5 sm:p-6 space-y-4">
                 {/* Worksheet Header Strip */}
                 <div className="flex items-center justify-between pb-3 border-b border-[#E4E4DC]">
                   <div className="flex items-center space-x-2">
@@ -246,7 +246,7 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Main Primary Card (8 Cols): Modul Siswa & Rasionalisasi PTN */}
-          <div className="lg:col-span-8 bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 shadow-paper space-y-5">
+          <div className="lg:col-span-8 bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 space-y-5">
             <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-3">
               <div className="flex items-center space-x-2">
                 <span className="w-6 h-6 rounded-full bg-[#1B8A5A] text-white flex items-center justify-center text-xs font-mono font-bold">
@@ -306,7 +306,7 @@ export default function LandingPage() {
           {/* Secondary Column (4 Cols): Stacked Tentor & Super-Admin Cards */}
           <div className="lg:col-span-4 space-y-5">
             {/* Secondary Card 1: Tentor */}
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-5 shadow-paper space-y-3">
+            <div className="bg-[#FFFFFF] border border-[#13224E] p-5 space-y-3">
               <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
                 <div className="flex items-center space-x-2">
                   <span className="w-5 h-5 rounded-full bg-[#EFA93B] text-[#13224E] flex items-center justify-center text-[10px] font-mono font-bold">
@@ -335,7 +335,7 @@ export default function LandingPage() {
             </div>
 
             {/* Secondary Card 2: Admin */}
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-5 shadow-paper space-y-3">
+            <div className="bg-[#FFFFFF] border border-[#13224E] p-5 space-y-3">
               <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2">
                 <div className="flex items-center space-x-2">
                   <span className="w-5 h-5 rounded-full bg-[#13224E] text-white flex items-center justify-center text-[10px] font-mono font-bold">

@@ -68,7 +68,7 @@ export default function DrillingPage() {
     <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Hub Header */}
-        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8 shadow-paper">
+        <div className="bg-[#FFFFFF] border-2 border-[#13224E] p-6 sm:p-8">
           <div className="border-b border-[#E4E4DC] pb-3 mb-4">
             <span className="font-mono text-[10px] text-[#637096] uppercase font-bold block mb-1">
               MODUL LATIHAN ADAPTIF
@@ -106,7 +106,7 @@ export default function DrillingPage() {
 
         {/* Drilling Question Paper Worksheet */}
         {currentQ ? (
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 shadow-paper space-y-5">
+          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 sm:p-8 space-y-5">
             {/* Top Metadata */}
             <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-3 font-mono text-xs">
               <div className="flex items-center space-x-2">

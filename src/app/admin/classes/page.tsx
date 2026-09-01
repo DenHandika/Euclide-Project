@@ -52,7 +52,7 @@ export default function AdminClassesPage() {
             return (
               <div
                 key={batch.id}
-                className="bg-[#FFFFFF] border border-[#13224E] p-5 shadow-paper flex flex-col justify-between"
+                className="bg-[#FFFFFF] border border-[#13224E] p-5 flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between font-mono text-[10px]">
@@ -123,7 +123,7 @@ export default function AdminClassesPage() {
       {/* Edit Capacity Modal */}
       {editingBatch && (
         <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] max-w-sm w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet font-sans">
+          <div className="bg-[#FFFFFF] max-w-sm w-full p-6 border-2 border-[#13224E] space-y-4 font-sans">
             <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
               <h3 className="font-serif font-bold text-base text-[#13224E]">
                 Ubah Batas Kuota Kelas

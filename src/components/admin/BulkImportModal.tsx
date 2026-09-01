@@ -238,7 +238,7 @@ NASKAH SOAL:
 
   return (
     <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4 overflow-y-auto font-sans">
-      <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border-2 border-[#13224E] space-y-5 shadow-sheet my-8 max-h-[90vh] flex flex-col">
+      <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border-2 border-[#13224E] space-y-5 my-8 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-[#E4E4DC] shrink-0">
           <div>
@@ -263,7 +263,7 @@ NASKAH SOAL:
             <button
               type="button"
               onClick={handleDownloadWordTemplate}
-              className="px-2.5 py-1 bg-[#1B3B8C] hover:bg-[#274DB8] text-white font-bold transition flex items-center space-x-1.5 shadow-sm"
+              className="px-2.5 py-1 bg-[#1B3B8C] hover:bg-[#274DB8] text-white font-bold transition flex items-center space-x-1.5"
               title="Download file Word .doc siap edit di Microsoft Word"
             >
               <FileDown className="w-3.5 h-3.5" />

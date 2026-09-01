@@ -62,7 +62,7 @@ export default function TentorAnalyticsPage() {
         {/* 1. Metric Overview Strip */}
         <div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper">
+            <div className="bg-[#FFFFFF] border border-[#13224E] p-4">
               <span className="text-[10px] text-[#637096] uppercase block mb-1">
                 Rerata Skor IRT Seluruh Siswa
               </span>
@@ -75,7 +75,7 @@ export default function TentorAnalyticsPage() {
               </div>
             </div>
 
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper">
+            <div className="bg-[#FFFFFF] border border-[#13224E] p-4">
               <span className="text-[10px] text-[#637096] uppercase block mb-1">
                 Subtest Paling Unggul
               </span>
@@ -87,7 +87,7 @@ export default function TentorAnalyticsPage() {
               </div>
             </div>
 
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-4 shadow-paper">
+            <div className="bg-[#FFFFFF] border border-[#13224E] p-4">
               <span className="text-[10px] text-[#637096] uppercase block mb-1">
                 Subtest Butuh Drilling Ekstra
               </span>
@@ -105,7 +105,7 @@ export default function TentorAnalyticsPage() {
         </div>
 
         {/* 2. Recharts Bar Chart: Euclide vs Nasional */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
           <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#13224E]">
@@ -141,7 +141,7 @@ export default function TentorAnalyticsPage() {
         </div>
 
         {/* 3. PTN Benchmark Table */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
           <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-lg font-bold text-[#13224E]">

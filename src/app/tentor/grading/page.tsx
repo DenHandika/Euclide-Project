@@ -60,11 +60,11 @@ export default function TentorGradingPage() {
           </div>
 
           <div className="flex items-center space-x-3 font-mono text-xs">
-            <div className="bg-[#FFFFFF] border border-[#13224E] px-3 py-1.5 shadow-paper">
+            <div className="bg-[#FFFFFF] border border-[#13224E] px-3 py-1.5">
               <span className="text-[#637096] block text-[10px] uppercase">Menunggu Penilaian:</span>
               <span className="font-bold text-[#C8831A] text-sm">{pendingList.length} Berkas</span>
             </div>
-            <div className="bg-[#FFFFFF] border border-[#13224E] px-3 py-1.5 shadow-paper">
+            <div className="bg-[#FFFFFF] border border-[#13224E] px-3 py-1.5">
               <span className="text-[#637096] block text-[10px] uppercase">Telah Dinilai:</span>
               <span className="font-bold text-[#1B8A5A] text-sm">{gradedList.length} Berkas</span>
             </div>
@@ -72,7 +72,7 @@ export default function TentorGradingPage() {
         </div>
 
         {/* Submissions Table Sheet */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 shadow-paper space-y-4">
+        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
           <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
             <h2 className="font-serif text-lg font-bold text-[#13224E]">
               Daftar Berkas Jawaban Masuk
@@ -148,7 +148,7 @@ export default function TentorGradingPage() {
       {/* Grading Worksheet Modal */}
       {selectedEssay && (
         <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#FFFFFF] max-w-2xl w-full p-6 border-2 border-[#13224E] space-y-4 shadow-sheet font-sans my-8">
+          <div className="bg-[#FFFFFF] max-w-2xl w-full p-6 border-2 border-[#13224E] space-y-4 font-sans my-8">
             <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
               <div>
                 <h3 className="font-serif font-bold text-base text-[#13224E]">

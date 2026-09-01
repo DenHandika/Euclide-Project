@@ -84,7 +84,7 @@ export default function TryoutsCatalogPage() {
             return (
               <div
                 key={to.id}
-                className="bg-[#FFFFFF] border border-[#13224E] p-5 shadow-paper flex flex-col justify-between"
+                className="bg-[#FFFFFF] border border-[#13224E] p-5 flex flex-col justify-between"
               >
                 <div>
                   {/* Top Header Strip */}
