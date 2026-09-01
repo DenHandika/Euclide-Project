@@ -5,6 +5,7 @@ import {
   User,
   UserRole,
   UserStatus,
+  StudentImportRow,
   Tryout,
   Question,
   ClassBatch,
@@ -71,6 +72,7 @@ interface AppContextType {
   payments: PaymentRecord[];
   updateBatchCapacity: (batchId: string, maxCapacity: number) => void;
   toggleStudentStatus: (studentId: string, status: UserStatus) => void;
+  importStudentsBulk: (rows: StudentImportRow[]) => { importedCount: number; errorsCount: number };
   addManualPayment: (payment: Omit<PaymentRecord, 'id' | 'invoiceNumber' | 'paidAt'>) => PaymentRecord;
   importPaymentsBulk: (rows: PaymentImportRow[]) => { importedCount: number; errorsCount: number };
   getFinancialMetrics: () => {
@@ -470,6 +472,45 @@ export function AppProvider({ children }: { children: ReactNode }) {
     showToast(`Status siswa diperbarui menjadi: ${status.toUpperCase()}`, 'info');
   };
 
+  const importStudentsBulk = (rows: StudentImportRow[]) => {
+    let imported = 0;
+    let errors = 0;
+    const newStudents: User[] = [];
+
+    rows.forEach((row, idx) => {
+      if (row.isValid && row.Nama && row.NIS) {
+        newStudents.push({
+          id: `stu-import-${Date.now()}-${idx}`,
+          nis: row.NIS,
+          name: row.Nama,
+          email: row.Email || `${row.NIS.toLowerCase()}@siswa.euclide.edu`,
+          role: 'siswa',
+          phone: row.No_Telepon_WA || '081234567890',
+          batchId: row.Batch_Kelas || 'batch-super-intensif',
+          targetPTN1: row.Target_PTN || 'Universitas Indonesia (UI)',
+          targetProdi1: row.Target_Prodi || 'Pendidikan Dokter',
+          status: (row.Status?.toLowerCase() === 'graduated' ? 'graduated' : row.Status?.toLowerCase() === 'leave' ? 'leave' : row.Status?.toLowerCase() === 'nonactive' ? 'nonactive' : 'active') as UserStatus,
+          joinedDate: new Date().toISOString().split('T')[0],
+          sppStatus: 'paid',
+        });
+        imported++;
+      } else {
+        errors++;
+      }
+    });
+
+    if (newStudents.length > 0) {
+      const updated = [...students, ...newStudents];
+      setStudents(updated);
+      saveState('euclide_students', updated);
+      showToast(`Berhasil mengimpor ${imported} data siswa! (${errors} baris dilewati)`, 'success');
+    } else {
+      showToast(`Gagal mengimpor siswa. Format kolom tidak valid (${errors} baris).`, 'error');
+    }
+
+    return { importedCount: imported, errorsCount: errors };
+  };
+
   const addManualPayment = (paymentData: Omit<PaymentRecord, 'id' | 'invoiceNumber' | 'paidAt'>): PaymentRecord => {
     const newRecord: PaymentRecord = {
       ...paymentData,
@@ -580,6 +621,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         payments,
         updateBatchCapacity,
         toggleStudentStatus,
+        importStudentsBulk,
         addManualPayment,
         importPaymentsBulk,
         getFinancialMetrics,

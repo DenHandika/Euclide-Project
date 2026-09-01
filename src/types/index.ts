@@ -1,6 +1,19 @@
 export type UserRole = 'admin' | 'tentor' | 'siswa';
 
-export type UserStatus = 'active' | 'suspended' | 'graduated';
+export type UserStatus = 'active' | 'nonactive' | 'suspended' | 'graduated' | 'leave';
+
+export interface StudentImportRow {
+  NIS: string;
+  Nama: string;
+  Email: string;
+  Batch_Kelas?: string;
+  Target_PTN?: string;
+  Target_Prodi?: string;
+  No_Telepon_WA?: string;
+  Status?: string;
+  isValid?: boolean;
+  errorMessage?: string;
+}
 
 export interface User {
   id: string;

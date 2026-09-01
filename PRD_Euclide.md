@@ -150,13 +150,13 @@ Tidak ditemukan produk siap-pakai (Alphastude, SIAPPTN, TryoutPintar) yang menca
 
 ---
 
-## 8. Asumsi & Pertanyaan Terbuka
+## 8. Keputusan Final atas Pertanyaan Terbuka
 
-- [ ] Apakah admin butuh kemampuan **impor massal** data siswa (dari Excel) saat migrasi awal, atau input satu-satu cukup untuk mulai?
-- [ ] Berapa lama data tryout siswa yang sudah lulus/nonaktif perlu disimpan? (kebijakan retensi data)
-- [ ] Apakah tentor boleh melihat bank soal milik tentor lain, atau hanya soal buatannya sendiri?
-- [ ] Format kuota kelas: apakah kuota per kelas tetap sepanjang periode, atau bisa berubah di tengah jalan (mis. ada siswa keluar, kuota terbuka lagi)?
-- [ ] Apakah dibutuhkan fitur ekspor hasil tryout ke PDF/Excel untuk dibagikan ke orang tua siswa?
+- [x] **Impor massal data siswa dari Excel:** $\to$ **Wajib di MVP**. Menginput 600–700 siswa satu per satu akan memakan waktu admin berhari-hari. Disediakan tombol **"Upload Data Siswa (.xlsx)"** dengan validasi kolom otomatis.
+- [x] **Kebijakan retensi data siswa lulus:** $\to$ **Disimpan selamanya (Read-Only)**. Status akun siswa diubah menjadi `graduated`/`lulus`, sehingga histori nilai dan riwayat tryout tetap bisa diakses oleh admin/tentor untuk kebutuhan arsip promosi atau statistik angkatan.
+- [x] **Hak akses bank soal antar-tentor:** $\to$ **Bersifat Terbuka/Kolaboratif di Internal Bimbel**. Semua tentor dan admin/owner bisa saling melihat dan menggunakan soal untuk menyusun paket tryout bersama.
+- [x] **Sifat kuota kelas:** $\to$ **Dinamis**. Sistem menghitung `jumlah_siswa_aktif < kapasitas_maksimal`. Jika ada siswa yang batal/keluar, slot kelas otomatis terbuka kembali secara real-time.
+- [x] **Ekspor PDF/Excel hasil tryout:** $\to$ **Wajib di Fase 2**. Sangat krusial bagi bimbel untuk membagikan rapor hasil tryout bergaya resmi (berlogo Euclide/Bimbel) ke grup WhatsApp orang tua siswa.
 
 ---
 
