@@ -45,6 +45,11 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left: Value Proposition */}
             <div className="lg:col-span-5 space-y-5">
+              <div className="inline-flex items-center space-x-2 px-2.5 py-1 bg-[#FAFAF7] border border-[#13224E] text-[10px] font-mono text-[#13224E] uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1B8A5A]" />
+                <span>NASKAH CBT TERSTANDARISASI SNBT 2026</span>
+              </div>
+
               <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#13224E] leading-[1.18]">
                 Sistem CBT Tryout & Bimbingan Belajar{' '}
                 <span className="stabilo">Presisi Tinggi</span>
