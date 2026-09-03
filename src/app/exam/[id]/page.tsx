@@ -24,6 +24,9 @@ import {
   ZoomIn,
   ZoomOut,
   Type,
+  HelpCircle,
+  Sparkles,
+  BookOpen,
 } from 'lucide-react';
 
 export default function CBTExamPlayerPage() {
@@ -52,6 +55,7 @@ export default function CBTExamPlayerPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fontSizeLevel, setFontSizeLevel] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [visitedQuestions, setVisitedQuestions] = useState<Set<string>>(new Set());
+  const [mobileTab, setMobileTab] = useState<'question' | 'stimulus'>('question');
   const [antiCheatModal, setAntiCheatModal] = useState<{ isOpen: boolean; count: number }>({
     isOpen: false,
     count: 0,
@@ -72,6 +76,8 @@ export default function CBTExamPlayerPage() {
     if (currentQuestion?.id) {
       setVisitedQuestions((prev) => new Set([...Array.from(prev), currentQuestion.id]));
     }
+    // When switching questions, default back to question tab on mobile
+    setMobileTab('question');
   }, [currentQuestion?.id]);
 
   // Timer per subtest
@@ -118,7 +124,7 @@ export default function CBTExamPlayerPage() {
         const count = incrementViolations(tryoutId);
         setAntiCheatModal({ isOpen: true, count });
         if (count >= 3) {
-          showToast('Batas toleransi pelanggaran fokus layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
+          showToast('Batas toleransi keluar layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
           setTimeout(() => {
             handleFinalSubmit();
           }, 1500);
@@ -130,7 +136,7 @@ export default function CBTExamPlayerPage() {
       const count = incrementViolations(tryoutId);
       setAntiCheatModal({ isOpen: true, count });
       if (count >= 3) {
-        showToast('Batas toleransi pelanggaran fokus layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
+        showToast('Batas toleransi keluar layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
         setTimeout(() => {
           handleFinalSubmit();
         }, 1500);
@@ -245,20 +251,18 @@ export default function CBTExamPlayerPage() {
 
   const handleToggleFlag = () => {
     toggleFlagQuestion(tryoutId, currentQuestion.id);
-    setSession((prev) => {
-      return {
-        ...prev,
-        answers: {
-          ...prev.answers,
-          [currentQuestion.id]: {
-            questionId: currentQuestion.id,
-            type: currentQuestion.type,
-            answer: currentAnswerVal,
-            isFlagged: !isCurrentFlagged,
-          },
+    setSession((prev) => ({
+      ...prev,
+      answers: {
+        ...prev.answers,
+        [currentQuestion.id]: {
+          questionId: currentQuestion.id,
+          type: currentQuestion.type,
+          answer: currentAnswerVal,
+          isFlagged: !isCurrentFlagged,
         },
-      };
-    });
+      },
+    }));
   };
 
   const handleNextSubtest = () => {
@@ -327,110 +331,100 @@ export default function CBTExamPlayerPage() {
   return (
     <div
       onContextMenu={(e) => e.preventDefault()}
-      className="cbt-secure-screen min-h-screen bg-[#F4F4F0] flex flex-col justify-between font-sans text-[#13224E]"
+      className="cbt-secure-screen min-h-screen bg-[#F8FAFC] flex flex-col justify-between font-sans text-slate-900 pb-20 lg:pb-6"
     >
       {/* ========================================================================= */}
-      {/* 1. PROFESSIONAL CBT EXAM COCKPIT HEADER                                   */}
+      {/* 1. COMPACT, HIGH-ERGONOMY CBT HEADER (DESKTOP & MOBILE COCKPIT)           */}
       {/* ========================================================================= */}
-      <header className="sticky top-0 z-40 bg-[#FFFFFF] border-b border-[#13224E] px-4 sm:px-6 py-2 flex items-center justify-between font-mono select-none shadow-xs">
-        {/* Left: Candidate & Exam Identifier */}
-        <div className="flex items-center space-x-3 min-w-0">
-          <div className="w-9 h-9 bg-[#13224E] text-white flex items-center justify-center font-bold text-sm shrink-0 border border-[#13224E]">
-            {currentSubtestIndex + 1}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-6 py-2.5 flex items-center justify-between shadow-2xs">
+        {/* Left: Active Question Badge & Subtest Tag */}
+        <div className="flex items-center space-x-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+            {currentQuestionIndex + 1}
           </div>
           <div className="min-w-0">
-            <div className="flex items-center space-x-2">
-              <span className="text-[10px] font-bold text-[#1B3B8C] uppercase tracking-wider bg-[#FAFAF7] px-1.5 py-0.5 border border-[#CECEC2]">
-                {tryout.code}
+            <div className="flex items-center space-x-1.5">
+              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                No. {currentQuestionIndex + 1}/{subtestQuestions.length}
               </span>
-              <span className="text-[#9EABC7] hidden sm:inline">•</span>
-              <span className="text-[11px] font-semibold text-[#13224E] truncate hidden sm:inline">
-                {currentUser.name} ({currentUser.nis || 'EUC-2026-0042'})
+              <span className="text-slate-300 hidden sm:inline">•</span>
+              <span className="text-xs font-semibold text-slate-600 truncate hidden sm:inline">
+                {currentUser.name}
               </span>
             </div>
-            <h1 className="font-serif font-bold text-xs sm:text-sm text-[#13224E] leading-tight truncate mt-0.5">
-              Subtest {currentSubtestIndex + 1}/{tryout.subtests.length}: {currentSubtest.name}
+            <h1 className="text-xs sm:text-sm font-bold text-slate-900 truncate mt-0.5 max-w-[140px] sm:max-w-none">
+              {currentSubtest.name}
             </h1>
           </div>
         </div>
 
-        {/* Center: Monospace High-Contrast Digital Countdown Timer */}
+        {/* Center/Right: Timer Pill + Quick Palette Drawer + Submit */}
         <div className="flex items-center space-x-2">
+          {/* High-Contrast Countdown Timer Pill */}
           <div
-            className={`flex items-center space-x-2 px-3.5 py-1.5 border-2 transition-colors ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-bold transition-all shadow-xs ${
               timerSeconds <= 60
-                ? 'bg-[#FBEBEA] border-[#D0342C] text-[#D0342C] animate-pulse font-bold'
+                ? 'bg-rose-50 text-rose-700 border border-rose-300 animate-pulse'
                 : timerSeconds <= 300
-                ? 'bg-[#FDF3E3] border-[#EFA93B] text-[#C8831A] font-bold'
-                : 'bg-[#13224E] border-[#13224E] text-white font-semibold'
+                ? 'bg-amber-50 text-amber-800 border border-amber-300'
+                : 'bg-slate-900 text-white'
             }`}
           >
-            <Clock className="w-4 h-4" />
-            <div className="text-right">
-              <span className="text-xs sm:text-sm font-bold tracking-wider">{formatTime(timerSeconds)}</span>
-              <span className="block text-[8px] uppercase tracking-tighter opacity-80">Sisa Waktu</span>
-            </div>
+            <Clock className="w-3.5 h-3.5 shrink-0" />
+            <span className="tracking-wide text-xs sm:text-sm">{formatTime(timerSeconds)}</span>
           </div>
-        </div>
 
-        {/* Right: Accessibility Controls, Anti-cheat Status, & Mobile Trigger */}
-        <div className="flex items-center space-x-2">
-          {/* Font Size Adjuster (Standard SNBT Feature) */}
-          <div className="hidden md:flex items-center space-x-0.5 bg-[#FAFAF7] border border-[#CECEC2] p-0.5 text-xs font-mono">
+          {/* Font Size Adjuster (Desktop Only) */}
+          <div className="hidden md:flex items-center space-x-0.5 bg-slate-100 p-0.5 rounded-lg text-xs font-bold">
             <button
               onClick={() => setFontSizeLevel('normal')}
-              className={`px-1.5 py-0.5 transition ${fontSizeLevel === 'normal' ? 'bg-[#13224E] text-white font-bold' : 'text-[#637096] hover:text-[#13224E]'}`}
+              className={`px-2 py-1 rounded transition ${fontSizeLevel === 'normal' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
               title="Font Normal"
             >
               A
             </button>
             <button
               onClick={() => setFontSizeLevel('large')}
-              className={`px-1.5 py-0.5 transition ${fontSizeLevel === 'large' ? 'bg-[#13224E] text-white font-bold' : 'text-[#637096] hover:text-[#13224E]'}`}
+              className={`px-2 py-1 rounded transition ${fontSizeLevel === 'large' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
               title="Font Besar"
             >
               A+
             </button>
             <button
               onClick={() => setFontSizeLevel('xlarge')}
-              className={`px-1.5 py-0.5 transition ${fontSizeLevel === 'xlarge' ? 'bg-[#13224E] text-white font-bold' : 'text-[#637096] hover:text-[#13224E]'}`}
+              className={`px-2 py-1 rounded transition ${fontSizeLevel === 'xlarge' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
               title="Font Ekstra Besar"
             >
               A++
             </button>
           </div>
 
+          {/* Mobile Bottom-Sheet Trigger */}
           <button
-            onClick={toggleFullScreen}
-            className="p-1.5 text-[#637096] hover:text-[#13224E] border border-[#CECEC2] bg-[#FAFAF7] hidden sm:inline-flex"
-            title="Layar Penuh"
-          >
-            {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
-          </button>
-
-          {/* Mobile-Only Palette Drawer Button */}
-          <button
+            type="button"
             onClick={() => setIsMobilePaletteOpen(true)}
-            className="lg:hidden flex items-center space-x-1 bg-[#FFFFFF] hover:bg-[#FAFAF7] text-[#13224E] border border-[#13224E] text-xs px-2.5 py-1.5"
+            className="lg:hidden flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-2.5 py-1.5 rounded-xl transition"
           >
-            <Grid className="w-3.5 h-3.5 text-[#1B3B8C]" />
-            <span>Nomor ({currentQuestionIndex + 1}/{subtestQuestions.length})</span>
+            <Grid className="w-3.5 h-3.5 text-blue-600" />
+            <span>Palet ({subtestAnsweredCount}/{subtestQuestions.length})</span>
           </button>
 
+          {/* Desktop Submit Button */}
           <button
+            type="button"
             onClick={() => setSubmitModalOpen(true)}
-            className="flex items-center space-x-1.5 bg-[#1B8A5A] hover:bg-[#126340] text-white text-xs px-3.5 py-1.5 font-bold transition border border-[#126340]"
+            className="hidden sm:inline-flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition"
           >
-            <Send className="w-3 h-3 text-[#EFA93B]" />
-            <span className="hidden sm:inline">Kumpulkan Naskah</span>
+            <Send className="w-3.5 h-3.5" />
+            <span>Kumpulkan</span>
           </button>
         </div>
       </header>
 
       {/* ========================================================================= */}
-      {/* 2. SUBTEST PROGRESS STEPPER STRIP                                         */}
+      {/* 2. SUBTEST PROGRESS CHIP BAR (HORIZONTAL SCROLLABLE)                      */}
       {/* ========================================================================= */}
-      <nav className="bg-[#FFFFFF] border-b border-[#E4E4DC] px-4 sm:px-6 py-1.5 flex items-center justify-between text-xs font-mono select-none overflow-x-auto">
+      <nav className="bg-white border-b border-slate-200/80 px-3 sm:px-6 py-1.5 flex items-center justify-between text-xs select-none overflow-x-auto gap-2">
         <div className="flex items-center space-x-1.5">
           {tryout.subtests.map((st, idx) => {
             const isActive = idx === currentSubtestIndex;
@@ -439,215 +433,266 @@ export default function CBTExamPlayerPage() {
               <button
                 key={st.id}
                 onClick={() => setCurrentSubtestIndex(idx)}
-                className={`px-3 py-1 border text-[11px] whitespace-nowrap transition flex items-center space-x-1.5 ${
+                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center space-x-1.5 ${
                   isActive
-                    ? 'bg-[#13224E] text-white border-[#13224E] font-bold'
+                    ? 'bg-blue-50 text-blue-700 border border-blue-200 font-bold shadow-2xs'
                     : isDone
-                    ? 'bg-[#EAF7F0] text-[#126340] border-[#1B8A5A]/40'
-                    : 'bg-[#FAFAF7] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
                 }`}
               >
                 <span>{idx + 1}. {st.name.split(' ')[0]}</span>
-                {isDone && <CheckCircle2 className="w-3 h-3 text-[#1B8A5A]" />}
+                {isDone && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
               </button>
             );
           })}
         </div>
 
-        <div className="hidden md:flex items-center space-x-3 text-[10px] text-[#637096]">
-          <span className="flex items-center space-x-1">
-            <ShieldCheck className="w-3 h-3 text-[#1B8A5A]" />
-            <span>Anti-Curang Aktif</span>
-          </span>
-          <span>•</span>
-          <span>Durasi per Subtest Terkunci</span>
+        <div className="hidden lg:flex items-center space-x-2 text-[11px] text-slate-500">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Screen Lock Aktif</span>
         </div>
       </nav>
 
       {/* ========================================================================= */}
-      {/* 3. MAIN ERGONOMIC WORKSPACE: QUESTION CANVAS + DOCKED PALETTE SIDEBAR     */}
+      {/* 3. MOBILE STIMULUS SEGMENTED CONTROL TABS (HANYA MUNCUL DI SMARTPHONE)    */}
+      {/* ========================================================================= */}
+      {hasStimulus && (
+        <div className="lg:hidden bg-slate-100 p-1.5 border-b border-slate-200 sticky top-[57px] z-30 flex items-center justify-center space-x-1 text-xs font-bold">
+          <button
+            type="button"
+            onClick={() => setMobileTab('stimulus')}
+            className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center space-x-1.5 transition ${
+              mobileTab === 'stimulus'
+                ? 'bg-white text-blue-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Wacana / Bacaan</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('question')}
+            className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center space-x-1.5 transition ${
+              mobileTab === 'question'
+                ? 'bg-white text-blue-700 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Soal & Jawaban OMR</span>
+          </button>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4. MAIN WORKSPACE: SMARTPHONE ERGONOMIC VIEW & DESKTOP DOCKED VIEW        */}
       {/* ========================================================================= */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 select-none">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           
-          {/* ======================================================================= */}
-          {/* LEFT/CENTER: QUESTION & ANSWERS WORKSPACE (9 of 12 columns)             */}
-          {/* ======================================================================= */}
-          <div className="lg:col-span-8 xl:col-span-9 bg-[#FFFFFF] border border-[#13224E] flex flex-col justify-between min-h-[580px]">
-            {/* Question Top Header Bar */}
-            <div className="p-4 border-b border-[#E4E4DC] flex items-center justify-between bg-[#FAFAF7]">
-              <div className="flex items-center space-x-3">
-                <span className="w-8 h-8 bg-[#13224E] text-white font-mono font-bold text-sm flex items-center justify-center border border-[#13224E]">
-                  {currentQuestionIndex + 1}
+          {/* QUESTION + OPTIONS WORKSPACE (9 COLS ON DESKTOP, FULL ON MOBILE) */}
+          <div className="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl border border-slate-200 shadow-card flex flex-col justify-between min-h-[520px]">
+            {/* Question Top Subheader */}
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60 rounded-t-2xl">
+              <div className="flex items-center space-x-2.5">
+                <span className="text-xs font-bold text-slate-800">
+                  Butir Soal No. {currentQuestionIndex + 1}
                 </span>
-                <div>
-                  <h2 className="font-serif font-bold text-sm sm:text-base text-[#13224E] leading-tight">
-                    Soal Nomor {currentQuestionIndex + 1}
-                  </h2>
-                  <span className="font-mono text-[10px] text-[#637096] uppercase">
-                    {currentQuestion.type === 'single_choice' && 'PILIHAN GANDA (PILIH 1 JAWABAN)'}
-                    {currentQuestion.type === 'multi_select' && 'PILIHAN MAJEMUK (BISA PILIH LEBIH DARI 1)'}
-                    {currentQuestion.type === 'short_answer' && 'ISIAN SINGKAT'}
-                    {currentQuestion.type === 'essay' && 'ESAI / ARGUMENTASI'}
-                  </span>
-                </div>
+                <span className="text-slate-300">•</span>
+                <span className="text-[11px] font-semibold text-slate-500 uppercase">
+                  {currentQuestion.type === 'single_choice' && 'Pilihan Ganda'}
+                  {currentQuestion.type === 'multi_select' && 'Pilihan Majemuk'}
+                  {currentQuestion.type === 'short_answer' && 'Isian Singkat'}
+                  {currentQuestion.type === 'essay' && 'Esai Argumentatif'}
+                </span>
               </div>
 
-              {/* Ragu-Ragu Toggle Button */}
+              {/* Ragu-Ragu Toggle Chip */}
               <button
                 type="button"
                 onClick={handleToggleFlag}
-                className={`flex items-center space-x-1.5 px-3.5 py-1.5 border font-mono text-xs font-semibold transition ${
+                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-2xs ${
                   isCurrentFlagged
-                    ? 'bg-[#EFA93B] text-[#13224E] border-[#C8831A] font-bold shadow-xs'
-                    : 'bg-[#FFFFFF] text-[#637096] border-[#CECEC2] hover:bg-[#FAFAF7]'
+                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <Bookmark className={`w-3.5 h-3.5 ${isCurrentFlagged ? 'fill-[#13224E] text-[#13224E]' : 'text-[#637096]'}`} />
-                <span>{isCurrentFlagged ? 'Ragu-Ragu (Ditandai)' : 'Tandai Ragu'}</span>
+                <Bookmark className={`w-3.5 h-3.5 ${isCurrentFlagged ? 'fill-amber-900 text-amber-900' : 'text-slate-400'}`} />
+                <span>{isCurrentFlagged ? 'Ragu' : 'Tandai Ragu'}</span>
               </button>
             </div>
 
-            {/* Question Content Area (Split-Pane jika ada Wacana) */}
-            <div
-              className="p-4 sm:p-6 flex-1 space-y-6 select-none"
-              onContextMenu={(e) => e.preventDefault()}
-              onCopy={(e) => e.preventDefault()}
-            >
-              <div className={`grid gap-6 items-start ${hasStimulus ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
-                {/* Left Pane: Stimulus / Wacana Bacaan */}
-                {hasStimulus && (
-                  <div className="bg-[#FAFAF7] border border-[#E4E4DC] p-4 sm:p-5 max-h-[460px] overflow-y-auto space-y-3 font-sans text-[#13224E] leading-relaxed">
-                    <div className="flex items-center space-x-1.5 pb-2 border-b border-[#E4E4DC] font-mono text-[10px] text-[#1B3B8C] font-bold uppercase">
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Wacana / Stimulus Bacaan:</span>
+            {/* Content Area */}
+            <div className="p-4 sm:p-6 flex-1 space-y-6">
+              {/* If on mobile and stimulus tab active */}
+              {hasStimulus && mobileTab === 'stimulus' ? (
+                <div className="lg:hidden bg-slate-50 rounded-xl border border-slate-200/80 p-4 space-y-3 font-sans text-slate-900 leading-relaxed">
+                  <div className="flex items-center space-x-1.5 pb-2 border-b border-slate-200 text-xs font-bold text-blue-700">
+                    <FileText className="w-4 h-4" />
+                    <span>Wacana Bacaan:</span>
+                  </div>
+
+                  {currentQuestion.stimulus?.startsWith('[IMAGE_STIMULUS]') ? (
+                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
+                      <img
+                        src={currentQuestion.stimulus.replace('[IMAGE_STIMULUS]', '')}
+                        alt="Stimulus Soal"
+                        className="max-h-72 object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className={`whitespace-pre-line leading-relaxed font-sans ${stimulusTextClass}`}>
+                      <MathRenderer content={currentQuestion.stimulus || ''} />
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setMobileTab('question')}
+                    className="w-full mt-4 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5"
+                  >
+                    <span>Lanjut Jawab Soal</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className={`grid gap-6 items-start ${hasStimulus ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+                  {/* Left Pane on Desktop (Always Visible on Desktop if Stimulus Exists) */}
+                  {hasStimulus && (
+                    <div className="hidden lg:block bg-slate-50 rounded-xl border border-slate-200/80 p-5 max-h-[460px] overflow-y-auto space-y-3 font-sans text-slate-900 leading-relaxed">
+                      <div className="flex items-center space-x-1.5 pb-2 border-b border-slate-200 text-xs font-bold text-blue-700">
+                        <FileText className="w-4 h-4" />
+                        <span>Wacana / Stimulus Bacaan:</span>
+                      </div>
+
+                      {currentQuestion.stimulus?.startsWith('[IMAGE_STIMULUS]') ? (
+                        <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
+                          <img
+                            src={currentQuestion.stimulus.replace('[IMAGE_STIMULUS]', '')}
+                            alt="Stimulus Soal"
+                            className="max-h-72 object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className={`whitespace-pre-line leading-relaxed font-sans ${stimulusTextClass}`}>
+                          <MathRenderer content={currentQuestion.stimulus || ''} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Main Question & Option Selector Cards */}
+                  <div className="space-y-5">
+                    {/* Prompt Text */}
+                    <div className={`font-serif font-semibold text-slate-900 leading-relaxed ${questionTextClass}`}>
+                      <MathRenderer content={currentQuestion.question} />
                     </div>
 
-                    {currentQuestion.stimulus?.startsWith('[IMAGE_STIMULUS]') ? (
-                      <div className="p-2 bg-[#FFFFFF] border border-[#E4E4DC] flex items-center justify-center">
-                        <img
-                          src={currentQuestion.stimulus.replace('[IMAGE_STIMULUS]', '')}
-                          alt="Stimulus Soal"
-                          className="max-h-72 object-contain"
+                    {/* 1. Format Single Choice: Large Thumb-Friendly OMR Cards */}
+                    {currentQuestion.type === 'single_choice' && currentQuestion.options && (
+                      <div className="space-y-2.5 pt-1">
+                        {currentQuestion.options.map((opt) => {
+                          const isSelected = currentAnswerVal === opt.id;
+                          return (
+                            <div
+                              key={opt.id}
+                              onClick={() => handleSelectOption(opt.id)}
+                              className={`flex items-start space-x-3.5 p-3.5 rounded-xl border cursor-pointer transition-all duration-150 select-none ${
+                                isSelected
+                                  ? 'border-blue-600 bg-blue-50/80 shadow-xs'
+                                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
+                              }`}
+                            >
+                              <span
+                                className={`omr-bubble shrink-0 ${
+                                  isSelected ? 'omr-bubble-filled' : ''
+                                }`}
+                              >
+                                {opt.id}
+                              </span>
+                              <div className={`pt-0.5 font-sans text-slate-900 leading-relaxed ${questionTextClass}`}>
+                                <MathRenderer content={opt.text} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* 2. Format Multi-Select: Ceklis Majemuk */}
+                    {currentQuestion.type === 'multi_select' && currentQuestion.options && (
+                      <div className="space-y-2.5 pt-1">
+                        {currentQuestion.options.map((opt) => {
+                          const arr = Array.isArray(currentAnswerVal) ? currentAnswerVal : [];
+                          const isChecked = arr.includes(opt.id);
+                          return (
+                            <div
+                              key={opt.id}
+                              onClick={() => handleToggleMultiSelect(opt.id)}
+                              className={`flex items-start space-x-3.5 p-3.5 rounded-xl border cursor-pointer transition-all duration-150 select-none ${
+                                isChecked
+                                  ? 'border-blue-600 bg-blue-50/80 shadow-xs'
+                                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
+                              }`}
+                            >
+                              <div
+                                className={`w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold ${
+                                  isChecked
+                                    ? 'bg-blue-600 text-white border-blue-600'
+                                    : 'bg-white text-transparent border-slate-300'
+                                }`}
+                              >
+                                ✓
+                              </div>
+                              <div className={`pt-0.5 font-sans text-slate-900 leading-relaxed ${questionTextClass}`}>
+                                <MathRenderer content={opt.text} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* 3. Format Short Answer */}
+                    {currentQuestion.type === 'short_answer' && (
+                      <div className="space-y-2 pt-1 font-mono">
+                        <label className="text-xs text-slate-500 font-semibold block uppercase">
+                          Ketikkan Jawaban Singkat:
+                        </label>
+                        <input
+                          type="text"
+                          value={typeof currentAnswerVal === 'string' ? currentAnswerVal : ''}
+                          onChange={(e) => handleShortAnswerChange(e.target.value)}
+                          placeholder="Contoh: 45 atau 12.5"
+                          className="w-full sm:w-80 p-3 bg-slate-50 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-blue-600 focus:bg-white transition"
                         />
                       </div>
-                    ) : (
-                      <div className={`whitespace-pre-line leading-relaxed font-sans ${stimulusTextClass}`}>
-                        <MathRenderer content={currentQuestion.stimulus || ''} />
+                    )}
+
+                    {/* 4. Format Essay */}
+                    {currentQuestion.type === 'essay' && (
+                      <div className="space-y-2 pt-1">
+                        <label className="text-xs text-slate-500 font-semibold block uppercase">
+                          Lembar Jawaban Esai:
+                        </label>
+                        <textarea
+                          rows={6}
+                          value={typeof currentAnswerVal === 'string' ? currentAnswerVal : ''}
+                          onChange={(e) => handleEssayChange(e.target.value)}
+                          placeholder="Tuliskan argumen penalaran Anda secara sistematis..."
+                          className="w-full p-3.5 bg-slate-50 rounded-xl border border-slate-300 text-sm font-sans leading-relaxed focus:outline-none focus:border-blue-600 focus:bg-white transition"
+                        />
                       </div>
                     )}
                   </div>
-                )}
-
-                {/* Right/Main: Question Prompt & Options */}
-                <div className="space-y-5">
-                  {/* Prompt Text */}
-                  <div className={`font-serif font-semibold text-[#13224E] leading-relaxed ${questionTextClass}`}>
-                    <MathRenderer content={currentQuestion.question} />
-                  </div>
-
-                  {/* 1. Format Single Choice: Bulatan OMR (A - E) */}
-                  {currentQuestion.type === 'single_choice' && currentQuestion.options && (
-                    <div className="space-y-2 pt-1">
-                      {currentQuestion.options.map((opt) => {
-                        const isSelected = currentAnswerVal === opt.id;
-                        return (
-                          <div
-                            key={opt.id}
-                            onClick={() => handleSelectOption(opt.id)}
-                            className={`flex items-start space-x-3 p-3.5 border cursor-pointer transition select-none ${
-                              isSelected
-                                ? 'border-[#13224E] bg-[#FAFAF7] font-medium'
-                                : 'border-[#E4E4DC] bg-[#FFFFFF] hover:border-[#CECEC2] hover:bg-[#FAFAF7]'
-                            }`}
-                          >
-                            <span
-                              className={`omr-bubble shrink-0 ${
-                                isSelected ? 'omr-bubble-filled' : ''
-                              }`}
-                            >
-                              {opt.id}
-                            </span>
-                            <div className={`pt-0.5 font-sans text-[#13224E] leading-relaxed ${questionTextClass}`}>
-                              <MathRenderer content={opt.text} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* 2. Format Multi-Select: Ceklis Kotak */}
-                  {currentQuestion.type === 'multi_select' && currentQuestion.options && (
-                    <div className="space-y-2 pt-1">
-                      {currentQuestion.options.map((opt) => {
-                        const arr = Array.isArray(currentAnswerVal) ? currentAnswerVal : [];
-                        const isChecked = arr.includes(opt.id);
-                        return (
-                          <div
-                            key={opt.id}
-                            onClick={() => handleToggleMultiSelect(opt.id)}
-                            className={`flex items-start space-x-3 p-3.5 border cursor-pointer transition select-none ${
-                              isChecked
-                                ? 'border-[#13224E] bg-[#FAFAF7] font-medium'
-                                : 'border-[#E4E4DC] bg-[#FFFFFF] hover:border-[#CECEC2] hover:bg-[#FAFAF7]'
-                            }`}
-                          >
-                            <div
-                              className={`w-5 h-5 border flex items-center justify-center shrink-0 mt-0.5 font-mono text-xs ${
-                                isChecked
-                                  ? 'bg-[#13224E] text-white border-[#13224E]'
-                                  : 'bg-white text-transparent border-[#CECEC2]'
-                              }`}
-                            >
-                              ✓
-                            </div>
-                            <div className={`pt-0.5 font-sans text-[#13224E] leading-relaxed ${questionTextClass}`}>
-                              <MathRenderer content={opt.text} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* 3. Format Short Answer */}
-                  {currentQuestion.type === 'short_answer' && (
-                    <div className="space-y-2 pt-1 font-mono">
-                      <label className="text-[10px] text-[#637096] uppercase block">
-                        Ketikkan Angka atau Jawaban Singkat:
-                      </label>
-                      <input
-                        type="text"
-                        value={typeof currentAnswerVal === 'string' ? currentAnswerVal : ''}
-                        onChange={(e) => handleShortAnswerChange(e.target.value)}
-                        placeholder="Contoh: 45 atau 12.5"
-                        className="w-full sm:w-80 p-3 bg-[#FAFAF7] border border-[#CECEC2] text-sm focus:outline-none focus:border-[#13224E]"
-                      />
-                    </div>
-                  )}
-
-                  {/* 4. Format Essay */}
-                  {currentQuestion.type === 'essay' && (
-                    <div className="space-y-2 pt-1">
-                      <label className="font-mono text-[10px] text-[#637096] uppercase block">
-                        Lembar Jawaban Esai Peserta:
-                      </label>
-                      <textarea
-                        rows={7}
-                        value={typeof currentAnswerVal === 'string' ? currentAnswerVal : ''}
-                        onChange={(e) => handleEssayChange(e.target.value)}
-                        placeholder="Tuliskan argumen penalaran Anda secara runtut dan sistematis..."
-                        className="w-full p-3.5 bg-[#FAFAF7] border border-[#CECEC2] text-sm font-sans leading-relaxed focus:outline-none focus:border-[#13224E]"
-                      />
-                    </div>
-                  )}
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Bottom Nav Action Bar */}
-            <div className="p-4 border-t border-[#E4E4DC] bg-[#FAFAF7] flex items-center justify-between font-mono text-xs">
+            {/* Desktop Navigation Footer */}
+            <div className="hidden lg:flex p-4 border-t border-slate-100 bg-slate-50/60 rounded-b-2xl items-center justify-between text-xs font-bold">
               <button
                 type="button"
                 onClick={() => {
@@ -658,17 +703,17 @@ export default function CBTExamPlayerPage() {
                   }
                 }}
                 disabled={currentSubtestIndex === 0 && currentQuestionIndex === 0}
-                className={`inline-flex items-center space-x-1.5 px-4 py-2 border transition ${
+                className={`inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border transition ${
                   currentSubtestIndex === 0 && currentQuestionIndex === 0
-                    ? 'bg-[#FAFAF7] text-[#9EABC7] border-[#E4E4DC] cursor-not-allowed'
-                    : 'bg-[#FFFFFF] hover:bg-[#FAFAF7] text-[#13224E] border-[#13224E]'
+                    ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                    : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 shadow-2xs'
                 }`}
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-4 h-4" />
                 <span>Soal Sebelumnya</span>
               </button>
 
-              <span className="text-[#637096] text-[11px] hidden sm:inline">
+              <span className="text-slate-500 text-xs">
                 Butir {currentQuestionIndex + 1} dari {subtestQuestions.length} Soal
               </span>
 
@@ -681,54 +726,50 @@ export default function CBTExamPlayerPage() {
                     handleNextSubtest();
                   }
                 }}
-                className="inline-flex items-center space-x-1.5 px-4.5 py-2 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-bold transition"
+                className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition"
               >
                 <span>
                   {currentQuestionIndex === subtestQuestions.length - 1 && currentSubtestIndex === tryout.subtests.length - 1
                     ? 'Selesai Subtest'
                     : 'Soal Berikutnya'}
                 </span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* ======================================================================= */}
-          {/* RIGHT SIDEBAR: PERMANENT DOCKED QUESTION PALETTE (3-4 of 12 columns)    */}
-          {/* ALWAYS VISIBLE ON DESKTOP & 1-CLICK JUMP                                */}
-          {/* ======================================================================= */}
+          {/* DESKTOP PERMANENT DOCKED PALETTE (3-4 COLS) */}
           <aside className="hidden lg:block lg:col-span-4 xl:col-span-3 space-y-4">
-            <div className="bg-[#FFFFFF] border border-[#13224E] p-4 sm:p-5 sticky top-20">
-              {/* Palette Header */}
-              <div className="pb-3 border-b border-[#E4E4DC] flex items-center justify-between">
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 sticky top-20 shadow-card">
+              <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                  <h3 className="font-serif font-bold text-sm text-[#13224E]">
+                  <h3 className="font-bold text-sm text-slate-900">
                     Daftar Nomor Soal
                   </h3>
-                  <p className="font-mono text-[10px] text-[#637096] mt-0.5">
-                    Subtest: <span className="font-semibold text-[#13224E]">{currentSubtest.name}</span>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Subtest: <span className="font-bold text-slate-800">{currentSubtest.name}</span>
                   </p>
                 </div>
-                <span className="font-mono text-xs px-2 py-0.5 bg-[#FAFAF7] text-[#1B3B8C] border border-[#CECEC2] font-bold">
+                <span className="text-xs font-bold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md">
                   {subtestQuestions.length} Soal
                 </span>
               </div>
 
-              {/* Number Matrix Grid (ALWAYS VISIBLE & 1-CLICK JUMP) */}
-              <div className="grid grid-cols-5 gap-2 py-4">
+              {/* Number Matrix Grid */}
+              <div className="grid grid-cols-5 gap-2 py-4 font-mono">
                 {subtestQuestions.map((q, idx) => {
                   const status = getQuestionPaletteStatus(q);
                   const isCurrent = idx === currentQuestionIndex;
 
-                  let statusClasses = 'bg-[#FFFFFF] text-[#637096] border-[#E4E4DC] hover:border-[#13224E]';
+                  let statusClasses = 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-400';
                   if (status === 'answered_flagged') {
-                    statusClasses = 'bg-[#EAF7F0] text-[#126340] border-2 border-[#EFA93B] font-bold';
+                    statusClasses = 'bg-emerald-50 text-emerald-800 border-2 border-amber-400 font-bold';
                   } else if (status === 'answered') {
-                    statusClasses = 'bg-[#1B8A5A] text-white border-[#1B8A5A] font-bold';
+                    statusClasses = 'bg-emerald-600 text-white border-emerald-600 font-bold';
                   } else if (status === 'flagged') {
-                    statusClasses = 'bg-[#EFA93B] text-[#13224E] border-[#C8831A] font-bold';
+                    statusClasses = 'bg-amber-400 text-slate-950 border-amber-500 font-bold';
                   } else if (status === 'visited_unanswered') {
-                    statusClasses = 'bg-[#FBEBEA] text-[#D0342C] border-[#D0342C]/40 font-medium';
+                    statusClasses = 'bg-rose-50 text-rose-700 border-rose-200 font-semibold';
                   }
 
                   return (
@@ -736,66 +777,41 @@ export default function CBTExamPlayerPage() {
                       key={q.id}
                       type="button"
                       onClick={() => setCurrentQuestionIndex(idx)}
-                      className={`relative h-9 border font-mono text-xs font-semibold flex items-center justify-center transition ${statusClasses} ${
-                        isCurrent ? 'ring-2 ring-[#13224E] ring-offset-1 scale-105 z-10' : ''
+                      className={`h-9 rounded-lg border text-xs flex items-center justify-center transition-all ${statusClasses} ${
+                        isCurrent ? 'ring-2 ring-slate-900 ring-offset-2 scale-105 z-10' : ''
                       }`}
                     >
                       <span>{idx + 1}</span>
-                      {status === 'answered_flagged' && (
-                        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#EFA93B]" />
-                      )}
                     </button>
                   );
                 })}
               </div>
 
               {/* Real-time Subtest Counter */}
-              <div className="py-2.5 px-3 bg-[#FAFAF7] border border-[#E4E4DC] grid grid-cols-3 gap-1 font-mono text-[10px] text-center">
+              <div className="py-2.5 px-3 bg-slate-50 rounded-xl border border-slate-200/80 grid grid-cols-3 gap-1 text-xs text-center font-bold">
                 <div>
-                  <span className="text-[#637096] block">Terjawab</span>
-                  <strong className="text-[#1B8A5A] text-xs">{subtestAnsweredCount}</strong>
+                  <span className="text-slate-400 text-[10px] block uppercase">Terjawab</span>
+                  <strong className="text-emerald-600">{subtestAnsweredCount}</strong>
                 </div>
                 <div>
-                  <span className="text-[#637096] block">Ragu</span>
-                  <strong className="text-[#C8831A] text-xs">{subtestFlaggedCount}</strong>
+                  <span className="text-slate-400 text-[10px] block uppercase">Ragu</span>
+                  <strong className="text-amber-600">{subtestFlaggedCount}</strong>
                 </div>
                 <div>
-                  <span className="text-[#637096] block">Kosong</span>
-                  <strong className="text-[#D0342C] text-xs">{subtestUnansweredCount}</strong>
-                </div>
-              </div>
-
-              {/* 5-Status Color Legend Strip */}
-              <div className="pt-3 border-t border-[#E4E4DC] space-y-1.5 font-mono text-[10px] text-[#637096]">
-                <div className="grid grid-cols-2 gap-1.5">
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-3 bg-[#1B8A5A] shrink-0 border border-[#1B8A5A]" />
-                    <span className="text-[#126340] font-medium">Sudah Dijawab</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-3 bg-[#EFA93B] shrink-0 border border-[#C8831A]" />
-                    <span className="text-[#C8831A] font-medium">Ragu-ragu</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-3 bg-[#EAF7F0] border-2 border-[#EFA93B] shrink-0" />
-                    <span className="text-[#13224E]">Dijawab & Ragu</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-3 h-3 bg-[#FBEBEA] border border-[#D0342C]/40 shrink-0" />
-                    <span className="text-[#D0342C]">Belum Dijawab</span>
-                  </div>
+                  <span className="text-slate-400 text-[10px] block uppercase">Kosong</span>
+                  <strong className="text-rose-600">{subtestUnansweredCount}</strong>
                 </div>
               </div>
 
               {/* Final Submit Trigger */}
-              <div className="pt-4 mt-2 border-t border-[#E4E4DC]">
+              <div className="pt-4 mt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setSubmitModalOpen(true)}
-                  className="w-full py-2.5 px-4 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-mono text-xs font-bold transition flex items-center justify-center space-x-2 border border-[#13224E]"
+                  className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center space-x-2"
                 >
-                  <Send className="w-3.5 h-3.5 text-[#EFA93B]" />
-                  <span>Kumpulkan Naskah Ujian</span>
+                  <Send className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Kumpulkan Ujian</span>
                 </button>
               </div>
             </div>
@@ -804,42 +820,127 @@ export default function CBTExamPlayerPage() {
       </main>
 
       {/* ========================================================================= */}
-      {/* 4. MOBILE SLIDE-OVER PALETTE DRAWER (Khusus Layar Smartphone)             */}
+      {/* 5. THUMB-FRIENDLY FIXED BOTTOM ACTION BAR (KHUSUS SMARTPHONE / MOBILE)    */}
+      {/* ========================================================================= */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2.5 flex items-center justify-between shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+        <button
+          type="button"
+          onClick={() => {
+            if (currentQuestionIndex > 0) {
+              setCurrentQuestionIndex(currentQuestionIndex - 1);
+            } else if (currentSubtestIndex > 0) {
+              handlePrevSubtest();
+            }
+          }}
+          disabled={currentSubtestIndex === 0 && currentQuestionIndex === 0}
+          className={`flex items-center space-x-1 py-2 px-3 rounded-xl text-xs font-bold transition ${
+            currentSubtestIndex === 0 && currentQuestionIndex === 0
+              ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+          }`}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>Prev</span>
+        </button>
+
+        {/* Center: Ragu Toggle */}
+        <button
+          type="button"
+          onClick={handleToggleFlag}
+          className={`flex items-center space-x-1 py-2 px-3.5 rounded-xl text-xs font-bold transition ${
+            isCurrentFlagged
+              ? 'bg-amber-100 text-amber-900 border border-amber-300'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          }`}
+        >
+          <Bookmark className={`w-3.5 h-3.5 ${isCurrentFlagged ? 'fill-amber-900 text-amber-900' : ''}`} />
+          <span>{isCurrentFlagged ? 'Ragu ✓' : 'Ragu'}</span>
+        </button>
+
+        {/* Right: Next / Submit */}
+        {currentQuestionIndex === subtestQuestions.length - 1 && currentSubtestIndex === tryout.subtests.length - 1 ? (
+          <button
+            type="button"
+            onClick={() => setSubmitModalOpen(true)}
+            className="flex items-center space-x-1.5 py-2 px-4 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-xs transition"
+          >
+            <span>Kumpulkan</span>
+            <Send className="w-3.5 h-3.5" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (currentQuestionIndex < subtestQuestions.length - 1) {
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
+              } else if (currentSubtestIndex < tryout.subtests.length - 1) {
+                handleNextSubtest();
+              }
+            }}
+            className="flex items-center space-x-1 py-2 px-3.5 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-xs transition"
+          >
+            <span>Next</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 6. MOBILE SLIDE-UP BOTTOM SHEET FOR PALETTE (ERGONOMIS LAYAR SENTUH)      */}
       {/* ========================================================================= */}
       {isMobilePaletteOpen && (
-        <div className="fixed inset-0 z-50 bg-[#13224E]/80 lg:hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-[#FFFFFF] max-w-md w-full p-5 space-y-4 max-h-[85vh] flex flex-col border-t-2 sm:border-2 border-[#13224E]">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs lg:hidden flex items-end justify-center p-0">
+          <div className="bg-white max-w-lg w-full rounded-t-3xl p-5 space-y-4 max-h-[80vh] flex flex-col shadow-2xl border-t border-slate-200 animate-in slide-in-from-bottom duration-200">
+            {/* Sheet Handle & Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h3 className="font-serif font-bold text-base text-[#13224E]">
-                  Daftar Nomor Soal: {currentSubtest.name}
+                <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2" />
+                <h3 className="font-bold text-base text-slate-900">
+                  Daftar Nomor: {currentSubtest.name}
                 </h3>
-                <p className="font-mono text-xs text-[#637096]">
-                  Pilih nomor butir soal untuk berpindah langsung
+                <p className="text-xs text-slate-500">
+                  Ketuk nomor butir soal untuk berpindah langsung
                 </p>
               </div>
               <button
                 onClick={() => setIsMobilePaletteOpen(false)}
-                className="text-[#637096] hover:text-[#13224E] p-1"
+                className="p-1.5 text-slate-400 hover:text-slate-900 bg-slate-100 rounded-full"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-5 gap-2 overflow-y-auto py-2">
+            {/* Quick Status Stats */}
+            <div className="grid grid-cols-3 gap-2 text-center text-xs font-bold py-1">
+              <div className="bg-emerald-50 text-emerald-800 p-2 rounded-xl border border-emerald-100">
+                <span className="text-[10px] block opacity-80 uppercase">Terjawab</span>
+                <span>{subtestAnsweredCount}</span>
+              </div>
+              <div className="bg-amber-50 text-amber-800 p-2 rounded-xl border border-amber-100">
+                <span className="text-[10px] block opacity-80 uppercase">Ragu</span>
+                <span>{subtestFlaggedCount}</span>
+              </div>
+              <div className="bg-slate-100 text-slate-700 p-2 rounded-xl border border-slate-200">
+                <span className="text-[10px] block opacity-80 uppercase">Kosong</span>
+                <span>{subtestUnansweredCount}</span>
+              </div>
+            </div>
+
+            {/* 5x4 Grid */}
+            <div className="grid grid-cols-5 gap-2.5 overflow-y-auto py-2 font-mono">
               {subtestQuestions.map((q, idx) => {
                 const status = getQuestionPaletteStatus(q);
                 const isCurrent = idx === currentQuestionIndex;
 
-                let statusClasses = 'bg-[#FFFFFF] text-[#637096] border-[#E4E4DC]';
+                let statusClasses = 'bg-slate-100 text-slate-700 border-slate-200';
                 if (status === 'answered_flagged') {
-                  statusClasses = 'bg-[#EAF7F0] text-[#126340] border-2 border-[#EFA93B] font-bold';
+                  statusClasses = 'bg-emerald-50 text-emerald-800 border-2 border-amber-400 font-bold';
                 } else if (status === 'answered') {
-                  statusClasses = 'bg-[#1B8A5A] text-white border-[#1B8A5A] font-bold';
+                  statusClasses = 'bg-emerald-600 text-white border-emerald-600 font-bold';
                 } else if (status === 'flagged') {
-                  statusClasses = 'bg-[#EFA93B] text-[#13224E] border-[#C8831A] font-bold';
+                  statusClasses = 'bg-amber-400 text-slate-950 border-amber-500 font-bold';
                 } else if (status === 'visited_unanswered') {
-                  statusClasses = 'bg-[#FBEBEA] text-[#D0342C] border-[#D0342C]/40';
+                  statusClasses = 'bg-rose-50 text-rose-700 border-rose-200';
                 }
 
                 return (
@@ -850,8 +951,8 @@ export default function CBTExamPlayerPage() {
                       setCurrentQuestionIndex(idx);
                       setIsMobilePaletteOpen(false);
                     }}
-                    className={`h-10 border font-mono text-xs font-semibold flex items-center justify-center ${statusClasses} ${
-                      isCurrent ? 'ring-2 ring-[#13224E] ring-offset-2' : ''
+                    className={`h-11 rounded-xl border text-sm font-bold flex items-center justify-center transition-all ${statusClasses} ${
+                      isCurrent ? 'ring-2 ring-slate-900 ring-offset-2' : ''
                     }`}
                   >
                     {idx + 1}
@@ -860,14 +961,14 @@ export default function CBTExamPlayerPage() {
               })}
             </div>
 
-            <div className="pt-3 border-t border-[#E4E4DC]">
+            <div className="pt-2 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => {
                   setIsMobilePaletteOpen(false);
                   setSubmitModalOpen(true);
                 }}
-                className="w-full py-2.5 bg-[#1B8A5A] hover:bg-[#126340] text-white font-mono text-xs font-bold transition"
+                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition"
               >
                 Kumpulkan Naskah Ujian
               </button>
@@ -877,51 +978,52 @@ export default function CBTExamPlayerPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* 5. CONFIRMATION SUBMIT MODAL                                              */}
+      {/* 7. CONFIRMATION SUBMIT MODAL                                              */}
       {/* ========================================================================= */}
       {submitModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#13224E]/80 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] max-w-md w-full p-6 border-2 border-[#13224E] space-y-4 font-sans shadow-xl">
-            <div className="flex items-center space-x-2.5 pb-2 border-b border-[#E4E4DC]">
-              <Send className="w-5 h-5 text-[#1B3B8C]" />
-              <h3 className="font-serif font-bold text-base text-[#13224E]">
-                Konfirmasi Pengumpulan Naskah Ujian
-              </h3>
-            </div>
-
-            <p className="text-xs text-[#637096] leading-relaxed">
-              Apakah Anda yakin ingin menyelesaikan simulasi UTBK ini? Pastikan seluruh subtest telah diperiksa sebelum naskah dikunci.
-            </p>
-
-            <div className="grid grid-cols-3 gap-2 p-3 bg-[#FAFAF7] border border-[#E4E4DC] text-center font-mono text-xs">
-              <div>
-                <span className="text-[10px] text-[#637096] block">TERJAWAB</span>
-                <span className="font-bold text-[#1B8A5A] text-sm">{totalAnswered}</span>
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white max-w-md w-full p-6 rounded-2xl border border-slate-200 space-y-4 shadow-xl font-sans">
+            <div className="flex items-center space-x-3 pb-3 border-b border-slate-100">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
+                <Send className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] text-[#637096] block">RAGU-RAGU</span>
-                <span className="font-bold text-[#C8831A] text-sm">{totalFlagged}</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-[#637096] block">KOSONG</span>
-                <span className="font-bold text-[#D0342C] text-sm">{totalUnanswered}</span>
+                <h3 className="font-bold text-base text-slate-900">
+                  Konfirmasi Pengumpulan
+                </h3>
+                <p className="text-xs text-slate-500">Periksa kembali ringkasan jawaban Anda</p>
               </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-end space-x-2 font-mono text-xs">
+            <div className="grid grid-cols-3 gap-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 text-center text-xs font-mono">
+              <div>
+                <span className="text-[10px] text-slate-400 block font-semibold">TERJAWAB</span>
+                <span className="font-bold text-emerald-600 text-sm">{totalAnswered}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 block font-semibold">RAGU</span>
+                <span className="font-bold text-amber-600 text-sm">{totalFlagged}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 block font-semibold">KOSONG</span>
+                <span className="font-bold text-rose-600 text-sm">{totalUnanswered}</span>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end space-x-2 text-xs font-bold">
               <button
                 type="button"
                 onClick={() => setSubmitModalOpen(false)}
-                className="px-3.5 py-2 bg-[#FAFAF7] border border-[#CECEC2] text-[#637096] hover:text-[#13224E]"
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition"
               >
-                Kembali Mengerjakan
+                Kembali
               </button>
               <button
                 type="button"
                 onClick={handleFinalSubmit}
-                className="px-4.5 py-2 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-bold transition"
+                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition"
               >
-                Kumpulkan & Kunci Nilai
+                Kumpulkan & Selesai
               </button>
             </div>
           </div>
@@ -929,33 +1031,33 @@ export default function CBTExamPlayerPage() {
       )}
 
       {/* ========================================================================= */}
-      {/* 6. PROCTORING / ANTI-CHEAT WARNING MODAL                                  */}
+      {/* 8. PROCTORING / ANTI-CHEAT WARNING MODAL                                  */}
       {/* ========================================================================= */}
       {antiCheatModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-[#13224E]/85 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] max-w-sm w-full p-6 border-2 border-[#D0342C] space-y-4 font-sans text-center shadow-2xl">
-            <div className="w-12 h-12 bg-[#FBEBEA] border border-[#D0342C] flex items-center justify-center mx-auto text-[#D0342C]">
+        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white max-w-sm w-full p-6 rounded-2xl border border-rose-200 space-y-4 text-center shadow-2xl">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center mx-auto text-rose-600">
               <ShieldAlert className="w-6 h-6" />
             </div>
 
             <div>
-              <h3 className="font-serif font-bold text-base text-[#D0342C]">
-                Peringatan Integritas CBT
+              <h3 className="font-bold text-base text-rose-700">
+                Peringatan Integritas Ujian
               </h3>
-              <p className="text-xs text-[#637096] mt-1 leading-relaxed">
-                Anda terdeteksi meninggalkan layar ujian / berpindah tab browser / split-screen.
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Anda terdeteksi berpindah tab, meminimalkan browser, atau membuka aplikasi lain.
               </p>
             </div>
 
-            <div className="p-2.5 bg-[#FAFAF7] border border-[#E4E4DC] font-mono text-xs">
-              Pelanggaran: <strong className="text-[#D0342C]">{antiCheatModal.count} dari 3 batas toleransi</strong>
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-xs">
+              Pelanggaran: <strong className="text-rose-600">{antiCheatModal.count} dari 3 batas toleransi</strong>
             </div>
 
             <button
               onClick={() => setAntiCheatModal({ isOpen: false, count: antiCheatModal.count })}
-              className="w-full py-2 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-mono text-xs font-bold transition"
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition"
             >
-              Kembali ke Layar Ujian
+              Kembali ke Ujian
             </button>
           </div>
         </div>

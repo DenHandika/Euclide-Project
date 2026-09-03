@@ -5,6 +5,7 @@ import Navbar from '@/components/common/Navbar';
 import Footer from '@/components/common/Footer';
 import RoleSwitcher from '@/components/common/RoleSwitcher';
 import ToastStack from '@/components/common/ToastStack';
+import MobileBottomNav from '@/components/common/MobileBottomNav';
 
 export const metadata: Metadata = {
   title: 'EUCLIDE — EdTech CBT Tryout & Bimbel Management System',
@@ -27,13 +28,14 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="flex flex-col min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans antialiased selection:bg-[#F59E0B]/25 selection:text-[#0F172A]">
+      <body className="flex flex-col min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans antialiased selection:bg-[#F59E0B]/25 selection:text-[#0F172A] pb-16 md:pb-0">
         <AppProvider>
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
           <RoleSwitcher />
           <ToastStack />
+          <MobileBottomNav />
         </AppProvider>
       </body>
     </html>
