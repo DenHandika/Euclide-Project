@@ -455,6 +455,63 @@ export default function CBTExamPlayerPage() {
       </nav>
 
       {/* ========================================================================= */}
+      {/* 2.5 PERMANENT QUESTION NUMBER RIBBON (SELALU TAMPIL TANPA PERLU KLIK)     */}
+      {/* ========================================================================= */}
+      <div className="bg-slate-50 border-b border-slate-200/90 px-3 sm:px-6 py-2 flex items-center justify-between gap-3 sticky top-[57px] z-30 shadow-2xs select-none">
+        {/* Horizontal Number Strip (Scrollable & 1-Tap Jump) */}
+        <div className="flex items-center space-x-1.5 overflow-x-auto py-0.5 no-scrollbar flex-1 font-mono">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-tight mr-1 hidden sm:inline shrink-0">
+            Nomor:
+          </span>
+          {subtestQuestions.map((q, idx) => {
+            const status = getQuestionPaletteStatus(q);
+            const isCurrent = idx === currentQuestionIndex;
+
+            let statusStyle = 'bg-white text-slate-700 border border-slate-200 hover:border-slate-400';
+            if (status === 'answered_flagged') {
+              statusStyle = 'bg-emerald-50 text-emerald-900 border-2 border-amber-400 font-bold';
+            } else if (status === 'answered') {
+              statusStyle = 'bg-emerald-600 text-white font-bold border border-emerald-600 shadow-2xs';
+            } else if (status === 'flagged') {
+              statusStyle = 'bg-amber-400 text-slate-950 font-bold border border-amber-500 shadow-2xs';
+            } else if (status === 'visited_unanswered') {
+              statusStyle = 'bg-rose-50 text-rose-700 border border-rose-200 font-semibold';
+            }
+
+            return (
+              <button
+                key={q.id}
+                type="button"
+                onClick={() => setCurrentQuestionIndex(idx)}
+                className={`w-8 h-8 rounded-lg text-xs shrink-0 flex items-center justify-center transition-all ${statusStyle} ${
+                  isCurrent ? 'ring-2 ring-blue-600 ring-offset-2 scale-110 z-10 font-extrabold shadow-sm' : ''
+                }`}
+                title={`Lompat ke Soal #${idx + 1}`}
+              >
+                <span>{idx + 1}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Live Status Indicators Legend Mini */}
+        <div className="hidden md:flex items-center space-x-3 text-[11px] shrink-0 font-medium text-slate-600">
+          <span className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
+            <span>Terjawab: <strong className="text-emerald-700">{subtestAnsweredCount}</strong></span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
+            <span>Ragu: <strong className="text-amber-700">{subtestFlaggedCount}</strong></span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" />
+            <span>Kosong: <strong className="text-slate-700">{subtestUnansweredCount}</strong></span>
+          </span>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
       {/* 3. MOBILE STIMULUS SEGMENTED CONTROL TABS (HANYA MUNCUL DI SMARTPHONE)    */}
       {/* ========================================================================= */}
       {hasStimulus && (
