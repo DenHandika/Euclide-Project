@@ -1,3 +1,5 @@
+import { DEMO_QUESTIONS } from './demoQuestions';
+import { buildDemoTryouts } from './demoTryouts';
 import {
   User,
   Tryout,
@@ -179,7 +181,7 @@ export const SUBTEST_CONFIGS: SubtestConfig[] = [
   },
 ];
 
-export const MOCK_QUESTIONS: Question[] = [
+const ORIGINAL_QUESTIONS: Question[] = [
   {
     id: 'q-pm-1',
     subtestId: 'penalaran_matematika',
@@ -321,56 +323,14 @@ export const MOCK_QUESTIONS: Question[] = [
   },
 ];
 
-export const MOCK_TRYOUTS: Tryout[] = [
-  {
-    id: 'to-utbk-national-01',
-    code: 'EUC-SNBT-2026-N01',
-    title: 'Simulasi Akbar UTBK-SNBT 2026 Seri 1 (Grand Tryout)',
-    description: 'Format resmi SNBT BPPP terbaru dengan 7 Subtest lengkap, Skor Tertimbang Subtest, dan rasionalisasi peluang PTN otomatis.',
-    totalDurationMinutes: 195,
-    totalQuestions: 160,
-    badge: 'Official Grand TO',
-    targetDate: '15 Maret 2026',
-    participantsCount: 642,
-    averageScore: 684.5,
-    subtests: SUBTEST_CONFIGS,
-    questions: MOCK_QUESTIONS,
-  },
-  {
-    id: 'to-tps-drilling-02',
-    code: 'EUC-TPS-DRILL-02',
-    title: 'Drilling Kilat TPS: Penalaran Matematika & Kuantitatif',
-    description: 'Fokus intensif 40 soal kalkulus, matriks, aljabar linear, dan pemecahan masalah numerik tingkat lanjut.',
-    totalDurationMinutes: 50,
-    totalQuestions: 40,
-    badge: 'Spesialis Kuantitatif',
-    targetDate: 'Tersedia Sekarang',
-    participantsCount: 580,
-    averageScore: 642.0,
-    subtests: [
-      SUBTEST_CONFIGS[1], // PK
-      SUBTEST_CONFIGS[6], // PM
-    ],
-    questions: MOCK_QUESTIONS.filter((q) => q.subtestId === 'penalaran_matematika' || q.subtestId === 'pengetahuan_kuantitatif'),
-  },
-  {
-    id: 'to-literasi-mastery-03',
-    code: 'EUC-LIT-MST-03',
-    title: 'Mastery Literasi Indonesia & English Reading Comprehension',
-    description: 'Drilling wacana kritis, tone analysis, ide pokok, dan analisis argumen filosofis / sains populer.',
-    totalDurationMinutes: 75,
-    totalQuestions: 50,
-    badge: 'Literasi Unggulan',
-    targetDate: 'Tersedia Sekarang',
-    participantsCount: 495,
-    averageScore: 710.2,
-    subtests: [
-      SUBTEST_CONFIGS[4], // Lit Indo
-      SUBTEST_CONFIGS[5], // Lit Eng
-    ],
-    questions: MOCK_QUESTIONS.filter((q) => q.subtestId === 'literasi_indonesia' || q.subtestId === 'literasi_inggris'),
-  },
-];
+// Keep historic demo IDs so existing saved answers remain addressable.
+export const MOCK_QUESTIONS: Question[] = [...ORIGINAL_QUESTIONS.map(question => question.id === 'q-pm-3' ? {
+  ...question,
+  options: question.options?.map(option => option.id === 'B' ? { ...option, text: '$k = 7.5$' } : option),
+  explanation: 'Titik puncak berada pada x = 3. Substitusi menghasilkan f(3) = 2k - 10 = 5, sehingga 2k = 15 dan k = 7.5. Jawaban B.',
+} : question), ...DEMO_QUESTIONS].map((question, index) => ({ ...question, number: index + 1 }));
+
+export const MOCK_TRYOUTS: Tryout[] = buildDemoTryouts(MOCK_QUESTIONS, SUBTEST_CONFIGS);
 
 export const MOCK_CLASS_BATCHES: ClassBatch[] = [
   {

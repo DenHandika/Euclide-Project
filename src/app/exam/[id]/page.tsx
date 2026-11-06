@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
-import { Question, UserAnswer } from '@/types';
+import { Question, UserAnswer, ExamSession } from '@/types';
 import MathRenderer from '@/components/common/MathRenderer';
 import {
   Clock,
@@ -30,6 +30,22 @@ import {
 } from 'lucide-react';
 
 export default function CBTExamPlayerPage() {
+  const params = useParams();
+  const router = useRouter();
+  const tryoutId = params.id as string;
+  const { isHydrated, getExamSession } = useApp();
+  const session = getExamSession(tryoutId);
+  const ready = !!session?.targetChoices?.length;
+  useEffect(() => {
+    if (!isHydrated) return;
+    if (!ready) router.replace(`/tryouts/${tryoutId}/prepare`);
+    else if (session?.isCompleted) router.replace(`/exam/${tryoutId}/result`);
+  }, [isHydrated, ready, session?.isCompleted, tryoutId, router]);
+  if (!isHydrated || !ready || session?.isCompleted) return <div className="p-8 text-center text-sm text-slate-500">Menyiapkan sesi tryout...</div>;
+  return <CBTExamPlayer key={`${tryoutId}-${session.startedAt}`} initialSession={session} />;
+}
+
+function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
   const params = useParams();
   const router = useRouter();
   const tryoutId = (params?.id as string) || 'to-utbk-national-01';
@@ -63,7 +79,7 @@ export default function CBTExamPlayerPage() {
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
 
   // Initialize or fetch session
-  const [session, setSession] = useState(() => startExam(tryoutId));
+  const [session, setSession] = useState(initialSession);
 
   // Current Subtest & Question
   const currentSubtest = tryout.subtests[currentSubtestIndex] || tryout.subtests[0];
@@ -643,7 +659,7 @@ export default function CBTExamPlayerPage() {
                   {/* Main Question & Option Selector Cards */}
                   <div className="space-y-5">
                     {/* Prompt Text */}
-                    <div className={`font-serif font-semibold text-slate-900 leading-relaxed ${questionTextClass}`}>
+                    <div className={`font-sans font-semibold text-slate-900 leading-relaxed ${questionTextClass}`}>
                       <MathRenderer content={currentQuestion.question} />
                     </div>
 

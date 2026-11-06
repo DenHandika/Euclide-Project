@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { StudyProgram, validateChoices, SNBT_RULE_YEAR } from '@/lib/snbtChoices';
 import {
   User,
   UserRole,
@@ -34,6 +35,7 @@ interface Toast {
 }
 
 interface AppContextType {
+  isHydrated: boolean;
   currentUser: User;
   currentRole: UserRole;
   switchRole: (role: UserRole) => void;
@@ -45,7 +47,7 @@ interface AppContextType {
   tryouts: Tryout[];
   questions: Question[];
   activeSessions: Record<string, ExamSession>;
-  startExam: (tryoutId: string) => ExamSession;
+  startExam: (tryoutId: string, choices?: StudyProgram[]) => ExamSession;
   getExamSession: (tryoutId: string) => ExamSession | null;
   saveAnswer: (tryoutId: string, questionId: string, type: any, answer: string | string[], isFlagged?: boolean) => void;
   toggleFlagQuestion: (tryoutId: string, questionId: string) => void;
@@ -91,6 +93,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const [isHydrated, setIsHydrated] = useState(false);
   // 1. User State
   const [currentUser, setCurrentUser] = useState<User>(() => {
     return MOCK_USERS[2]; // Default: Active Siswa (Raihan)
@@ -128,16 +131,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const storedStudents = localStorage.getItem('euclide_students');
       if (storedStudents) setStudents(JSON.parse(storedStudents));
 
+      const storedBatches = localStorage.getItem('euclide_batches');
+      if (storedBatches) setBatches(JSON.parse(storedBatches));
+
       const storedQuestions = localStorage.getItem('euclide_questions');
-      if (storedQuestions) setQuestions(JSON.parse(storedQuestions));
+      if (storedQuestions) {
+        const saved: Question[] = JSON.parse(storedQuestions);
+        const savedIds = new Set(saved.map(question => question.id));
+        // Add newly shipped examples without deleting questions edited by the user.
+        setQuestions([...MOCK_QUESTIONS.filter(question => !savedIds.has(question.id)), ...saved]);
+      }
 
       const storedEssays = localStorage.getItem('euclide_essays');
       if (storedEssays) setEssaySubmissions(JSON.parse(storedEssays));
 
       const storedResults = localStorage.getItem('euclide_results');
       if (storedResults) setExamResults(JSON.parse(storedResults));
+      const storedSessions = localStorage.getItem('euclide_sessions');
+      if (storedSessions) setActiveSessions(JSON.parse(storedSessions));
     } catch (e) {
       console.warn('LocalStorage error or SSR', e);
+    } finally {
+      setIsHydrated(true);
     }
   }, []);
 
@@ -228,11 +243,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   // Exam engine methods
-  const startExam = (tryoutId: string): ExamSession => {
+  const startExam = (tryoutId: string, choices: StudyProgram[] = []): ExamSession => {
     const existing = activeSessions[tryoutId];
-    if (existing && !existing.isCompleted) {
+    if (existing && existing.userId === currentUser.id && !existing.isCompleted && existing.targetChoices?.length) {
       return existing;
     }
+
+    const validation = validateChoices(choices);
+    if (!validation.valid) throw new Error(validation.message);
 
     const tryout = tryouts.find((t) => t.id === tryoutId) || tryouts[0];
     const initialTimers: Record<SubtestId, number> = {} as any;
@@ -241,6 +259,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
 
     const newSession: ExamSession = {
+      targetChoices: choices.map(choice => ({ ...choice })),
+      choiceRuleYear: SNBT_RULE_YEAR,
       tryoutId,
       userId: currentUser.id,
       currentSubtestIndex: 0,
@@ -260,7 +280,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const getExamSession = (tryoutId: string): ExamSession | null => {
-    return activeSessions[tryoutId] || null;
+    const session = activeSessions[tryoutId];
+    return session?.userId === currentUser.id ? session : null;
   };
 
   const saveAnswer = (
@@ -363,6 +384,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       userId: currentUser.id,
       userName: currentUser.name,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+      targetChoices: session?.targetChoices?.map(choice => ({ ...choice })),
+      choiceRuleYear: session?.choiceRuleYear,
     };
 
     // If student answered essay, add to essay grading queue
@@ -419,7 +442,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const getExamResult = (tryoutId: string): ExamResult => {
-    return examResults[tryoutId] || { ...MOCK_EXAM_RESULT, tryoutId };
+    const result = examResults[tryoutId];
+    return result?.userId === currentUser.id ? result : { ...MOCK_EXAM_RESULT, tryoutId, userId: currentUser.id, userName: currentUser.name };
   };
 
   const addQuestion = (newQ: Omit<Question, 'id'>) => {
@@ -600,6 +624,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider
       value={{
+        isHydrated,
         currentUser,
         currentRole,
         switchRole,

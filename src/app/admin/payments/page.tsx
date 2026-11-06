@@ -1,4 +1,8 @@
 'use client';
+import Pagination from '@/components/common/Pagination';
+import usePagination from '@/hooks/usePagination';
+
+import StatusBadge from '@/components/common/StatusBadge';
 
 import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
@@ -17,14 +21,25 @@ import {
 } from 'lucide-react';
 
 export default function AdminPaymentsPage() {
-  const { payments, addManualPayment, importPaymentsBulk, showToast } = useApp();
+  const { payments, addManualPayment, importPaymentsBulk, showToast } =
+    useApp();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [parsedRows, setParsedRows] = useState<PaymentImportRow[]>([]);
   const [fileName, setFileName] = useState<string>('');
+  const paymentsPagination = usePagination(payments, 5);
+  const paymentImportPagination = usePagination(
+    parsedRows,
+    10,
+    fileName,
+    [10, 25, 50]
+  );
+
   const [isDragging, setIsDragging] = useState(false);
   const [manualModalOpen, setManualModalOpen] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(
+    null
+  );
 
   const [manualForm, setManualForm] = useState({
     nis: 'EUC-2026-0042',
@@ -58,9 +73,15 @@ export default function AdminPaymentsPage() {
         const rawJson: any[] = XLSX.utils.sheet_to_json(worksheet);
 
         const validatedRows: PaymentImportRow[] = rawJson.map((row) => {
-          const nis = String(row.Nomor_Induk || row.NIS || row.nis || '').trim();
-          const nama = String(row.Nama || row.Nama_Siswa || row.nama || '').trim();
-          const bulan = String(row.Bulan || row.Periode || 'Februari 2026').trim();
+          const nis = String(
+            row.Nomor_Induk || row.NIS || row.nis || ''
+          ).trim();
+          const nama = String(
+            row.Nama || row.Nama_Siswa || row.nama || ''
+          ).trim();
+          const bulan = String(
+            row.Bulan || row.Periode || 'Februari 2026'
+          ).trim();
           const nominal = Number(row.Nominal || row.Jumlah || row.amount || 0);
           const status = String(row.Status || row.status || 'Lunas').trim();
 
@@ -68,10 +89,10 @@ export default function AdminPaymentsPage() {
           const errorMessage = !nis
             ? 'Nomor Induk kosong'
             : !nama
-            ? 'Nama Siswa kosong'
-            : nominal <= 0
-            ? 'Nominal tidak valid'
-            : undefined;
+              ? 'Nama Siswa kosong'
+              : nominal <= 0
+                ? 'Nominal tidak valid'
+                : undefined;
 
           return {
             Nomor_Induk: nis,
@@ -85,9 +106,15 @@ export default function AdminPaymentsPage() {
         });
 
         setParsedRows(validatedRows);
-        showToast(`Berhasil membaca ${validatedRows.length} baris dari ${file.name}`, 'info');
+        showToast(
+          `Berhasil membaca ${validatedRows.length} baris dari ${file.name}`,
+          'info'
+        );
       } catch (err) {
-        showToast('Gagal memproses file spreadsheet. Pastikan format valid.', 'error');
+        showToast(
+          'Gagal memproses file spreadsheet. Pastikan format valid.',
+          'error'
+        );
       }
     };
 
@@ -152,33 +179,34 @@ export default function AdminPaymentsPage() {
   const errorCount = parsedRows.filter((r) => !r.isValid).length;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="min-h-screen bg-[#F6F8FC] py-8 font-sans text-[#263D5F]">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#13224E] pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
-            <span className="font-mono text-[10px] font-bold uppercase text-[#1B8A5A] block mb-1">
+            <span className="font-sans text-xs font-bold uppercase text-[#1B8A5A] block mb-1">
               MODUL EXCEL & KASIR SPP BIMBEL
             </span>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-[#263D5F]">
               Import Pembayaran Excel (.xlsx) & Kasir
             </h1>
-            <p className="text-xs sm:text-sm text-[#637096] mt-0.5">
-              Impor massal ratusan baris data pembayaran via spreadsheet SheetJS, validasi instan, dan cetak kuitansi.
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Impor massal ratusan baris data pembayaran via spreadsheet
+              SheetJS, validasi instan, dan cetak kuitansi.
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 font-mono text-xs">
+          <div className="flex items-center space-x-2 font-sans text-xs">
             <button
               onClick={handleDownloadTemplate}
-              className="inline-flex items-center space-x-1.5 bg-[#FFFFFF] hover:bg-[#FAFAF7] text-[#13224E] px-3.5 py-2 border border-[#CECEC2] transition"
+              className="inline-flex items-center space-x-1.5 bg-[#FFFFFF] hover:bg-[#F6F8FC] text-[#263D5F] px-3.5 py-2 border border-slate-200 transition rounded-xl min-h-11"
             >
               <Download className="w-3.5 h-3.5 text-[#1B3B8C]" />
               <span>Unduh Template .xlsx</span>
             </button>
             <button
               onClick={() => setManualModalOpen(true)}
-              className="inline-flex items-center space-x-1.5 bg-[#13224E] hover:bg-[#1B3B8C] text-white px-3.5 py-2 transition"
+              className="inline-flex items-center space-x-1.5 bg-[#2E578F] hover:bg-[#234573] text-white px-3.5 py-2 transition rounded-xl min-h-11"
             >
               <PlusCircle className="w-3.5 h-3.5 text-[#EFA93B]" />
               <span>Entri Kasir Tunai</span>
@@ -195,11 +223,11 @@ export default function AdminPaymentsPage() {
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed p-8 text-center cursor-pointer transition-all ${
+          className={`border border-dashed p-8 text-center cursor-pointer transition-all rounded-2xl shadow-sm ${
             isDragging
               ? 'border-[#1B8A5A] bg-[#EAF7F0]'
-              : 'border-[#CECEC2] bg-[#FFFFFF] hover:border-[#13224E]'
-          }`}
+              : 'border-slate-200 bg-[#FFFFFF] hover:border-slate-200'
+          } `}
         >
           <input
             ref={fileInputRef}
@@ -214,50 +242,57 @@ export default function AdminPaymentsPage() {
           />
 
           <div className="max-w-md mx-auto space-y-2 font-sans">
-            <div className="w-10 h-10 bg-[#FAFAF7] border border-[#CECEC2] text-[#13224E] flex items-center justify-center mx-auto">
+            <div className="w-10 h-10 bg-[#F6F8FC] border border-slate-200 text-[#263D5F] flex items-center justify-center mx-auto rounded-xl">
               <UploadCloud className="w-5 h-5" />
             </div>
 
             <div>
-              <h3 className="font-serif font-bold text-base text-[#13224E]">
-                {fileName ? `File Terpilih: ${fileName}` : 'Tarik & Letakkan File Spreadsheet (.xlsx / .csv)'}
+              <h3 className="font-sans font-bold text-base text-[#263D5F]">
+                {fileName
+                  ? `File Terpilih: ${fileName}`
+                  : 'Tarik & Letakkan File Spreadsheet (.xlsx / .csv)'}
               </h3>
-              <p className="text-xs text-[#637096] mt-0.5">
-                atau klik untuk memilih file dari komputer (SheetJS Parser Client-Side).
+              <p className="text-xs text-slate-500 mt-0.5">
+                atau klik untuk memilih file dari komputer (SheetJS Parser
+                Client-Side).
               </p>
             </div>
 
-            <div className="font-mono text-[10px] text-[#9EABC7] pt-1">
-              Format Kolom: <strong>Nomor_Induk</strong>, <strong>Nama</strong>, <strong>Bulan</strong>, <strong>Nominal</strong>, <strong>Status</strong>
+            <div className="font-sans text-xs text-slate-500 pt-1">
+              Format Kolom: <strong>Nomor_Induk</strong>, <strong>Nama</strong>,{' '}
+              <strong>Bulan</strong>, <strong>Nominal</strong>,{' '}
+              <strong>Status</strong>
             </div>
           </div>
         </div>
 
         {/* 2. Spreadsheet Preview Table */}
         {parsedRows.length > 0 && (
-          <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4 animate-in fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E4DC] pb-3">
+          <div className="bg-[#FFFFFF] border border-slate-200 p-6 space-y-4 animate-in fade-in rounded-2xl shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-serif font-bold text-base text-[#13224E]">
+                <h3 className="font-sans font-bold text-base text-[#263D5F]">
                   Pratinjau Data Impor ({parsedRows.length} Baris)
                 </h3>
-                <p className="font-mono text-xs text-[#637096]">
-                  Valid: <strong className="text-[#1B8A5A]">{validCount}</strong> baris • Tidak Valid:{' '}
+                <p className="font-sans text-xs text-slate-500">
+                  Valid:{' '}
+                  <strong className="text-[#1B8A5A]">{validCount}</strong> baris
+                  • Tidak Valid:{' '}
                   <strong className="text-[#D0342C]">{errorCount}</strong> baris
                 </p>
               </div>
 
-              <div className="flex items-center space-x-2 font-mono text-xs">
+              <div className="flex items-center space-x-2 font-sans text-xs">
                 <button
                   onClick={() => setParsedRows([])}
-                  className="px-3 py-1.5 text-[#637096] hover:text-[#13224E] bg-[#FAFAF7] border border-[#CECEC2]"
+                  className="px-3 py-1.5 text-slate-500 hover:text-[#263D5F] bg-[#F6F8FC] border border-slate-200 rounded-xl min-h-11"
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleSaveToDatabase}
                   disabled={validCount === 0}
-                  className="inline-flex items-center space-x-1.5 bg-[#1B8A5A] hover:bg-[#126340] disabled:opacity-40 text-white px-3.5 py-1.5 transition font-semibold"
+                  className="inline-flex items-center space-x-1.5 bg-[#1B8A5A] hover:bg-[#126340] disabled:opacity-40 text-white px-3.5 py-1.5 transition font-semibold rounded-xl min-h-11"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Simpan ke Database ({validCount} Data)</span>
@@ -267,7 +302,7 @@ export default function AdminPaymentsPage() {
 
             <div className="overflow-x-auto max-h-96">
               <table className="w-full text-left text-xs font-sans">
-                <thead className="sticky top-0 bg-[#FAFAF7] border-b border-[#13224E] font-mono text-[10px] uppercase text-[#637096]">
+                <thead className="sticky top-0 bg-[#F6F8FC] border-b border-slate-200 font-sans text-xs uppercase text-slate-500">
                   <tr>
                     <th className="py-2 px-2">Status Baris</th>
                     <th className="py-2 px-2">Nomor Induk (NIS)</th>
@@ -277,42 +312,56 @@ export default function AdminPaymentsPage() {
                     <th className="py-2 px-2">Status Bayar</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E4E4DC]">
-                  {parsedRows.map((row, idx) => (
+                <tbody className="divide-y divide-slate-100">
+                  {paymentImportPagination.pageItems.map((row, idx) => (
                     <tr
                       key={idx}
-                      className={`hover:bg-[#FAFAF7] ${!row.isValid ? 'bg-[#FDECEB]/50' : ''}`}
+                      className={`hover:bg-[#F6F8FC] ${!row.isValid ? 'bg-[#FDECEB]/50' : ''}`}
                     >
-                      <td className="py-2 px-2 font-mono text-[11px]">
+                      <td className="py-2 px-2 font-sans text-xs">
                         {row.isValid ? (
-                          <span className="text-[#1B8A5A] font-bold">Valid</span>
+                          <span className="text-[#1B8A5A] font-bold">
+                            Valid
+                          </span>
                         ) : (
-                          <span className="text-[#D0342C] font-semibold">{row.errorMessage}</span>
+                          <span className="text-[#D0342C] font-semibold">
+                            {row.errorMessage}
+                          </span>
                         )}
                       </td>
-                      <td className="py-2 px-2 font-mono text-[#13224E]">{row.Nomor_Induk}</td>
-                      <td className="py-2 px-2 font-semibold text-[#13224E]">{row.Nama}</td>
-                      <td className="py-2 px-2 text-[#637096]">{row.Bulan}</td>
-                      <td className="py-2 px-2 font-mono font-bold text-[#13224E]">
+                      <td className="py-2 px-2 font-sans text-[#263D5F]">
+                        {row.Nomor_Induk}
+                      </td>
+                      <td className="py-2 px-2 font-semibold text-[#263D5F]">
+                        {row.Nama}
+                      </td>
+                      <td className="py-2 px-2 text-slate-500">{row.Bulan}</td>
+                      <td className="py-2 px-2 font-sans font-bold text-[#263D5F]">
                         {formatIDR(Number(row.Nominal))}
                       </td>
-                      <td className="py-2 px-2 font-mono text-[10px]">{row.Status}</td>
+                      <td className="py-2 px-2 font-sans text-xs">
+                        {row.Status}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+            <Pagination
+              pagination={paymentImportPagination}
+              label="baris impor pembayaran"
+            />
           </div>
         )}
 
         {/* 3. Existing Payment History Table */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
-          <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
+        <div className="bg-[#FFFFFF] border border-slate-200 p-6 space-y-4 rounded-2xl shadow-sm">
+          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
             <div>
-              <h2 className="font-serif text-lg font-bold text-[#13224E]">
+              <h2 className="font-sans text-lg font-bold text-[#263D5F]">
                 Buku Kas Pembayaran Tersimpan ({payments.length} Transaksi)
               </h2>
-              <p className="text-xs text-[#637096]">
+              <p className="text-xs text-slate-500">
                 Log pembukuan resmi bimbel yang tersimpan di sistem lokal.
               </p>
             </div>
@@ -321,7 +370,7 @@ export default function AdminPaymentsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-sans">
               <thead>
-                <tr className="border-b border-[#13224E] font-mono text-[10px] text-[#637096] uppercase tracking-wider">
+                <tr className="border-b border-slate-200 font-sans text-xs text-slate-500 uppercase tracking-wider">
                   <th className="pb-2 px-2">No. Invoice</th>
                   <th className="pb-2 px-2">Nama Siswa / NIS</th>
                   <th className="pb-2 px-2">Periode</th>
@@ -332,40 +381,48 @@ export default function AdminPaymentsPage() {
                   <th className="pb-2 px-2 text-right">Kuitansi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E4E4DC]">
-                {payments.map((pay) => (
-                  <tr key={pay.id} className="hover:bg-[#FAFAF7] transition">
-                    <td className="py-2.5 px-2 font-mono font-semibold text-[#13224E]">
+              <tbody className="divide-y divide-slate-100">
+                {paymentsPagination.pageItems.map((pay) => (
+                  <tr key={pay.id} className="hover:bg-[#F6F8FC] transition">
+                    <td className="py-2.5 px-2 font-sans font-semibold text-[#263D5F]">
                       {pay.invoiceNumber}
                     </td>
                     <td className="py-2.5 px-2">
-                      <div className="font-semibold text-[#13224E]">{pay.studentName}</div>
-                      <div className="text-[10px] font-mono text-[#637096]">{pay.nis}</div>
+                      <div className="font-semibold text-[#263D5F]">
+                        {pay.studentName}
+                      </div>
+                      <div className="text-xs font-sans text-slate-500">
+                        {pay.nis}
+                      </div>
                     </td>
-                    <td className="py-2.5 px-2 text-[#637096]">{pay.month}</td>
-                    <td className="py-2.5 px-2 font-mono text-[11px] text-[#1B3B8C]">{pay.paymentMethod}</td>
-                    <td className="py-2.5 px-2 font-mono font-bold text-[#13224E]">
+                    <td className="py-2.5 px-2 text-slate-500">{pay.month}</td>
+                    <td className="py-2.5 px-2 font-sans text-xs text-[#1B3B8C]">
+                      {pay.paymentMethod}
+                    </td>
+                    <td className="py-2.5 px-2 font-sans font-bold text-[#263D5F]">
                       {formatIDR(pay.amount)}
                     </td>
-                    <td className="py-2.5 px-2 font-mono text-[10px] text-[#637096]">{pay.paidAt}</td>
-                    <td className="py-2.5 px-2 font-mono text-[10px]">
-                      <span
-                        className={`inline-block px-1.5 py-0.2 font-semibold ${
+                    <td className="py-2.5 px-2 font-sans text-xs text-slate-500">
+                      {pay.paidAt}
+                    </td>
+                    <td className="py-2.5 px-2 font-sans text-xs">
+                      <StatusBadge
+                        tone={
                           pay.status === 'Lunas'
-                            ? 'bg-[#EAF7F0] text-[#126340] border border-[#1B8A5A]/30'
+                            ? 'success'
                             : pay.status === 'Menunggu'
-                            ? 'bg-[#FDF3E3] text-[#C8831A] border border-[#EFA93B]/40'
-                            : 'bg-[#FDECEB] text-[#A6211A] border border-[#D0342C]/30'
-                        }`}
+                              ? 'warning'
+                              : 'danger'
+                        }
                       >
                         {pay.status}
-                      </span>
+                      </StatusBadge>
                     </td>
                     <td className="py-2.5 px-2 text-right">
                       {pay.status === 'Lunas' && (
                         <button
                           onClick={() => setSelectedReceipt(pay)}
-                          className="inline-flex items-center space-x-1 font-mono text-[10px] text-[#1B3B8C] hover:underline bg-[#FAFAF7] px-2 py-1 border border-[#CECEC2]"
+                          className="inline-flex items-center space-x-1 font-sans text-xs text-[#1B3B8C] hover:underline bg-[#F6F8FC] px-2 py-1 border border-slate-200 rounded-xl min-h-11"
                         >
                           <Printer className="w-3 h-3" />
                           <span>Kuitansi</span>
@@ -377,20 +434,21 @@ export default function AdminPaymentsPage() {
               </tbody>
             </table>
           </div>
+          <Pagination pagination={paymentsPagination} label="pembayaran" />
         </div>
       </div>
 
       {/* Manual Entry Modal */}
       {manualModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] max-w-md w-full p-6 border-2 border-[#13224E] space-y-4 font-sans">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
-              <h3 className="font-serif font-bold text-base text-[#13224E]">
+        <div className="fixed inset-0 z-50 bg-[#182D4D]/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#FFFFFF] max-w-md w-full p-6 border border-slate-200 space-y-4 font-sans rounded-3xl shadow-xl">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="font-sans font-bold text-base text-[#263D5F]">
                 Entri Pembayaran Kasir Manual
               </h3>
               <button
                 onClick={() => setManualModalOpen(false)}
-                className="text-[#637096]"
+                className="text-slate-500 rounded-xl min-h-11"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -398,60 +456,85 @@ export default function AdminPaymentsPage() {
 
             <form onSubmit={handleManualSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="block font-mono font-semibold text-[#13224E] mb-1">
+                <label className="block font-sans font-semibold text-[#263D5F] mb-1">
                   Nomor Induk Siswa (NIS)
                 </label>
                 <input
                   type="text"
                   required
                   value={manualForm.nis}
-                  onChange={(e) => setManualForm({ ...manualForm, nis: e.target.value })}
-                  className="w-full px-2.5 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] font-mono text-xs focus:outline-none focus:border-[#13224E]"
+                  onChange={(e) =>
+                    setManualForm({ ...manualForm, nis: e.target.value })
+                  }
+                  className="w-full px-2.5 py-1.5 bg-[#F6F8FC] border border-slate-200 font-sans text-xs focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 rounded-xl min-h-11"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-[#13224E] mb-1">Nama Siswa</label>
+                <label className="block font-semibold text-[#263D5F] mb-1">
+                  Nama Siswa
+                </label>
                 <input
                   type="text"
                   required
                   value={manualForm.studentName}
-                  onChange={(e) => setManualForm({ ...manualForm, studentName: e.target.value })}
-                  className="w-full px-2.5 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-xs font-semibold text-[#13224E] focus:outline-none focus:border-[#13224E]"
+                  onChange={(e) =>
+                    setManualForm({
+                      ...manualForm,
+                      studentName: e.target.value,
+                    })
+                  }
+                  className="w-full px-2.5 py-1.5 bg-[#F6F8FC] border border-slate-200 text-xs font-semibold text-[#263D5F] focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 rounded-xl min-h-11"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-[#13224E] mb-1">Bulan SPP</label>
+                  <label className="block font-semibold text-[#263D5F] mb-1">
+                    Bulan SPP
+                  </label>
                   <input
                     type="text"
                     required
                     value={manualForm.month}
-                    onChange={(e) => setManualForm({ ...manualForm, month: e.target.value })}
-                    className="w-full px-2.5 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-xs focus:outline-none"
+                    onChange={(e) =>
+                      setManualForm({ ...manualForm, month: e.target.value })
+                    }
+                    className="w-full px-2.5 py-1.5 bg-[#F6F8FC] border border-slate-200 text-xs focus:outline-none rounded-xl min-h-11"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-[#13224E] mb-1">Nominal (Rp)</label>
+                  <label className="block font-semibold text-[#263D5F] mb-1">
+                    Nominal (Rp)
+                  </label>
                   <input
                     type="number"
                     required
                     value={manualForm.amount}
-                    onChange={(e) => setManualForm({ ...manualForm, amount: Number(e.target.value) })}
-                    className="w-full px-2.5 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-xs font-mono font-bold focus:outline-none"
+                    onChange={(e) =>
+                      setManualForm({
+                        ...manualForm,
+                        amount: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-2.5 py-1.5 bg-[#F6F8FC] border border-slate-200 text-xs font-sans font-bold focus:outline-none rounded-xl min-h-11"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-[#13224E] mb-1">Metode Bayar</label>
+                <label className="block font-semibold text-[#263D5F] mb-1">
+                  Metode Bayar
+                </label>
                 <select
                   value={manualForm.paymentMethod}
                   onChange={(e) =>
-                    setManualForm({ ...manualForm, paymentMethod: e.target.value as any })
+                    setManualForm({
+                      ...manualForm,
+                      paymentMethod: e.target.value as any,
+                    })
                   }
-                  className="w-full px-2.5 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-xs focus:outline-none"
+                  className="w-full px-2.5 py-1.5 bg-[#F6F8FC] border border-slate-200 text-xs focus:outline-none rounded-xl min-h-11"
                 >
                   <option value="Tunai / Kasir">Tunai / Kasir</option>
                   <option value="Transfer Bank">Transfer Bank</option>
@@ -460,17 +543,17 @@ export default function AdminPaymentsPage() {
                 </select>
               </div>
 
-              <div className="pt-2 border-t border-[#E4E4DC] flex items-center justify-end space-x-2 font-mono">
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-end space-x-2 font-sans">
                 <button
                   type="button"
                   onClick={() => setManualModalOpen(false)}
-                  className="px-3 py-1.5 text-[#637096] bg-[#FAFAF7] border border-[#CECEC2]"
+                  className="px-3 py-1.5 text-slate-500 bg-[#F6F8FC] border border-slate-200 rounded-xl min-h-11"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 text-white bg-[#13224E] hover:bg-[#1B3B8C] font-semibold"
+                  className="px-4 py-1.5 text-white bg-[#2E578F] hover:bg-[#234573] font-semibold rounded-xl min-h-11"
                 >
                   Simpan & Cetak
                 </button>

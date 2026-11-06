@@ -1,5 +1,12 @@
 # EUCLIDE — EdTech CBT Tryout & Bimbel Management System
 
+Panduan uji manual: **[UAT Frontend — alur siswa dan tentor](docs/UAT_FRONTEND.md)**.
+
+> **Status pengembangan:** UI masih berupa prototipe dengan data contoh dan
+> LocalStorage. API PostgreSQL belum terhubung ke seluruh UI. Daftar fitur di bawah
+> menggambarkan demo; skor bukan IRT resmi dan statistik bukan hasil nasional.
+> Untuk menjalankan lokal, baca [docs/LOCAL.md](docs/LOCAL.md).
+
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import MathRenderer from '@/components/common/MathRenderer';
+import TargetEvaluation from '@/components/student/TargetEvaluation';
+import { evaluateTarget } from '@/lib/snbtChoices';
 import {
   Radar,
   RadarChart,
@@ -44,6 +46,8 @@ export default function ExamResultPage() {
 
   const result = getExamResult(tryoutId);
   const tryout = tryouts.find((t) => t.id === tryoutId) || tryouts[0];
+  const firstChoice = result.targetChoices?.[0];
+  const firstTarget = evaluateTarget(result.totalScore, firstChoice?.targetScore ?? null);
 
   const radarData = result.subtestResults.map((st) => ({
     subject: st.subtestName.replace('Penalaran', 'Pen.').replace('Pengetahuan', 'Peng.'),
@@ -60,6 +64,7 @@ export default function ExamResultPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-10 font-sans text-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">Prototipe untuk demo: skor, statistik, dan evaluasi materi masih menggunakan data contoh. Pilihan prodi berasal dari preferensi saat sesi dimulai.</p>
         {/* 1. Official Evaluation Header Card */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
@@ -71,14 +76,14 @@ export default function ExamResultPage() {
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
                 {result.tryoutTitle}
               </h1>
-              <p className="text-xs text-slate-500 font-mono">
+              <p className="text-xs text-slate-500 font-sans">
                 Peserta: <strong className="text-slate-800">{result.userName}</strong> • Tanggal Uji: {result.date} • Metodologi: Skor Tertimbang Subtest UTBK
               </p>
             </div>
 
             <div className="flex items-center space-x-2 text-xs font-bold">
               <Link
-                href={`/exam/${tryoutId}`}
+                href={`/tryouts/${tryoutId}/prepare`}
                 className="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-4 py-2.5 rounded-xl transition"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -104,7 +109,7 @@ export default function ExamResultPage() {
                 <span className="text-3xl font-extrabold text-slate-900">
                   {result.totalScore}
                 </span>
-                <span className="text-xs text-slate-400 font-mono">/ 1000</span>
+                <span className="text-xs text-slate-400 font-sans">/ 1000</span>
               </div>
               <div className="mt-1 text-xs text-emerald-600 font-bold">
                 +138.5 di atas rata-rata angkatan
@@ -119,7 +124,7 @@ export default function ExamResultPage() {
                 <span className="text-3xl font-extrabold text-amber-600">
                   {result.percentileRank}%
                 </span>
-                <span className="text-xs text-slate-400 font-mono">Top Tier</span>
+                <span className="text-xs text-slate-400 font-sans">Top Tier</span>
               </div>
               <p className="mt-1 text-xs text-slate-600">
                 Top 5% dari 650 siswa angkatan
@@ -134,7 +139,7 @@ export default function ExamResultPage() {
                 <span className="text-3xl font-extrabold text-blue-600">
                   {result.totalCorrect}
                 </span>
-                <span className="text-xs text-slate-400 font-mono">/ 20 Butir</span>
+                <span className="text-xs text-slate-400 font-sans">/ {result.totalCorrect + result.totalIncorrect + result.totalUnanswered} Butir contoh</span>
               </div>
               <p className="mt-1 text-xs text-slate-600">
                 {result.totalIncorrect} Salah • {result.totalUnanswered} Kosong
@@ -143,111 +148,36 @@ export default function ExamResultPage() {
 
             <div className="bg-slate-50 p-5 rounded-xl border border-slate-200/70">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                Peluang Lolos Pilihan 1
+                Target Pilihan 1
               </span>
               <div className="flex items-baseline space-x-1.5">
-                <span className="text-3xl font-extrabold text-emerald-600">
-                  88.5%
-                </span>
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full ml-1">
-                  Lolos
+                <span className="text-xl font-extrabold text-slate-900">
+                  {firstChoice ? firstTarget.label : 'Belum ada pilihan'}
                 </span>
               </div>
               <p className="mt-1 text-xs text-slate-600">
-                Passing grade FK UI terlampaui
+                {firstChoice ? `${firstChoice.name} · ${firstChoice.degree}` : 'Pilih prodi sebelum memulai tryout.'}
               </p>
             </div>
           </div>
         </div>
 
-        {/* 3. Rasionalisasi Kelulusan PTN (Sesuai PRD: Lolos / Mendekati / Perlu Ditingkatkan) */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-5">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
-                <GraduationCap className="w-4 h-4" />
+        <TargetEvaluation choices={result.targetChoices ?? []} score={result.totalScore} />
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
+          <h2 className="text-lg font-bold">Fokus belajar berikutnya</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-500">Mulai dari subtes dengan skor terendah pada contoh hasil ini.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[...result.subtestResults].sort((a, b) => a.score - b.score).slice(0, 3).map((subtest, index) => (
+              <div key={subtest.subtestId} className="rounded-xl bg-slate-50 p-4">
+                <p className="text-xs font-semibold text-[#244676]">Prioritas latihan {index + 1}</p>
+                <h3 className="mt-2 text-sm font-bold leading-6">{subtest.subtestName}</h3>
+                <p className="mt-1 text-xs text-slate-500">Skor contoh: {subtest.score}/1000</p>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  Rasionalisasi Peluang Lolos PTN Impian
-                </h3>
-                <p className="text-xs text-slate-500">Perbandingan skor capaian tryout terhadap batas passing grade jurusan</p>
-              </div>
-            </div>
-            <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
-              Pilihan SNBT
-            </span>
+            ))}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {result.ptnTargets.map((target, idx) => {
-              const isLolos = target.userScore >= target.targetScore;
-              const isMendekati = target.userScore >= target.targetScore - 35 && !isLolos;
-              const statusLabel = isLolos ? 'Lolos' : isMendekati ? 'Mendekati' : 'Perlu Ditingkatkan';
-
-              return (
-                <div
-                  key={idx}
-                  className={`p-5 rounded-xl border transition-all ${
-                    isLolos
-                      ? 'bg-emerald-50/40 border-emerald-200'
-                      : isMendekati
-                      ? 'bg-amber-50/40 border-amber-200'
-                      : 'bg-rose-50/40 border-rose-200'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                        PILIHAN KE-{idx + 1}
-                      </span>
-                      <h4 className="text-base font-bold text-slate-900">
-                        {target.ptnName}
-                      </h4>
-                      <p className="text-xs text-blue-700 font-semibold">{target.prodiName}</p>
-                    </div>
-
-                    <span
-                      className={`text-xs font-bold px-3 py-1 rounded-full ${
-                        isLolos
-                          ? 'bg-emerald-600 text-white'
-                          : isMendekati
-                          ? 'bg-amber-500 text-slate-950 font-bold'
-                          : 'bg-rose-600 text-white'
-                      }`}
-                    >
-                      {statusLabel}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 text-xs bg-white p-3 rounded-lg border border-slate-200/70 mb-3 text-center">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-mono">Skor Anda</span>
-                      <strong className="text-slate-900">{target.userScore}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-mono">Target Skor</span>
-                      <strong className="text-slate-900">{target.targetScore}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-mono">Selisih</span>
-                      <strong className={target.difference >= 0 ? 'text-emerald-600' : 'text-rose-600'}>
-                        {target.difference >= 0 ? `+${target.difference}` : target.difference}
-                      </strong>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-600 leading-relaxed mb-3">{target.advice}</p>
-
-                  <div className="pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
-                    <span>Estimasi Peluang: <strong className="text-slate-800">{target.chancePercentage}%</strong></span>
-                    <span>Daya Tampung: <strong className="text-slate-800">{target.acceptanceQuota} Kursi</strong></span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+          <Link href="/drilling" className="eu-button-secondary mt-5 rounded-xl">Buka latihan soal <ArrowRight size={16} /></Link>
+        </section>
 
         {/* 4. Visualizations: Radar Chart & Subtest Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -260,7 +190,7 @@ export default function ExamResultPage() {
                 </h3>
                 <p className="text-xs text-slate-500">Skor Siswa vs Rata-rata Angkatan Euclide</p>
               </div>
-              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">
+              <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">
                 7 SUBTEST
               </span>
             </div>
@@ -308,7 +238,7 @@ export default function ExamResultPage() {
                 </h3>
                 <p className="text-xs text-slate-500">Rincian pencapaian skor per bidang studi</p>
               </div>
-              <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
+              <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
                 SKOR CAPAIAN
               </span>
             </div>
@@ -406,11 +336,11 @@ export default function ExamResultPage() {
                 <button
                   key={tab.id}
                   onClick={() => setFilterReview(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-lg font-semibold transition ${
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition min-h-11 ${
                     filterReview === tab.id
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  } `}
                 >
                   {tab.label}
                 </button>
@@ -426,7 +356,7 @@ export default function ExamResultPage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center font-mono font-bold text-xs">
+                    <span className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center font-sans font-bold text-xs">
                       {idx + 1}
                     </span>
                     <span className="text-xs font-bold text-slate-800">
@@ -434,7 +364,7 @@ export default function ExamResultPage() {
                     </span>
                   </div>
 
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">
                     Kunci: {Array.isArray(q.correctAnswer) ? q.correctAnswer.join(', ') : q.correctAnswer}
                   </span>
                 </div>

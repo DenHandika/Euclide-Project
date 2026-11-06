@@ -4,9 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "local:init": "node scripts/local-init.mjs",
+    "local:check": "node scripts/local-check.mjs",
+    "dev:local": "next dev --hostname 127.0.0.1 --port 3000",
+    "start:local": "next start --hostname 127.0.0.1 --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "node scripts/migrate.mjs",
+    "test:backend": "tsx --test tests/backend.test.ts tests/choices.test.ts",
+    "test:demo": "tsx --test tests/demoData.test.ts",
+    "test:ui": "tsx --test tests/pagination.test.ts tests/demoData.test.ts",
+    "db:setup": "node scripts/setup-db.mjs",
+    "db:bootstrap-admin": "node scripts/bootstrap-admin.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
@@ -14,21 +24,27 @@
     "katex": "^0.16.21",
     "lucide-react": "^0.475.0",
     "next": "^14.2.24",
+    "next-auth": "^4.24.15",
+    "pg": "^8.23.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@types/canvas-confetti": "^1.9.0",
     "@types/katex": "^0.16.7",
     "@types/node": "^20.17.19",
+    "@types/pg": "^8.23.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.2",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.3"
   }
 }

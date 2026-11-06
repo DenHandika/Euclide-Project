@@ -1,4 +1,6 @@
 'use client';
+import Pagination from '@/components/common/Pagination';
+import usePagination from '@/hooks/usePagination';
 
 import React, { useState } from 'react';
 import { Question, SubtestId } from '@/types';
@@ -39,7 +41,10 @@ function autoFormatMathText(text: string): string {
   formatted = formatted.replace(/(?:sqrt|akar)\(([^)]+)\)/gi, '$\\sqrt{$1}$');
 
   // 2. Simple exponents: e.g., 3t^2, x^3, 2^n -> $3t^2$
-  formatted = formatted.replace(/\b([a-zA-Z0-9]+)\^([a-zA-Z0-9]+)\b/g, '$$$1^{$2}$$');
+  formatted = formatted.replace(
+    /\b([a-zA-Z0-9]+)\^([a-zA-Z0-9]+)\b/g,
+    '$$$1^{$2}$$'
+  );
 
   // 3. Simple inequality symbols: <= -> \le, >= -> \ge, != -> \neq, +- -> \pm
   formatted = formatted.replace(/<=/g, '$\\le$');
@@ -47,10 +52,13 @@ function autoFormatMathText(text: string): string {
   formatted = formatted.replace(/\+-/g, '$\\pm$');
 
   // 4. Equations with standard functions: e.g., V(t) = ... or f(x) = ...
-  formatted = formatted.replace(/\b([fghvV]\([a-zA-Z]\)\s*=\s*[^,\n\r]+)/g, (match) => {
-    if (match.includes('$')) return match;
-    return `$${match}$`;
-  });
+  formatted = formatted.replace(
+    /\b([fghvV]\([a-zA-Z]\)\s*=\s*[^,\n\r]+)/g,
+    (match) => {
+      if (match.includes('$')) return match;
+      return `$${match}$`;
+    }
+  );
 
   return formatted;
 }
@@ -79,11 +87,18 @@ Diberikan persamaan kuadrat x^2 - 6x + 8 = 0. Jika akar-akarnya adalah alpha dan
 [KUNCI] B
 [PEMBAHASAN] Diketahui $\\alpha + \\beta = 6$ dan $\\alpha \\cdot \\beta = 8$. Maka $\\alpha^2 + \\beta^2 = (\\alpha + \\beta)^2 - 2\\alpha\\beta = 6^2 - 2(8) = 36 - 16 = 20$.`;
 
-export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImportModalProps) {
+export default function BulkImportModal({
+  isOpen,
+  onClose,
+  onImport,
+}: BulkImportModalProps) {
   const [rawText, setRawText] = useState<string>('');
-  const [parsedQuestions, setParsedQuestions] = useState<Omit<Question, 'id'>[]>([]);
+  const [parsedQuestions, setParsedQuestions] = useState<
+    Omit<Question, 'id'>[]
+  >([]);
   const [copied, setCopied] = useState<boolean>(false);
   const [autoMathEnabled, setAutoMathEnabled] = useState<boolean>(true);
+  const questionImportPagination = usePagination(parsedQuestions, 5, rawText);
 
   if (!isOpen) return null;
 
@@ -91,17 +106,22 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
     if (!text.trim()) return [];
 
     // Split by [SOAL ... or [NOMOR ...
-    const blocks = text.split(/\[(?:SOAL|NOMOR)[^\]]*\]/i).filter((b) => b.trim().length > 0);
+    const blocks = text
+      .split(/\[(?:SOAL|NOMOR)[^\]]*\]/i)
+      .filter((b) => b.trim().length > 0);
 
     const results: Omit<Question, 'id'>[] = [];
 
     blocks.forEach((block, idx) => {
       // Extract subtest
       const subtestMatch = block.match(/\[SUBTEST\]\s*([a-zA-Z0-9_-]+)/i);
-      const subtestId: SubtestId = (subtestMatch?.[1] as SubtestId) || 'penalaran_matematika';
+      const subtestId: SubtestId =
+        (subtestMatch?.[1] as SubtestId) || 'penalaran_matematika';
 
       // Extract difficulty (Mudah | Sedang | Sukar/Sulit)
-      const diffMatch = block.match(/\[KESULITAN\]\s*(Mudah|Sedang|Sulit|Sukar)/i);
+      const diffMatch = block.match(
+        /\[KESULITAN\]\s*(Mudah|Sedang|Sulit|Sukar)/i
+      );
       let difficulty: 'Mudah' | 'Sedang' | 'Sukar' = 'Sedang';
       if (diffMatch) {
         const d = diffMatch[1].toLowerCase();
@@ -111,12 +131,15 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
       }
 
       // Extract Stimulus (optional)
-      const stimMatch = block.match(/\[STIMULUS\]([\s\S]*?)(?=\[(?:SOAL|A|B|C|D|E|KUNCI|PEMBAHASAN)\]|$)/i);
+      const stimMatch = block.match(
+        /\[STIMULUS\]([\s\S]*?)(?=\[(?:SOAL|A|B|C|D|E|KUNCI|PEMBAHASAN)\]|$)/i
+      );
       const stimulus = stimMatch ? stimMatch[1].trim() : undefined;
 
       // Extract Question prompt: text between subtest/kesulitan and first option [A]
       let questionPrompt = '';
-      const promptRegex = /(?:\[KESULITAN\][^\n]*\n|\[SUBTEST\][^\n]*\n|^)([\s\S]*?)(?=\[A\])/i;
+      const promptRegex =
+        /(?:\[KESULITAN\][^\n]*\n|\[SUBTEST\][^\n]*\n|^)([\s\S]*?)(?=\[A\])/i;
       const promptMatch = block.match(promptRegex);
       if (promptMatch) {
         questionPrompt = promptMatch[1]
@@ -138,17 +161,44 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
       const correctAnswer = keyMatch ? keyMatch[1].toUpperCase() : 'A';
 
       // Extract Explanation
-      const expMatch = block.match(/\[PEMBAHASAN\]\s*([\s\S]*?)(?=\[(?:SOAL|NOMOR)\]|$)/i);
-      const explanation = expMatch ? expMatch[1].trim() : 'Pembahasan resmi belum ditambahkan.';
+      const expMatch = block.match(
+        /\[PEMBAHASAN\]\s*([\s\S]*?)(?=\[(?:SOAL|NOMOR)\]|$)/i
+      );
+      const explanation = expMatch
+        ? expMatch[1].trim()
+        : 'Pembahasan resmi belum ditambahkan.';
 
       if (questionPrompt && optA && optB) {
-        const finalQuestion = autoMathEnabled ? autoFormatMathText(questionPrompt) : questionPrompt;
+        const finalQuestion = autoMathEnabled
+          ? autoFormatMathText(questionPrompt)
+          : questionPrompt;
         const options = [
           { id: 'A', text: autoMathEnabled ? autoFormatMathText(optA) : optA },
           { id: 'B', text: autoMathEnabled ? autoFormatMathText(optB) : optB },
-          ...(optC ? [{ id: 'C', text: autoMathEnabled ? autoFormatMathText(optC) : optC }] : []),
-          ...(optD ? [{ id: 'D', text: autoMathEnabled ? autoFormatMathText(optD) : optD }] : []),
-          ...(optE ? [{ id: 'E', text: autoMathEnabled ? autoFormatMathText(optE) : optE }] : []),
+          ...(optC
+            ? [
+                {
+                  id: 'C',
+                  text: autoMathEnabled ? autoFormatMathText(optC) : optC,
+                },
+              ]
+            : []),
+          ...(optD
+            ? [
+                {
+                  id: 'D',
+                  text: autoMathEnabled ? autoFormatMathText(optD) : optD,
+                },
+              ]
+            : []),
+          ...(optE
+            ? [
+                {
+                  id: 'E',
+                  text: autoMathEnabled ? autoFormatMathText(optE) : optE,
+                },
+              ]
+            : []),
         ];
 
         results.push({
@@ -159,7 +209,9 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
           question: finalQuestion,
           options,
           correctAnswer,
-          explanation: autoMathEnabled ? autoFormatMathText(explanation) : explanation,
+          explanation: autoMathEnabled
+            ? autoFormatMathText(explanation)
+            : explanation,
           difficulty,
           maxScore: 100,
         });
@@ -189,7 +241,8 @@ export default function BulkImportModal({ isOpen, onClose, onImport }: BulkImpor
   };
 
   const handleDownloadWordTemplate = () => {
-    const fileHeader = `PANDUAN TEMPLATE IMPORT NASKAH SOAL EUCLIDE CBT
+    const fileHeader =
+      `PANDUAN TEMPLATE IMPORT NASKAH SOAL EUCLIDE CBT
 ======================================================
 PETUNJUK PENGISIAN UNTUK TENTOR / PENYUSUN SOAL:
 1. Gunakan tag [SOAL 1], [SOAL 2], dst untuk memisahkan nomor soal.
@@ -205,7 +258,9 @@ NASKAH SOAL:
 
 ` + TEMPLATE_EXAMPLE;
 
-    const blob = new Blob([fileHeader], { type: 'application/msword;charset=utf-8' });
+    const blob = new Blob([fileHeader], {
+      type: 'application/msword;charset=utf-8',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -237,33 +292,37 @@ NASKAH SOAL:
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4 overflow-y-auto font-sans">
-      <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border-2 border-[#13224E] space-y-5 my-8 max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-[#182D4D]/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-sans">
+      <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border border-slate-200 space-y-5 my-8 max-h-[90vh] flex flex-col rounded-3xl shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#E4E4DC] shrink-0">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
           <div>
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 bg-[#1B3B8C]" />
-              <h3 className="font-serif font-bold text-lg text-[#13224E]">
+              <h3 className="font-sans font-bold text-lg text-[#263D5F]">
                 Import Massal Naskah Soal (Template Word / Text)
               </h3>
             </div>
-            <p className="font-mono text-xs text-[#637096] mt-0.5">
-              Paste naskah soal berformat bracket dari Microsoft Word (.docx/txt) dengan konversi otomatis rumus.
+            <p className="font-sans text-xs text-slate-500 mt-0.5">
+              Paste naskah soal berformat bracket dari Microsoft Word
+              (.docx/txt) dengan konversi otomatis rumus.
             </p>
           </div>
-          <button onClick={onClose} className="text-[#637096] hover:text-[#13224E]">
+          <button
+            onClick={onClose}
+            className="text-slate-500 hover:text-[#263D5F] rounded-xl min-h-11"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Toolbar Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-[#FAFAF7] border border-[#E4E4DC] text-xs font-mono shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-[#F6F8FC] border border-slate-100 text-xs font-sans shrink-0 rounded-xl">
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleDownloadWordTemplate}
-              className="px-2.5 py-1 bg-[#1B3B8C] hover:bg-[#274DB8] text-white font-bold transition flex items-center space-x-1.5"
+              className="px-2.5 py-1 bg-[#1B3B8C] hover:bg-[#274DB8] text-white font-bold transition flex items-center space-x-1.5 rounded-xl min-h-11"
               title="Download file Word .doc siap edit di Microsoft Word"
             >
               <FileDown className="w-3.5 h-3.5" />
@@ -272,22 +331,26 @@ NASKAH SOAL:
             <button
               type="button"
               onClick={handleLoadSample}
-              className="px-2.5 py-1 bg-[#FFFFFF] hover:bg-[#F3F3ED] text-[#13224E] border border-[#CECEC2] font-semibold transition"
+              className="px-2.5 py-1 bg-[#FFFFFF] hover:bg-[#EDF2F9] text-[#263D5F] border border-slate-200 font-semibold transition rounded-xl min-h-11"
             >
               Muat Contoh
             </button>
             <button
               type="button"
               onClick={handleCopyTemplate}
-              className="px-2.5 py-1 bg-[#FFFFFF] hover:bg-[#F3F3ED] text-[#13224E] border border-[#CECEC2] transition flex items-center space-x-1"
+              className="px-2.5 py-1 bg-[#FFFFFF] hover:bg-[#EDF2F9] text-[#263D5F] border border-slate-200 transition flex items-center space-x-1 rounded-xl min-h-11"
             >
-              {copied ? <Check className="w-3 h-3 text-[#1B8A5A]" /> : <Copy className="w-3 h-3" />}
+              {copied ? (
+                <Check className="w-3 h-3 text-[#1B8A5A]" />
+              ) : (
+                <Copy className="w-3 h-3" />
+              )}
               <span>{copied ? 'Tersalin!' : 'Salin Teks'}</span>
             </button>
           </div>
 
           <div className="flex items-center space-x-3">
-            <label className="flex items-center space-x-1.5 cursor-pointer text-[#13224E]">
+            <label className="flex items-center space-x-1.5 cursor-pointer text-[#263D5F]">
               <input
                 type="checkbox"
                 checked={autoMathEnabled}
@@ -300,10 +363,15 @@ NASKAH SOAL:
               <span>Auto-Format Rumus (Pangkat/Akar/Integral)</span>
             </label>
 
-            <label className="px-2.5 py-1 bg-[#13224E] hover:bg-[#1B3B8C] text-white cursor-pointer transition flex items-center space-x-1">
+            <label className="px-2.5 py-1 bg-[#2E578F] hover:bg-[#234573] text-white cursor-pointer transition flex items-center space-x-1">
               <Upload className="w-3 h-3 text-[#EFA93B]" />
               <span>Unggah File .txt</span>
-              <input type="file" accept=".txt,.doc,.docx" onChange={handleFileUpload} className="hidden" />
+              <input
+                type="file"
+                accept=".txt,.doc,.docx"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
             </label>
           </div>
         </div>
@@ -312,7 +380,7 @@ NASKAH SOAL:
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-[280px] overflow-hidden">
           {/* Left: Input Textarea */}
           <div className="flex flex-col space-y-1">
-            <span className="font-mono text-[10px] text-[#637096] uppercase font-bold">
+            <span className="font-sans text-xs text-slate-500 uppercase font-bold">
               Area Tempel (Paste) Teks Naskah Soal:
             </span>
             <textarea
@@ -320,14 +388,14 @@ NASKAH SOAL:
               value={rawText}
               onChange={handleTextChange}
               placeholder="Paste naskah soal dari Word di sini... Format: [SOAL 1] [SUBTEST] penalaran_matematika [A] ... [KUNCI] B"
-              className="flex-1 w-full p-3 bg-[#FAFAF7] border border-[#CECEC2] font-mono text-xs focus:outline-none focus:border-[#13224E] resize-none leading-relaxed text-[#13224E]"
+              className="flex-1 w-full p-3 bg-[#F6F8FC] border border-slate-200 font-mono text-xs focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 resize-none leading-relaxed text-[#263D5F] rounded-xl min-h-11"
             />
           </div>
 
           {/* Right: Realtime Parsed Preview */}
           <div className="flex flex-col space-y-1">
-            <div className="flex items-center justify-between font-mono text-[10px]">
-              <span className="text-[#637096] uppercase font-bold">
+            <div className="flex items-center justify-between font-sans text-xs">
+              <span className="text-slate-500 uppercase font-bold">
                 Hasil Parsing & Preview KaTeX ({parsedQuestions.length} Soal):
               </span>
               {parsedQuestions.length > 0 ? (
@@ -336,24 +404,30 @@ NASKAH SOAL:
                   <span>Format Valid</span>
                 </span>
               ) : (
-                <span className="text-[#C8831A]">Belum ada soal terdeteksi</span>
+                <span className="text-[#C8831A]">
+                  Belum ada soal terdeteksi
+                </span>
               )}
             </div>
 
-            <div className="flex-1 p-3 bg-[#FFFFFF] border-2 border-[#13224E] overflow-y-auto space-y-3 font-sans max-h-[300px]">
+            <div className="flex-1 p-3 bg-[#FFFFFF] border border-slate-200 overflow-y-auto space-y-3 font-sans max-h-[300px] rounded-xl">
               {parsedQuestions.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#9EABC7] space-y-2">
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-2">
                   <BookOpen className="w-8 h-8 opacity-40" />
-                  <p className="text-xs font-mono">
-                    Ketik atau paste teks soal ber-tag di panel kiri, atau klik <strong>"Muat Contoh Template"</strong>.
+                  <p className="text-xs font-sans">
+                    Ketik atau paste teks soal ber-tag di panel kiri, atau klik{' '}
+                    <strong>"Muat Contoh Template"</strong>.
                   </p>
                 </div>
               ) : (
-                parsedQuestions.map((q, i) => (
-                  <div key={i} className="p-3 bg-[#FAFAF7] border border-[#E4E4DC] space-y-2 text-xs">
-                    <div className="flex items-center justify-between font-mono text-[10px]">
-                      <span className="font-bold text-[#13224E] bg-[#FFFFFF] px-1.5 py-0.5 border border-[#CECEC2]">
-                        Nomor #{i + 1}
+                questionImportPagination.pageItems.map((q, i) => (
+                  <div
+                    key={i}
+                    className="p-3 bg-[#F6F8FC] border border-slate-100 space-y-2 text-xs rounded-xl"
+                  >
+                    <div className="flex items-center justify-between font-sans text-xs">
+                      <span className="font-bold text-[#263D5F] bg-[#FFFFFF] px-1.5 py-0.5 border border-slate-200 rounded-full">
+                        Nomor #{questionImportPagination.offset + i + 1}
                       </span>
                       <span className="text-[#C8831A] font-medium capitalize">
                         {q.subtestId.replace(/_/g, ' ')} • {q.difficulty}
@@ -361,29 +435,29 @@ NASKAH SOAL:
                     </div>
 
                     {/* Question text with KaTeX */}
-                    <div className="font-serif font-semibold text-[#13224E]">
+                    <div className="font-sans font-semibold text-[#263D5F]">
                       <MathRenderer content={q.question} />
                     </div>
 
                     {/* Options list */}
-                    <div className="space-y-1 pt-1 font-mono text-[11px]">
+                    <div className="space-y-1 pt-1 font-sans text-xs">
                       {q.options?.map((opt) => (
                         <div
                           key={opt.id}
-                          className={`flex items-center space-x-2 px-2 py-1 border ${
+                          className={`flex items-center space-x-2 px-2 py-1 border rounded-xl ${
                             opt.id === q.correctAnswer
                               ? 'bg-[#EAF7F0] border-[#1B8A5A]/40 text-[#126340] font-bold'
-                              : 'bg-[#FFFFFF] border-[#E4E4DC] text-[#13224E]'
-                          }`}
+                              : 'bg-[#FFFFFF] border-slate-100 text-[#263D5F]'
+                          } `}
                         >
-                          <span className="w-4 h-4 rounded-full bg-[#13224E] text-white flex items-center justify-center text-[9px]">
+                          <span className="w-4 h-4 rounded-full bg-[#2E578F] text-white flex items-center justify-center text-xs">
                             {opt.id}
                           </span>
                           <div className="text-xs font-sans">
                             <MathRenderer content={opt.text} />
                           </div>
                           {opt.id === q.correctAnswer && (
-                            <span className="text-[9px] font-mono text-[#1B8A5A] ml-auto uppercase">
+                            <span className="text-xs font-sans text-[#1B8A5A] ml-auto uppercase">
                               [KUNCI JAWABAN]
                             </span>
                           )}
@@ -394,20 +468,25 @@ NASKAH SOAL:
                 ))
               )}
             </div>
+            <Pagination
+              pagination={questionImportPagination}
+              label="pratinjau soal impor"
+            />
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-3 border-t border-[#E4E4DC] flex items-center justify-between font-mono text-xs shrink-0">
-          <span className="text-[#637096]">
-            Total siap di-import: <strong>{parsedQuestions.length} butir soal</strong>
+        <div className="pt-3 border-t border-slate-100 flex items-center justify-between font-sans text-xs shrink-0">
+          <span className="text-slate-500">
+            Total siap di-import:{' '}
+            <strong>{parsedQuestions.length} butir soal</strong>
           </span>
 
           <div className="flex items-center space-x-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-1.5 bg-[#FAFAF7] hover:bg-[#F3F3ED] text-[#637096] border border-[#CECEC2]"
+              className="px-3.5 py-1.5 bg-[#F6F8FC] hover:bg-[#EDF2F9] text-slate-500 border border-slate-200 rounded-xl min-h-11"
             >
               Batal
             </button>
@@ -415,11 +494,11 @@ NASKAH SOAL:
               type="button"
               disabled={parsedQuestions.length === 0}
               onClick={handleConfirmImport}
-              className={`px-5 py-1.5 flex items-center space-x-1.5 font-bold transition ${
+              className={`px-5 py-1.5 flex items-center space-x-1.5 font-bold transition rounded-xl min-h-11 ${
                 parsedQuestions.length > 0
-                  ? 'bg-[#13224E] hover:bg-[#1B3B8C] text-white cursor-pointer'
-                  : 'bg-[#CECEC2] text-[#637096] cursor-not-allowed'
-              }`}
+                  ? 'bg-[#2E578F] hover:bg-[#234573] text-white cursor-pointer'
+                  : 'bg-[#CECEC2] text-slate-500 cursor-not-allowed'
+              } `}
             >
               <span>Simpan ke Bank Soal</span>
               <ArrowRight className="w-3.5 h-3.5" />

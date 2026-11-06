@@ -1,3 +1,5 @@
+import type { StudyProgram } from '@/lib/snbtChoices';
+
 export type UserRole = 'admin' | 'tentor' | 'siswa';
 
 export type UserStatus = 'active' | 'nonactive' | 'suspended' | 'graduated' | 'leave';
@@ -99,6 +101,8 @@ export interface UserAnswer {
 }
 
 export interface ExamSession {
+  targetChoices?: StudyProgram[];
+  choiceRuleYear?: number;
   tryoutId: string;
   userId: string;
   currentSubtestIndex: number;
@@ -137,6 +141,8 @@ export interface PTNTargetAnalysis {
 }
 
 export interface ExamResult {
+  targetChoices?: StudyProgram[];
+  choiceRuleYear?: number;
   id: string;
   tryoutId: string;
   tryoutTitle: string;

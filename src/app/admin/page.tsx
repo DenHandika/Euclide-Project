@@ -1,4 +1,6 @@
 'use client';
+import Pagination from '@/components/common/Pagination';
+import usePagination from '@/hooks/usePagination';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -21,7 +23,11 @@ import {
 export default function AdminDashboardPage() {
   const { batches, payments, students, getFinancialMetrics } = useApp();
   const metrics = getFinancialMetrics();
-  const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(null);
+  const classesPagination = usePagination(batches, 3, '', [3, 6, 12, 24]);
+
+  const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(
+    null
+  );
 
   const formatIDR = (val: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -33,7 +39,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-10 font-sans text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Admin Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
@@ -45,7 +51,8 @@ export default function AdminDashboardPage() {
               Buku Kas & Manajemen Operasional
             </h1>
             <p className="text-sm text-slate-600 mt-1">
-              Pantau arus kas SPP, sesi ujian serentak, kapasitas kuota batch, dan roster siswa.
+              Pantau arus kas SPP, sesi ujian serentak, kapasitas kuota batch,
+              dan roster siswa.
             </p>
           </div>
 
@@ -77,7 +84,8 @@ export default function AdminDashboardPage() {
               <Users className="w-4 h-4 text-blue-600" />
             </div>
             <div className="text-3xl font-extrabold text-slate-900">
-              650 <span className="text-xs font-normal text-slate-400">Siswa</span>
+              650{' '}
+              <span className="text-xs font-normal text-slate-400">Siswa</span>
             </div>
             <div className="mt-2 text-xs text-blue-600 font-semibold">
               {students.length} Akun Terdaftar Aktif
@@ -92,7 +100,8 @@ export default function AdminDashboardPage() {
               <Activity className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="text-3xl font-extrabold text-emerald-600">
-              {metrics.activeConcurrent} <span className="text-xs font-normal text-slate-400">Online</span>
+              {metrics.activeConcurrent}{' '}
+              <span className="text-xs font-normal text-slate-400">Online</span>
             </div>
             <div className="mt-2 text-xs text-emerald-600 font-semibold flex items-center space-x-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -140,11 +149,13 @@ export default function AdminDashboardPage() {
                 <h3 className="text-base font-bold text-slate-900">
                   Monitoring Kapasitas Kuota Kelas
                 </h3>
-                <p className="text-xs text-slate-500">Keterisian kursi per batch bimbingan aktif</p>
+                <p className="text-xs text-slate-500">
+                  Keterisian kursi per batch bimbingan aktif
+                </p>
               </div>
               <Link
                 href="/admin/classes"
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center space-x-1"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center space-x-1 rounded-xl"
               >
                 <span>Kelola Batch</span>
                 <ArrowRight className="w-3 h-3" />
@@ -152,8 +163,10 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="space-y-4">
-              {batches.map((batch) => {
-                const percent = Math.round((batch.currentStudents / batch.maxCapacity) * 100);
+              {classesPagination.pageItems.map((batch) => {
+                const percent = Math.round(
+                  (batch.currentStudents / batch.maxCapacity) * 100
+                );
                 const isFull = percent >= 95;
 
                 return (
@@ -176,8 +189,8 @@ export default function AdminDashboardPage() {
                           isFull
                             ? 'bg-rose-100 text-rose-800'
                             : percent > 75
-                            ? 'bg-amber-100 text-amber-900'
-                            : 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-amber-100 text-amber-900'
+                              : 'bg-emerald-100 text-emerald-800'
                         }`}
                       >
                         {isFull ? 'Penuh (100%)' : `${percent}% Terisi`}
@@ -189,12 +202,16 @@ export default function AdminDashboardPage() {
                       <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
-                            isFull ? 'bg-rose-600' : percent > 75 ? 'bg-amber-500' : 'bg-blue-600'
+                            isFull
+                              ? 'bg-rose-600'
+                              : percent > 75
+                                ? 'bg-amber-500'
+                                : 'bg-blue-600'
                           }`}
                           style={{ width: `${percent}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-sans">
                         <span>{batch.currentStudents} Kursi Terisi</span>
                         <span>Maks. {batch.maxCapacity} Siswa</span>
                       </div>
@@ -203,6 +220,10 @@ export default function AdminDashboardPage() {
                 );
               })}
             </div>
+            <Pagination
+              pagination={classesPagination}
+              label="ringkasan kelas"
+            />
           </div>
 
           {/* Transaksi SPP Terkini (5 Cols) */}
@@ -212,11 +233,13 @@ export default function AdminDashboardPage() {
                 <h3 className="text-base font-bold text-slate-900">
                   Pembukuan SPP Terbaru
                 </h3>
-                <p className="text-xs text-slate-500">Transaksi kasir & rekonsiliasi Excel</p>
+                <p className="text-xs text-slate-500">
+                  Transaksi kasir & rekonsiliasi Excel
+                </p>
               </div>
               <Link
                 href="/admin/payments"
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center space-x-1"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center space-x-1 rounded-xl"
               >
                 <span>Lihat Semua</span>
                 <ArrowRight className="w-3 h-3" />
@@ -230,19 +253,21 @@ export default function AdminDashboardPage() {
                   className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center justify-between"
                 >
                   <div className="space-y-0.5">
-                    <div className="text-xs font-bold text-slate-900">{pay.studentName}</div>
-                    <div className="text-[11px] text-slate-500 font-mono">
+                    <div className="text-xs font-bold text-slate-900">
+                      {pay.studentName}
+                    </div>
+                    <div className="text-xs text-slate-500 font-sans">
                       {pay.invoiceNumber} • {pay.month}
                     </div>
                   </div>
 
                   <div className="text-right space-y-1">
-                    <div className="text-xs font-bold text-slate-900 font-mono">
+                    <div className="text-xs font-bold text-slate-900 font-sans">
                       {formatIDR(pay.amount)}
                     </div>
                     <button
                       onClick={() => setSelectedReceipt(pay)}
-                      className="text-[10px] font-semibold text-blue-600 hover:text-blue-700 flex items-center space-x-1 ml-auto"
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center space-x-1 ml-auto rounded-xl min-h-11"
                     >
                       <Printer className="w-3 h-3" />
                       <span>Kuitansi</span>

@@ -98,11 +98,11 @@ export default function DrillingPage() {
                   setSelectedAnswer('');
                   setShowExplanation(false);
                 }}
-                className={`px-4 py-2 rounded-xl whitespace-nowrap font-semibold transition ${
+                className={`px-4 py-2 rounded-xl whitespace-nowrap font-semibold transition min-h-11 ${
                   selectedSubtest === st.id
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                    ? "bg-blue-600 text-white shadow-xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                } `}
               >
                 {st.name.split(' ')[0]}
               </button>
@@ -153,7 +153,7 @@ export default function DrillingPage() {
             )}
 
             {/* Question Prompt */}
-            <div className="text-sm sm:text-base font-serif font-medium text-slate-900 leading-relaxed">
+            <div className="text-sm sm:text-base font-sans font-medium text-slate-900 leading-relaxed">
               <MathRenderer content={currentQ.question} />
             </div>
 
@@ -204,11 +204,11 @@ export default function DrillingPage() {
                     type="button"
                     onClick={handleCheckAnswer}
                     disabled={!selectedAnswer || (Array.isArray(selectedAnswer) && selectedAnswer.length === 0)}
-                    className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold transition ${
+                    className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold transition min-h-11 ${
                       !selectedAnswer || (Array.isArray(selectedAnswer) && selectedAnswer.length === 0)
-                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        : 'bg-slate-900 hover:bg-slate-800 text-white shadow-xs'
-                    }`}
+                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : "bg-slate-900 hover:bg-slate-800 text-white shadow-xs"
+                    } `}
                   >
                     Periksa Jawaban
                   </button>
@@ -232,7 +232,7 @@ export default function DrillingPage() {
               <button
                 type="button"
                 onClick={handleNextQuestion}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition"
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition min-h-11"
               >
                 <span>Soal Berikutnya</span>
                 <ChevronRight className="w-4 h-4" />

@@ -20,7 +20,7 @@ export default function MobileBottomNav() {
 
   // Do not show bottom nav during active CBT exam sessions
   const isExamScreen = pathname?.startsWith('/exam/') && !pathname?.includes('/result');
-  if (isExamScreen) {
+  if (isExamScreen || pathname === '/') {
     return null;
   }
 

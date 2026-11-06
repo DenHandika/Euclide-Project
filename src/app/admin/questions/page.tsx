@@ -1,4 +1,6 @@
 'use client';
+import Pagination from '@/components/common/Pagination';
+import usePagination from '@/hooks/usePagination';
 
 import React, { useState, useRef } from 'react';
 import { useApp } from '@/context/AppContext';
@@ -22,7 +24,13 @@ import {
 } from 'lucide-react';
 
 export default function AdminQuestionsPage() {
-  const { questions, addQuestion, addQuestionsBulk, deleteQuestion, showToast } = useApp();
+  const {
+    questions,
+    addQuestion,
+    addQuestionsBulk,
+    deleteQuestion,
+    showToast,
+  } = useApp();
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const [filterSubtest, setFilterSubtest] = useState<string>('all');
@@ -33,7 +41,8 @@ export default function AdminQuestionsPage() {
     type: 'single_choice' as const,
     stimulus: '',
     stimulusImage: '' as string,
-    question: 'Diberikan matriks $A = \\begin{pmatrix} 2 & x \\\\ 3 & 5 \\end{pmatrix}$. Jika $\\det(A) = 4$, maka nilai $x$ adalah...',
+    question:
+      'Diberikan matriks $A = \\begin{pmatrix} 2 & x \\\\ 3 & 5 \\end{pmatrix}$. Jika $\\det(A) = 4$, maka nilai $x$ adalah...',
     options: [
       { id: 'A', text: '$x = 1$' },
       { id: 'B', text: '$x = 2$' },
@@ -42,12 +51,21 @@ export default function AdminQuestionsPage() {
       { id: 'E', text: '$x = 5$' },
     ],
     correctAnswer: 'B',
-    explanation: 'Perhitungan determinan: $$\\det(A) = (2)(5) - (3)(x) = 10 - 3x$$ Diketahui $\\det(A) = 4$, maka: $$10 - 3x = 4 \\implies 3x = 6 \\implies x = 2$$',
+    explanation:
+      'Perhitungan determinan: $$\\det(A) = (2)(5) - (3)(x) = 10 - 3x$$ Diketahui $\\det(A) = 4$, maka: $$10 - 3x = 4 \\implies 3x = 6 \\implies x = 2$$',
     difficulty: 'Sedang' as const,
     maxScore: 100,
   });
 
-  const [activeTargetField, setActiveTargetField] = useState<'question' | 'explanation' | 'option-0' | 'option-1' | 'option-2' | 'option-3' | 'option-4'>('question');
+  const [activeTargetField, setActiveTargetField] = useState<
+    | 'question'
+    | 'explanation'
+    | 'option-0'
+    | 'option-1'
+    | 'option-2'
+    | 'option-3'
+    | 'option-4'
+  >('question');
 
   const handleOptionTextChange = (index: number, text: string) => {
     const newOptions = [...formData.options];
@@ -58,9 +76,15 @@ export default function AdminQuestionsPage() {
   // Insert snippet from MathToolbar into active target field
   const handleInsertMathSnippet = (snippet: string) => {
     if (activeTargetField === 'question') {
-      setFormData((prev) => ({ ...prev, question: `${prev.question} ${snippet}` }));
+      setFormData((prev) => ({
+        ...prev,
+        question: `${prev.question} ${snippet}`,
+      }));
     } else if (activeTargetField === 'explanation') {
-      setFormData((prev) => ({ ...prev, explanation: `${prev.explanation} ${snippet}` }));
+      setFormData((prev) => ({
+        ...prev,
+        explanation: `${prev.explanation} ${snippet}`,
+      }));
     } else if (activeTargetField.startsWith('option-')) {
       const optIdx = parseInt(activeTargetField.split('-')[1]);
       const newOptions = [...formData.options];
@@ -80,7 +104,10 @@ export default function AdminQuestionsPage() {
           reader.onload = (event) => {
             const dataUrl = event.target?.result as string;
             setFormData((prev) => ({ ...prev, stimulusImage: dataUrl }));
-            showToast('Gambar soal berhasil di-paste (Ctrl+V) sebagai stimulus!', 'success');
+            showToast(
+              'Gambar soal berhasil di-paste (Ctrl+V) sebagai stimulus!',
+              'success'
+            );
           };
           reader.readAsDataURL(file);
         }
@@ -108,7 +135,9 @@ export default function AdminQuestionsPage() {
       subtestId: formData.subtestId,
       number: questions.length + 1,
       type: formData.type,
-      stimulus: formData.stimulusImage ? `[IMAGE_STIMULUS]${formData.stimulusImage}` : formData.stimulus || undefined,
+      stimulus: formData.stimulusImage
+        ? `[IMAGE_STIMULUS]${formData.stimulusImage}`
+        : formData.stimulus || undefined,
       question: formData.question,
       options: formData.options,
       correctAnswer: formData.correctAnswer,
@@ -121,7 +150,9 @@ export default function AdminQuestionsPage() {
     setModalOpen(false);
   };
 
-  const handleBulkImportConfirm = (importedQuestions: Omit<Question, 'id'>[]) => {
+  const handleBulkImportConfirm = (
+    importedQuestions: Omit<Question, 'id'>[]
+  ) => {
     addQuestionsBulk(importedQuestions);
   };
 
@@ -129,28 +160,35 @@ export default function AdminQuestionsPage() {
     if (filterSubtest === 'all') return true;
     return q.subtestId === filterSubtest;
   });
+  const questionsPagination = usePagination(
+    filteredQuestions,
+    6,
+    filterSubtest,
+    [3, 6, 12, 24]
+  );
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="min-h-screen bg-[#F6F8FC] py-8 font-sans text-[#263D5F]">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#13224E] pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
-            <span className="font-mono text-[10px] font-bold uppercase text-[#1B3B8C] block mb-1">
+            <span className="font-sans text-xs font-bold uppercase text-[#1B3B8C] block mb-1">
               BANK SOAL & INSTRUMEN UJIAN
             </span>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
-              Bank Soal KaTeX & Rumus Matematika
+            <h1 className="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-[#263D5F]">
+              Bank soal
             </h1>
-            <p className="text-xs sm:text-sm text-[#637096] mt-0.5">
-              Buat dan kelola butir soal dengan Math Toolbar visual, paste foto soal langsung (Ctrl+V), atau import massal dari template Word.
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Buat dan kelola butir soal dengan Math Toolbar visual, paste foto
+              soal langsung (Ctrl+V), atau import massal dari template Word.
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 font-mono text-xs">
+          <div className="flex items-center space-x-2 font-sans text-xs">
             <button
               onClick={() => setBulkModalOpen(true)}
-              className="inline-flex items-center space-x-1.5 bg-[#FFFFFF] hover:bg-[#F3F3ED] text-[#13224E] border border-[#13224E] px-3.5 py-2 font-semibold transition"
+              className="inline-flex items-center space-x-1.5 bg-[#FFFFFF] hover:bg-[#EDF2F9] text-[#263D5F] border border-slate-200 px-3.5 py-2 font-semibold transition rounded-xl min-h-11"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-[#1B3B8C]" />
               <span>Import Massal Word (.docx)</span>
@@ -158,7 +196,7 @@ export default function AdminQuestionsPage() {
 
             <button
               onClick={() => setModalOpen(true)}
-              className="inline-flex items-center space-x-1.5 bg-[#13224E] hover:bg-[#1B3B8C] text-white px-3.5 py-2 font-semibold transition"
+              className="inline-flex items-center space-x-1.5 bg-[#2E578F] hover:bg-[#234573] text-white px-3.5 py-2 font-semibold transition rounded-xl min-h-11"
             >
               <PlusCircle className="w-3.5 h-3.5 text-[#EFA93B]" />
               <span>Buat Soal Baru</span>
@@ -167,14 +205,14 @@ export default function AdminQuestionsPage() {
         </div>
 
         {/* Subtest Filter Tabs */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto font-mono text-xs pb-1">
+        <div className="flex items-center space-x-1.5 overflow-x-auto font-sans text-xs pb-1">
           <button
             onClick={() => setFilterSubtest('all')}
-            className={`px-3 py-1 border whitespace-nowrap transition ${
+            className={`px-3 py-1 border whitespace-nowrap transition rounded-xl min-h-11 ${
               filterSubtest === 'all'
-                ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
-                : 'bg-[#FFFFFF] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
-            }`}
+                ? 'bg-[#2E578F] text-white border-slate-200 font-semibold'
+                : 'bg-[#FFFFFF] text-slate-500 border-slate-100 hover:border-slate-200'
+            } `}
           >
             Semua Subtest ({questions.length})
           </button>
@@ -182,29 +220,30 @@ export default function AdminQuestionsPage() {
             <button
               key={st.id}
               onClick={() => setFilterSubtest(st.id)}
-              className={`px-3 py-1 border whitespace-nowrap transition ${
+              className={`px-3 py-1 border whitespace-nowrap transition rounded-xl min-h-11 ${
                 filterSubtest === st.id
-                  ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
-                  : 'bg-[#FFFFFF] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
-              }`}
+                  ? 'bg-[#2E578F] text-white border-slate-200 font-semibold'
+                  : 'bg-[#FFFFFF] text-slate-500 border-slate-100 hover:border-slate-200'
+              } `}
             >
-              {st.name} ({questions.filter((q) => q.subtestId === st.id).length})
+              {st.name} ({questions.filter((q) => q.subtestId === st.id).length}
+              )
             </button>
           ))}
         </div>
 
         {/* Questions Grid List */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filteredQuestions.map((q) => (
+          {questionsPagination.pageItems.map((q) => (
             <div
               key={q.id}
-              className="bg-[#FFFFFF] border-2 border-[#E4E4DC] hover:border-[#13224E] p-5 space-y-4 flex flex-col justify-between transition"
+              className="bg-[#FFFFFF] border border-slate-100 hover:border-slate-200 p-5 space-y-4 flex flex-col justify-between transition rounded-2xl shadow-sm"
             >
               <div className="space-y-3">
                 {/* Meta Header */}
-                <div className="flex items-center justify-between font-mono text-[10px] pb-2 border-b border-[#E4E4DC]">
+                <div className="flex items-center justify-between font-sans text-xs pb-2 border-b border-slate-100">
                   <div className="flex items-center space-x-2">
-                    <span className="font-bold text-[#13224E] bg-[#FAFAF7] px-2 py-0.5 border border-[#CECEC2]">
+                    <span className="font-bold text-[#263D5F] bg-[#F6F8FC] px-2 py-0.5 border border-slate-200 rounded-full">
                       #{q.number}
                     </span>
                     <span className="text-[#1B3B8C] font-semibold uppercase">
@@ -212,12 +251,12 @@ export default function AdminQuestionsPage() {
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-[#C8831A] bg-[#EFA93B]/20 px-2 py-0.2 font-bold">
+                    <span className="text-[#C8831A] bg-[#EFA93B]/20 px-2 py-1 font-bold rounded-full">
                       {q.difficulty}
                     </span>
                     <button
                       onClick={() => deleteQuestion(q.id)}
-                      className="text-[#9EABC7] hover:text-[#D0342C] transition p-0.5"
+                      className="text-slate-500 hover:text-[#D0342C] transition p-0.5 rounded-xl min-h-11"
                       title="Hapus Soal"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -227,7 +266,7 @@ export default function AdminQuestionsPage() {
 
                 {/* Stimulus Image Preview if present */}
                 {q.stimulus && q.stimulus.startsWith('[IMAGE_STIMULUS]') && (
-                  <div className="p-2 bg-[#FAFAF7] border border-[#E4E4DC] max-h-36 overflow-hidden flex items-center justify-center">
+                  <div className="p-2 bg-[#F6F8FC] border border-slate-100 max-h-36 overflow-hidden flex items-center justify-center rounded-xl">
                     <img
                       src={q.stimulus.replace('[IMAGE_STIMULUS]', '')}
                       alt="Stimulus Soal"
@@ -237,29 +276,29 @@ export default function AdminQuestionsPage() {
                 )}
 
                 {/* Question Prompt with KaTeX */}
-                <div className="font-serif text-sm font-semibold text-[#13224E] leading-relaxed">
+                <div className="font-sans text-sm font-semibold text-[#263D5F] leading-relaxed">
                   <MathRenderer content={q.question} />
                 </div>
 
                 {/* Options OMR */}
-                <div className="space-y-1.5 font-mono text-xs">
+                <div className="space-y-1.5 font-sans text-xs">
                   {q.options?.map((opt) => (
                     <div
                       key={opt.id}
-                      className={`flex items-start space-x-2.5 p-2 border ${
+                      className={`flex items-start space-x-2.5 p-2 border rounded-xl ${
                         opt.id === q.correctAnswer
                           ? 'bg-[#EAF7F0] border-[#1B8A5A]/50 text-[#126340] font-semibold'
-                          : 'bg-[#FAFAF7] border-[#E4E4DC] text-[#13224E]'
-                      }`}
+                          : 'bg-[#F6F8FC] border-slate-100 text-[#263D5F]'
+                      } `}
                     >
-                      <span className="omr-bubble shrink-0 text-[10px] w-5 h-5">
+                      <span className="omr-bubble shrink-0 text-xs w-5 h-5">
                         {opt.id}
                       </span>
                       <div className="pt-0.5 text-xs font-sans">
                         <MathRenderer content={opt.text} />
                       </div>
                       {opt.id === q.correctAnswer && (
-                        <span className="ml-auto text-[9px] font-mono text-[#1B8A5A] uppercase font-bold">
+                        <span className="ml-auto text-xs font-sans text-[#1B8A5A] uppercase font-bold">
                           [KUNCI]
                         </span>
                       )}
@@ -269,8 +308,8 @@ export default function AdminQuestionsPage() {
               </div>
 
               {/* Explanation Drawer */}
-              <div className="pt-2 border-t border-[#E4E4DC] text-[11px] text-[#637096] bg-[#FAFAF7] p-2.5 border">
-                <span className="font-mono text-[9px] uppercase font-bold text-[#13224E] block mb-0.5">
+              <div className="pt-2 border-t border-slate-100 text-xs text-slate-500 bg-[#F6F8FC] p-2.5 border">
+                <span className="font-sans text-xs uppercase font-bold text-[#263D5F] block mb-0.5">
                   [ PEMBAHASAN RESMI ]
                 </span>
                 <MathRenderer content={q.explanation} />
@@ -278,29 +317,34 @@ export default function AdminQuestionsPage() {
             </div>
           ))}
         </div>
+        <Pagination pagination={questionsPagination} label="soal" />
       </div>
 
       {/* 1. Modal: Buat Soal Baru dengan Visual Math Toolbar & Paste Gambar */}
       {modalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4 overflow-y-auto font-sans"
+          className="fixed inset-0 z-50 bg-[#182D4D]/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-sans"
           onPaste={handlePasteImage}
         >
-          <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border-2 border-[#13224E] space-y-4 my-8 max-h-[92vh] overflow-y-auto">
+          <div className="bg-[#FFFFFF] max-w-4xl w-full p-6 border border-slate-200 space-y-4 my-8 max-h-[92vh] overflow-y-auto rounded-3xl shadow-xl">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-[#E4E4DC]">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="w-2.5 h-2.5 bg-[#1B3B8C]" />
-                  <h3 className="font-serif font-bold text-lg text-[#13224E]">
+                  <h3 className="font-sans font-bold text-lg text-[#263D5F]">
                     Editor Pembuat Soal KaTeX & Rumus Matematika
                   </h3>
                 </div>
-                <p className="font-mono text-xs text-[#637096] mt-0.5">
-                  Gunakan Math Toolbar visual untuk menyisipkan rumus otomatis atau tekan Ctrl+V untuk paste gambar soal.
+                <p className="font-sans text-xs text-slate-500 mt-0.5">
+                  Gunakan Math Toolbar visual untuk menyisipkan rumus otomatis
+                  atau tekan Ctrl+V untuk paste gambar soal.
                 </p>
               </div>
-              <button onClick={() => setModalOpen(false)} className="text-[#637096] hover:text-[#13224E]">
+              <button
+                onClick={() => setModalOpen(false)}
+                className="text-slate-500 hover:text-[#263D5F] rounded-xl min-h-11"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -310,13 +354,20 @@ export default function AdminQuestionsPage() {
 
             <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
               {/* Row 1: Subtest & Tingkat Kesulitan */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans">
                 <div>
-                  <label className="block text-[#13224E] font-bold mb-1">Subtest Ujian:</label>
+                  <label className="block text-[#263D5F] font-bold mb-1">
+                    Subtest Ujian:
+                  </label>
                   <select
                     value={formData.subtestId}
-                    onChange={(e) => setFormData({ ...formData, subtestId: e.target.value as SubtestId })}
-                    className="w-full p-2 bg-[#FAFAF7] border border-[#CECEC2] text-xs focus:outline-none focus:border-[#13224E]"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        subtestId: e.target.value as SubtestId,
+                      })
+                    }
+                    className="w-full p-2 bg-[#F6F8FC] border border-slate-200 text-xs focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 rounded-xl min-h-11"
                   >
                     {SUBTEST_CONFIGS.map((st) => (
                       <option key={st.id} value={st.id}>
@@ -327,11 +378,18 @@ export default function AdminQuestionsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[#13224E] font-bold mb-1">Tingkat Kesulitan:</label>
+                  <label className="block text-[#263D5F] font-bold mb-1">
+                    Tingkat Kesulitan:
+                  </label>
                   <select
                     value={formData.difficulty}
-                    onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
-                    className="w-full p-2 bg-[#FAFAF7] border border-[#CECEC2] text-xs focus:outline-none focus:border-[#13224E]"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        difficulty: e.target.value as any,
+                      })
+                    }
+                    className="w-full p-2 bg-[#F6F8FC] border border-slate-200 text-xs focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 rounded-xl min-h-11"
                   >
                     <option value="Mudah">Mudah</option>
                     <option value="Sedang">Sedang</option>
@@ -340,11 +398,18 @@ export default function AdminQuestionsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[#13224E] font-bold mb-1">Kunci Jawaban Benar:</label>
+                  <label className="block text-[#263D5F] font-bold mb-1">
+                    Kunci Jawaban Benar:
+                  </label>
                   <select
                     value={formData.correctAnswer}
-                    onChange={(e) => setFormData({ ...formData, correctAnswer: e.target.value })}
-                    className="w-full p-2 bg-[#FAFAF7] border border-[#1B8A5A] text-xs font-bold text-[#1B8A5A] focus:outline-none"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        correctAnswer: e.target.value,
+                      })
+                    }
+                    className="w-full p-2 bg-[#F6F8FC] border border-[#1B8A5A] text-xs font-bold text-[#1B8A5A] focus:outline-none rounded-xl min-h-11"
                   >
                     <option value="A">Opsi A</option>
                     <option value="B">Opsi B</option>
@@ -356,38 +421,53 @@ export default function AdminQuestionsPage() {
               </div>
 
               {/* Stimulus Gambar (Ctrl+V paste / upload) */}
-              <div className="p-3 bg-[#FAFAF7] border border-[#E4E4DC] space-y-2">
-                <div className="flex items-center justify-between font-mono text-[10px]">
-                  <span className="font-bold text-[#13224E] uppercase flex items-center space-x-1.5">
+              <div className="p-3 bg-[#F6F8FC] border border-slate-100 space-y-2 rounded-xl">
+                <div className="flex items-center justify-between font-sans text-xs">
+                  <span className="font-bold text-[#263D5F] uppercase flex items-center space-x-1.5">
                     <ImageIcon className="w-3.5 h-3.5 text-[#1B3B8C]" />
                     <span>Gambar Stimulus / Grafik Soal (Opsional):</span>
                   </span>
-                  <span className="text-[#C8831A]">Bisa langsung tekan Ctrl+V (Paste) di halaman ini</span>
+                  <span className="text-[#C8831A]">
+                    Bisa langsung tekan Ctrl+V (Paste) di halaman ini
+                  </span>
                 </div>
 
                 {formData.stimulusImage ? (
-                  <div className="flex items-center space-x-4 p-2 bg-[#FFFFFF] border border-[#CECEC2]">
-                    <img src={formData.stimulusImage} alt="Stimulus" className="h-16 object-contain border" />
+                  <div className="flex items-center space-x-4 p-2 bg-[#FFFFFF] border border-slate-200 rounded-xl">
+                    <img
+                      src={formData.stimulusImage}
+                      alt="Stimulus"
+                      className="h-16 object-contain border"
+                    />
                     <div className="text-xs">
-                      <span className="text-[#1B8A5A] font-bold block">Gambar Terpasang</span>
+                      <span className="text-[#1B8A5A] font-bold block">
+                        Gambar Terpasang
+                      </span>
                       <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, stimulusImage: '' })}
-                        className="text-[#D0342C] text-[10px] font-mono hover:underline mt-1"
+                        onClick={() =>
+                          setFormData({ ...formData, stimulusImage: '' })
+                        }
+                        className="text-[#D0342C] text-xs font-sans hover:underline mt-1 rounded-xl min-h-11"
                       >
                         Hapus Gambar
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between border border-dashed border-[#CECEC2] p-2.5 bg-[#FFFFFF]">
-                    <span className="text-[#637096] text-[11px] font-mono">
+                  <div className="flex items-center justify-between border border-dashed border-slate-200 p-2.5 bg-[#FFFFFF] rounded-xl">
+                    <span className="text-slate-500 text-xs font-sans">
                       Belum ada gambar. Paste screenshot soal atau unggah file:
                     </span>
-                    <label className="px-2.5 py-1 bg-[#FAFAF7] hover:bg-[#F3F3ED] text-[#13224E] border border-[#CECEC2] font-mono text-[10px] cursor-pointer flex items-center space-x-1">
+                    <label className="px-2.5 py-1 bg-[#F6F8FC] hover:bg-[#EDF2F9] text-[#263D5F] border border-slate-200 font-sans text-xs cursor-pointer flex items-center space-x-1">
                       <Upload className="w-3 h-3" />
                       <span>Pilih Berkas Gambar</span>
-                      <input type="file" accept="image/*" onChange={handleImageFileUpload} className="hidden" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageFileUpload}
+                        className="hidden"
+                      />
                     </label>
                   </div>
                 )}
@@ -397,15 +477,17 @@ export default function AdminQuestionsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="font-bold text-[#13224E] font-mono text-[11px]">
+                    <label className="font-bold text-[#263D5F] font-sans text-xs">
                       Pertanyaan Soal (LaTeX / Teks):
                     </label>
                     <button
                       type="button"
                       onClick={() => setActiveTargetField('question')}
-                      className={`text-[10px] font-mono px-1.5 py-0.2 border ${
-                        activeTargetField === 'question' ? 'bg-[#13224E] text-white' : 'bg-[#FAFAF7] text-[#637096]'
-                      }`}
+                      className={`text-xs font-sans px-1.5 py-1 border rounded-xl min-h-11 ${
+                        activeTargetField === 'question'
+                          ? 'bg-[#2E578F] text-white'
+                          : 'bg-[#F6F8FC] text-slate-500'
+                      } `}
                     >
                       Target Toolbar
                     </button>
@@ -415,16 +497,18 @@ export default function AdminQuestionsPage() {
                     required
                     value={formData.question}
                     onFocus={() => setActiveTargetField('question')}
-                    onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                    className="w-full p-2.5 bg-[#FAFAF7] border border-[#CECEC2] font-mono text-xs focus:outline-none focus:border-[#13224E]"
+                    onChange={(e) =>
+                      setFormData({ ...formData, question: e.target.value })
+                    }
+                    className="w-full p-2.5 bg-[#F6F8FC] border border-slate-200 font-sans text-xs focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 rounded-xl min-h-11"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-[#13224E] font-mono text-[11px] block mb-1">
+                  <label className="font-bold text-[#263D5F] font-sans text-xs block mb-1">
                     Live Preview Soal KaTeX:
                   </label>
-                  <div className="p-3 bg-[#FFFFFF] border-2 border-[#13224E] min-h-[96px] max-h-[120px] overflow-y-auto font-serif text-xs leading-relaxed text-[#13224E]">
+                  <div className="p-3 bg-[#FFFFFF] border border-slate-200 min-h-[96px] max-h-[120px] overflow-y-auto font-sans text-xs leading-relaxed text-[#263D5F] rounded-xl">
                     <MathRenderer content={formData.question} />
                   </div>
                 </div>
@@ -432,23 +516,30 @@ export default function AdminQuestionsPage() {
 
               {/* Options A to E */}
               <div className="space-y-2">
-                <label className="font-bold text-[#13224E] font-mono text-[11px] block">
+                <label className="font-bold text-[#263D5F] font-sans text-xs block">
                   Pilihan Jawaban (A — E):
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {formData.options.map((opt, idx) => (
-                    <div key={opt.id} className="flex items-center space-x-2 bg-[#FAFAF7] p-1.5 border border-[#E4E4DC]">
-                      <span className="w-5 h-5 bg-[#13224E] text-white flex items-center justify-center font-mono font-bold text-[10px] shrink-0">
+                    <div
+                      key={opt.id}
+                      className="flex items-center space-x-2 bg-[#F6F8FC] p-1.5 border border-slate-100 rounded-xl"
+                    >
+                      <span className="w-5 h-5 bg-[#2E578F] text-white flex items-center justify-center font-sans font-bold text-xs shrink-0">
                         {opt.id}
                       </span>
                       <input
                         type="text"
                         required
                         value={opt.text}
-                        onFocus={() => setActiveTargetField(`option-${idx}` as any)}
-                        onChange={(e) => handleOptionTextChange(idx, e.target.value)}
+                        onFocus={() =>
+                          setActiveTargetField(`option-${idx}` as any)
+                        }
+                        onChange={(e) =>
+                          handleOptionTextChange(idx, e.target.value)
+                        }
                         placeholder={`Teks pilihan ${opt.id}...`}
-                        className="flex-1 p-1 bg-[#FFFFFF] border border-[#CECEC2] font-mono text-xs focus:outline-none focus:border-[#13224E]"
+                        className="flex-1 p-1 bg-[#FFFFFF] border border-slate-200 font-sans text-xs focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 rounded-xl min-h-11"
                       />
                       <div className="w-24 truncate text-right font-sans text-xs">
                         <MathRenderer content={opt.text} />
@@ -461,15 +552,17 @@ export default function AdminQuestionsPage() {
               {/* Explanation */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="font-bold text-[#13224E] font-mono text-[11px]">
+                  <label className="font-bold text-[#263D5F] font-sans text-xs">
                     Langkah Pembahasan Soal (KaTeX):
                   </label>
                   <button
                     type="button"
                     onClick={() => setActiveTargetField('explanation')}
-                    className={`text-[10px] font-mono px-1.5 py-0.2 border ${
-                      activeTargetField === 'explanation' ? 'bg-[#13224E] text-white' : 'bg-[#FAFAF7] text-[#637096]'
-                    }`}
+                    className={`text-xs font-sans px-1.5 py-1 border rounded-xl min-h-11 ${
+                      activeTargetField === 'explanation'
+                        ? 'bg-[#2E578F] text-white'
+                        : 'bg-[#F6F8FC] text-slate-500'
+                    } `}
                   >
                     Target Toolbar
                   </button>
@@ -479,23 +572,25 @@ export default function AdminQuestionsPage() {
                   required
                   value={formData.explanation}
                   onFocus={() => setActiveTargetField('explanation')}
-                  onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
-                  className="w-full p-2.5 bg-[#FAFAF7] border border-[#CECEC2] font-mono text-xs focus:outline-none focus:border-[#13224E]"
+                  onChange={(e) =>
+                    setFormData({ ...formData, explanation: e.target.value })
+                  }
+                  className="w-full p-2.5 bg-[#F6F8FC] border border-slate-200 font-sans text-xs focus:outline-none focus:border-[#7F9FC8] focus:ring-2 focus:ring-blue-100 rounded-xl min-h-11"
                 />
               </div>
 
               {/* Actions */}
-              <div className="pt-3 border-t border-[#E4E4DC] flex items-center justify-end space-x-2 font-mono">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2 font-sans">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-3 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-[#637096]"
+                  className="px-3 py-1.5 bg-[#F6F8FC] border border-slate-200 text-slate-500 rounded-xl min-h-11"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-1.5 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-bold"
+                  className="px-5 py-1.5 bg-[#2E578F] hover:bg-[#234573] text-white font-bold rounded-xl min-h-11"
                 >
                   Simpan Soal ke Bank Soal
                 </button>

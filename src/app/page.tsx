@@ -1,463 +1,63 @@
-'use client';
-
-import React, { useState } from 'react';
 import Link from 'next/link';
-import { useApp } from '@/context/AppContext';
-import {
-  BookOpen,
-  ShieldCheck,
-  Award,
-  FileSpreadsheet,
-  FileCheck2,
-  ArrowRight,
-  Clock,
-  Bookmark,
-  CheckCircle2,
-  Sparkles,
-  Zap,
-  GraduationCap,
-  Users,
-} from 'lucide-react';
-import MathRenderer from '@/components/common/MathRenderer';
+import { ArrowRight, BookOpen, Check, Clock, GraduationCap, Target, TrendingUp } from 'lucide-react';
+
+const programs = [
+  { icon: GraduationCap, title: 'Bimbingan belajar SMA', text: 'Bangun pemahaman materi dan kebiasaan belajar bersama pengajar.', points: ['Pendampingan materi sekolah', 'Belajar bersama kelas bimbingan', 'Evaluasi perkembangan belajar'] },
+  { icon: Clock, title: 'Persiapan UTBK–SNBT', text: 'Persiapan terarah untuk TPS, literasi, dan penalaran matematika.', points: ['Latihan sesuai materi', 'Simulasi dengan waktu per subtes', 'Pembahasan dan evaluasi hasil'] },
+  { icon: Target, title: 'Target kampus & prodi', text: 'Kenali jarak kemampuanmu dengan target program studi pilihan.', points: ['Tentukan prioritas prodi', 'Bandingkan hasil dengan target', 'Temukan fokus latihan berikutnya'] },
+];
+
+const registrationSteps = [
+  { title: 'Ajukan pendaftaran', text: 'Calon siswa mengisi data diri dan program yang diminati. Admin juga dapat membantu pengajuan.' },
+  { title: 'Admin meninjau', text: 'Data, pilihan kelas, dan ketersediaan tempat diperiksa sebelum pengajuan diterima atau ditolak.' },
+  { title: 'Selesaikan pendaftaran', text: 'Jika diterima, ikuti arahan admin untuk penempatan kelas dan penyelesaian administrasi.' },
+  { title: 'Mulai belajar', text: 'Gunakan akun yang telah diaktifkan untuk mengikuti kegiatan belajar dan melihat perkembanganmu.' },
+];
+
+const faqs = [
+  { question: 'Apakah saya bisa mengajukan pendaftaran sendiri?', answer: 'Bisa. Calon siswa dapat mengajukan pendaftaran secara mandiri, atau meminta bantuan admin. Semua pengajuan ditinjau admin sebelum diterima.' },
+  { question: 'Apakah mengajukan pendaftaran langsung memberi akses tryout?', answer: 'Belum. Pengajuan pendaftaran berbeda dari akun siswa aktif. Akses belajar diberikan setelah pengajuan diterima dan proses aktivasi diselesaikan.' },
+  { question: 'Bagaimana jika saya sudah pernah belajar di Euclide?', answer: 'Gunakan akun dan Kode Siswa yang sama untuk daftar ulang. Jika lupa Kode Siswa, minta admin membantu mencari data lama agar riwayat belajarmu tetap tersambung.' },
+  { question: 'Apakah hasil tryout menjamin diterima di PTN?', answer: 'Hasil terhadap target prodi merupakan bahan evaluasi belajar, bukan jaminan kelulusan atau pengumuman seleksi resmi.' },
+  { question: 'Apakah bisa belajar melalui HP?', answer: 'Halaman belajar dirancang agar nyaman digunakan melalui browser HP. Pastikan koneksi internet stabil saat mengerjakan ujian.' },
+];
 
 export default function LandingPage() {
-  const { switchRole, tryouts } = useApp();
-
-  // Interactive Hero CBT Question preview state
-  const [heroSelectedOpt, setHeroSelectedOpt] = useState<string>('B');
-  const [heroFlagged, setHeroFlagged] = useState<boolean>(false);
-
-  const heroQuestion = {
-    subtest: 'Penalaran Matematika & Kuantitatif',
-    timeRemaining: '18:45',
-    prompt:
-      'Diberikan laju pengisian volume tangki air $V(t) = \\int_{0}^{t} (3x^2 - 4x + 6) \\, dx$ liter/menit. Jika kapasitas penuh tangki adalah $90\\text{ liter}$, maka nilai $t$ yang memenuhi adalah...',
-    options: [
-      { id: 'A', text: '$t^3 - 2t^2 + 6t - 90 = 0$' },
-      { id: 'B', text: '$t^3 - 2t^2 + 6t = 90 \\implies t = 5\\text{ menit}$' },
-      { id: 'C', text: '$3t^2 - 4t + 6 = 90$' },
-      { id: 'D', text: '$t^3 - 4t^2 + 6t = 45$' },
-      { id: 'E', text: '$6t^2 - 4t = 90$' },
-    ],
-  };
-
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 selection:bg-amber-100 selection:text-slate-900">
-      {/* 1. Hero Section: Modern, Impactful, Interactive EdTech Workspace */}
-      <section className="relative pt-12 pb-20 lg:pt-16 lg:pb-24 border-b border-slate-200/80 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left: Value Proposition */}
-            <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 bg-blue-50 border border-blue-200/80 rounded-full text-xs font-semibold text-blue-700 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Simulasi Standar SNBT 2026</span>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
-                Platform CBT Tryout & Manajemen Bimbel{' '}
-                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Terintegrasi
-                </span>
-              </h1>
-
-              <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl">
-                Sistem ujian berbasis komputer resmi dengan formula matematika KaTeX bebas latensi, navigasi lembar OMR cerdas, analitik rasionalisasi PTN, dan modul kasir SPP otomatis.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-center gap-3.5">
-                <Link
-                  href="/exam/to-utbk-national-01"
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span>Uji Coba CBT Lengkap</span>
-                </Link>
-                <Link
-                  href="/tryouts"
-                  className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-slate-100 hover:bg-slate-200/80 text-slate-800 text-sm font-semibold px-5 py-3.5 rounded-xl transition"
-                >
-                  <span>Katalog Paket Soal</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-
-              {/* Micro Trust Indicators */}
-              <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-slate-500 border-t border-slate-100">
-                <div className="flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Anti-Curang Screen Lock</span>
-                </div>
-                <div className="flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Editor Rumus KaTeX Visual</span>
-                </div>
-                <div className="flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Import Excel SPP & Siswa</span>
-                </div>
-              </div>
+    <div className="bg-white">
+      <section className="relative overflow-hidden bg-[#F4F7FB]">
+        <div className="absolute right-0 top-0 hidden h-full w-1/3 bg-[#E9EEF7] lg:block" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-14 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:py-20">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#D9E2F0] bg-white px-3.5 py-2 text-xs font-semibold text-[#244676]"><GraduationCap size={16} /> Teman belajar menuju kampus impian</span>
+            <h1 className="mt-6 max-w-xl text-4xl font-extrabold leading-[1.16] tracking-tight sm:text-5xl lg:text-[58px]">Langkah kecil hari ini.<br /><span className="text-[#244676]">Kampus impian</span><br />di depan nanti.</h1>
+            <p className="mt-6 max-w-lg text-base leading-7 text-slate-600">Persiapkan UTBK bersama Euclide. Latih kemampuanmu, ikuti tryout, dan kenali materi yang perlu kamu tingkatkan.</p>
+            <div className="mt-8 flex flex-wrap gap-3"><Link href="#pendaftaran" className="eu-button-primary">Kenali cara bergabung <ArrowRight size={17} /></Link><Link href="#program" className="eu-button-secondary">Lihat program <BookOpen size={17} /></Link></div>
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-600">{['7 subtes UTBK', 'Latihan per materi', 'Evaluasi hasil belajar'].map(text => <span key={text} className="flex items-center gap-1.5"><Check size={15} className="text-[#2B8065]" />{text}</span>)}</div>
+          </div>
+          <div className="relative mx-auto w-full max-w-lg lg:py-6">
+            <div className="mb-4 flex items-center justify-between text-xs font-semibold text-[#526580]"><span>KENALI CARA BELAJARMU</span><span className="rounded-full bg-white px-3 py-1.5">Bersama Euclide</span></div>
+            <div className="overflow-hidden rounded-3xl border border-[#D9E2EF] bg-white shadow-[0_18px_50px_-25px_rgba(25,48,83,0.3)]">
+              <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-5"><div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFF1CD] text-[#93641E]"><Target size={23} /></div><div><h2 className="text-base font-bold">Setiap latihan, satu langkah maju</h2><p className="mt-1 text-xs text-slate-500">Belajar terarah untuk persiapan UTBK</p></div></div>
+              <div className="space-y-5 p-6">{[{icon: BookOpen, title: 'Mulai dari materi yang kamu butuhkan', text: 'Latihan TPS, literasi, dan penalaran matematika.', number: '01'}, {icon: Clock, title: 'Biasakan diri dengan waktu ujian', text: 'Kerjakan simulasi dengan timer per subtes.', number: '02'}, {icon: TrendingUp, title: 'Pahami hasil, perbaiki langkah', text: 'Lihat pembahasan dan evaluasi hasil tryout.', number: '03'}].map(item => <div key={item.number} className="flex items-start gap-4"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F1F5FA] text-[#244676]"><item.icon size={19} /></div><div className="flex-1"><h3 className="text-sm font-bold">{item.title}</h3><p className="mt-1 text-xs leading-6 text-slate-500">{item.text}</p></div><span className="pt-1 text-xs font-semibold text-slate-300">{item.number}</span></div>)}</div>
+              <Link href="#program" className="flex items-center justify-between bg-[#244676] px-6 py-4 text-sm font-semibold text-white hover:bg-[#19365F]">Temukan langkah belajarmu<ArrowRight size={18} /></Link>
             </div>
-
-            {/* Right: Live Interactive CBT Exam Worksheet Preview */}
-            <div className="lg:col-span-6">
-              <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 shadow-card hover:shadow-card-hover transition-all duration-300">
-                {/* Worksheet Top Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                  <div className="flex items-center space-x-3">
-                    <span className="w-7 h-7 bg-slate-900 text-white rounded-lg flex items-center justify-center font-mono font-bold text-xs">
-                      4
-                    </span>
-                    <div>
-                      <div className="text-xs font-bold text-slate-900">
-                        {heroQuestion.subtest}
-                      </div>
-                      <div className="text-[11px] text-slate-500 font-mono">
-                        SOAL 04 DARI 20 • PILIHAN GANDA (OMR)
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-100 rounded-lg font-mono text-xs font-bold text-slate-800">
-                      <Clock className="w-3.5 h-3.5 text-blue-600" />
-                      <span>{heroQuestion.timeRemaining}</span>
-                    </div>
-
-                    <button
-                      onClick={() => setHeroFlagged(!heroFlagged)}
-                      className={`flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold rounded-lg border transition ${
-                        heroFlagged
-                          ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold'
-                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                      }`}
-                      title="Uji coba tombol ragu-ragu"
-                    >
-                      <Bookmark className={`w-3.5 h-3.5 ${heroFlagged ? 'fill-amber-900' : ''}`} />
-                      <span className="hidden sm:inline">{heroFlagged ? 'Ragu' : 'Tandai Ragu'}</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Prompt with MathRenderer */}
-                <div className="text-sm sm:text-base font-serif font-medium text-slate-900 leading-relaxed pt-3">
-                  <MathRenderer content={heroQuestion.prompt} />
-                </div>
-
-                {/* Interactive OMR Options */}
-                <div className="space-y-2.5 pt-3">
-                  <div className="text-[11px] font-semibold text-slate-500 flex items-center justify-between">
-                    <span>PILIH JAWABAN (BULATAN OMR):</span>
-                    {heroSelectedOpt === 'B' && (
-                      <span className="text-emerald-600 font-bold flex items-center space-x-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Kunci Terpilih (Opsi B)</span>
-                      </span>
-                    )}
-                  </div>
-
-                  {heroQuestion.options.map((opt) => {
-                    const isSelected = heroSelectedOpt === opt.id;
-                    return (
-                      <div
-                        key={opt.id}
-                        onClick={() => setHeroSelectedOpt(opt.id)}
-                        className={`flex items-start space-x-3 p-3 rounded-xl border cursor-pointer transition-all duration-150 ${
-                          isSelected
-                            ? 'border-blue-600 bg-blue-50/70 shadow-xs'
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
-                        }`}
-                      >
-                        <span
-                          className={`omr-bubble shrink-0 ${
-                            isSelected ? 'omr-bubble-filled' : ''
-                          }`}
-                        >
-                          {opt.id}
-                        </span>
-                        <div className="pt-0.5 text-xs sm:text-sm text-slate-900 leading-relaxed font-sans">
-                          <MathRenderer content={opt.text} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Mini OMR Navigator Bar */}
-                <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-1.5 overflow-x-auto font-mono">
-                    <span className="text-slate-500 mr-1 text-[11px]">Palet Soal:</span>
-                    {[1, 2, 3].map((n) => (
-                      <span
-                        key={n}
-                        className="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold"
-                      >
-                        {n}
-                      </span>
-                    ))}
-                    <span className="w-6 h-6 rounded-md bg-slate-900 text-white ring-2 ring-blue-500 ring-offset-1 flex items-center justify-center text-[10px] font-bold">
-                      4
-                    </span>
-                    {[5, 6, 7, 8].map((n) => (
-                      <span
-                        key={n}
-                        className="w-6 h-6 rounded-md border border-slate-200 bg-white text-slate-600 flex items-center justify-center text-[10px]"
-                      >
-                        {n}
-                      </span>
-                    ))}
-                  </div>
-
-                  <Link
-                    href="/exam/to-utbk-national-01"
-                    className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-bold"
-                  >
-                    <span>Masuk CBT</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <p className="mt-4 text-center text-xs text-slate-500">Tidak harus langsung sempurna. Yang penting, mulai dulu.</p>
           </div>
         </div>
       </section>
-
-      {/* 2. Key Metrics Bar */}
-      <section className="py-8 bg-slate-50 border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">650+</div>
-              <div className="text-xs text-slate-500 mt-0.5">Siswa Terdaftar Aktif</div>
-            </div>
-            <div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-blue-600">7 Subtest</div>
-              <div className="text-xs text-slate-500 mt-0.5">Format Standar SNBT</div>
-            </div>
-            <div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600">4 Format</div>
-              <div className="text-xs text-slate-500 mt-0.5">OMR, Ceklis, Isian & Esai</div>
-            </div>
-            <div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-500">2 Pilihan</div>
-              <div className="text-xs text-slate-500 mt-0.5">Rasionalisasi Kuota PTN</div>
-            </div>
-          </div>
-        </div>
+      <section id="program" className="scroll-mt-28 mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:py-20">
+        <div className="mb-8 max-w-2xl"><p className="eu-eyebrow">RUANG UNTUK BERTUMBUH</p><h2 className="mt-2 text-2xl font-bold sm:text-3xl">Dari memahami materi hingga menyiapkan tujuan.</h2><p className="mt-3 text-sm leading-7 text-slate-500">Pendampingan belajar, latihan, dan evaluasi yang saling melengkapi untuk langkah berikutnya.</p></div>
+        <div className="grid gap-5 md:grid-cols-3">{programs.map(program => <article key={program.title} className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7"><div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F1F5FA] text-[#244676]"><program.icon size={25} /></div><h3 className="text-lg font-bold">{program.title}</h3><p className="mt-3 text-sm leading-7 text-slate-500">{program.text}</p><ul className="mt-5 space-y-3">{program.points.map(point => <li key={point} className="flex items-start gap-2 text-sm text-slate-600"><Check size={16} className="mt-0.5 shrink-0 text-[#2B8065]" />{point}</li>)}</ul></article>)}</div>
       </section>
-
-      {/* 3. Asymmetric Ruang Kerja Portals */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-            Ruang Kerja Terintegrasi 3 Role
-          </h2>
-          <p className="text-sm text-slate-600 mt-1">
-            Dirancang khusus untuk kebutuhan peserta tryout, tentor pengoreksi esai, dan manajemen operasional bimbel.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Main Primary Spotlight (8 Cols): Siswa Portal */}
-          <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-card hover:shadow-card-hover transition">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
-                  <GraduationCap className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">
-                    Portal Siswa & Rasionalisasi PTN
-                  </h3>
-                  <p className="text-xs text-slate-500">Simulasi CBT 4 Format Soal & Peta Peluang Kampus Impian</p>
-                </div>
-              </div>
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-                Modul Siswa
-              </span>
-            </div>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Pengalaman ujian terstandarisasi dengan countdown timer per subtest, navigasi palet soal docked, perlindungan anti-curang keluar layar, serta hasil evaluasi skor terhadap passing grade PTN Pilihan 1 & 2.
-            </p>
-
-            {/* Sub-feature boxes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-1.5">
-                <div className="text-xs font-bold text-blue-700 flex items-center space-x-1.5">
-                  <Zap className="w-4 h-4" />
-                  <span>4 Tipe Soal Terstandarisasi</span>
-                </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Pilihan tunggal OMR, pilihan majemuk ceklis, isian singkat matematis, dan esai penalaran analitis.
-                </p>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-1.5">
-                <div className="text-xs font-bold text-emerald-700 flex items-center space-x-1.5">
-                  <Award className="w-4 h-4" />
-                  <span>Rasionalisasi Passing Grade</span>
-                </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Evaluasi skor capaian terhadap batas minimal jurusan PTN dengan visualisasi radar chart 7 subtest.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <span className="text-xs text-slate-500">
-                Akses demo: Siswa Raihan Pratama (Aktif)
-              </span>
-              <Link
-                href="/exam/to-utbk-national-01"
-                onClick={() => switchRole('siswa')}
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition"
-              >
-                <span>Buka Simulasi CBT</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Secondary Stack (4 Cols): Tentor & Admin Portals */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Tentor Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-card hover:shadow-card-hover transition">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">
-                    <FileCheck2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900">
-                      Portal Tentor
-                    </h4>
-                    <span className="text-[11px] text-slate-500">Koreksi & Bank Soal</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Antrean koreksi berkas jawaban esai siswa dengan rubrik slider (0–100) dan editor visual matematika KaTeX.
-              </p>
-              <div className="pt-1">
-                <Link
-                  href="/tentor/grading"
-                  onClick={() => switchRole('tentor')}
-                  className="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 hover:text-amber-800"
-                >
-                  <span>Buka Koreksi Esai</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Admin Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-card hover:shadow-card-hover transition">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-900 flex items-center justify-center font-bold text-xs">
-                    <Users className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900">
-                      Portal Admin & Owner
-                    </h4>
-                    <span className="text-[11px] text-slate-500">Kasir SPP & Roster</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Import massal data pembayaran & siswa (.xlsx), monitoring kapasitas kelas, dan pencatatan kuitansi resmi.
-              </p>
-              <div className="pt-1">
-                <Link
-                  href="/admin/payments"
-                  onClick={() => switchRole('admin')}
-                  className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-900 hover:text-blue-600"
-                >
-                  <span>Buka Modul Kasir SPP</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+      <section className="border-y border-slate-100 bg-[#F8FAFC]"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[1fr_1.4fr] lg:py-16"><div><p className="eu-eyebrow">BELAJAR LEBIH TERARAH</p><h2 className="mt-3 text-2xl font-bold leading-snug sm:text-3xl">Bukan sekadar selesai.<br />Pahami progresmu.</h2><p className="mt-4 max-w-md text-sm leading-7 text-slate-500">Jadikan hasil latihan sebagai bekal untuk menentukan langkah belajar berikutnya.</p></div><div className="grid gap-4 sm:grid-cols-2"><Link href="/drilling" className="eu-feature-card"><BookOpen className="mb-5 text-[#244676]" size={25} /><h3 className="font-bold">Latihan sesuai kebutuhan</h3><p className="mt-2 text-sm leading-6 text-slate-500">Ulangi materi dan pelajari pembahasannya sesuai ritme belajarmu.</p><span className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#244676]">Mulai latihan<ArrowRight size={16} /></span></Link><Link href="/exam/to-utbk-national-01/result" className="eu-feature-card"><Target className="mb-5 text-[#A67522]" size={25} /><h3 className="font-bold">Kenali target kampusmu</h3><p className="mt-2 text-sm leading-6 text-slate-500">Bandingkan hasil tryout dengan target program studi pilihanmu.</p><span className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#244676]">Lihat contoh hasil<ArrowRight size={16} /></span></Link></div></div></section>
+      <section id="pendaftaran" className="scroll-mt-28 mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:py-20">
+        <div className="max-w-2xl"><p className="eu-eyebrow">CARA BERGABUNG</p><h2 className="mt-3 text-2xl font-bold sm:text-3xl">Kenalan dulu. Lalu mulai perjalananmu.</h2><p className="mt-4 text-sm leading-7 text-slate-500">Kamu dapat mengajukan pendaftaran sendiri atau dibantu admin. Setiap pengajuan ditinjau agar data dan pilihan kelas sesuai.</p></div>
+        <ol className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{registrationSteps.map((step, index) => <li key={step.title} className="rounded-2xl border border-slate-200 p-6"><span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF1CD] text-sm font-bold text-[#93641E]">{String(index + 1).padStart(2, '0')}</span><h3 className="mt-5 font-bold">{step.title}</h3><p className="mt-3 text-sm leading-7 text-slate-500">{step.text}</p></li>)}</ol>
+        <div className="mt-7 rounded-2xl bg-[#F1F5FA] p-5 text-sm leading-7 text-slate-600"><strong className="text-[#244676]">Sudah menjadi siswa Euclide?</strong> Daftar ulang menggunakan akun dan Kode Siswa yang sama. Tidak perlu membuat identitas baru.</div>
       </section>
-
-      {/* 4. Tryout Booklet Catalog Section */}
-      <section className="py-16 bg-white border-t border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-8">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                Katalog Naskah Simulasi CBT
-              </h2>
-              <p className="text-sm text-slate-600 mt-1">
-                Paket tryout UTBK terstandarisasi dengan 7 subtest resmi SNBT.
-              </p>
-            </div>
-            <Link
-              href="/tryouts"
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center space-x-1"
-            >
-              <span>Lihat Semua Paket ({tryouts.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tryouts.map((to) => (
-              <div
-                key={to.id}
-                className="bg-slate-50/60 rounded-2xl border border-slate-200/80 p-6 flex flex-col justify-between hover:border-blue-500/50 hover:bg-white hover:shadow-card-hover transition-all duration-200"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-mono font-bold text-slate-800 bg-white px-2.5 py-1 rounded-md border border-slate-200">
-                      {to.code}
-                    </span>
-                    <span className="text-xs font-semibold text-amber-800 bg-amber-100/70 px-2.5 py-0.5 rounded-full">
-                      {to.badge || 'Terbuka'}
-                    </span>
-                  </div>
-
-                  <h3 className="font-bold text-base text-slate-900 mb-2 leading-snug">
-                    {to.title}
-                  </h3>
-                  <p className="text-xs text-slate-600 mb-5 line-clamp-2">
-                    {to.description}
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs font-mono bg-white p-3 rounded-xl border border-slate-200/70 mb-5">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block uppercase">Durasi Total</span>
-                      <span className="font-bold text-slate-800">{to.totalDurationMinutes} Menit</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block uppercase">Jumlah Subtest</span>
-                      <span className="font-bold text-slate-800">{to.subtests.length} Subtest</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-200/60 flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium">
-                    {to.participantsCount.toLocaleString('id-ID')} Peserta
-                  </span>
-                  <Link
-                    href={`/exam/${to.id}`}
-                    className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg transition"
-                  >
-                    <span>Mulai Ujian</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <section id="faq" className="scroll-mt-28 border-t border-slate-100 bg-[#F8FAFC]"><div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-8 lg:grid-cols-[1fr_1.5fr] lg:py-20"><div><p className="eu-eyebrow">SEBELUM MULAI</p><h2 className="mt-3 text-2xl font-bold sm:text-3xl">Yang sering ditanyakan.</h2><p className="mt-4 max-w-sm text-sm leading-7 text-slate-500">Kenali alur pendaftaran dan ruang belajarmu di Euclide.</p></div><div className="space-y-3">{faqs.map(faq => <details key={faq.question} className="group rounded-2xl border border-slate-200 bg-white p-5"><summary className="cursor-pointer text-sm font-bold leading-6 text-slate-800 marker:text-[#C69336]">{faq.question}</summary><p className="mt-4 text-sm leading-7 text-slate-500">{faq.answer}</p></details>)}</div></div></section>
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8"><div className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-[#FFF5DF] px-7 py-9 sm:px-10 md:flex-row md:items-center"><div><p className="text-xs font-bold tracking-widest text-[#956A22]">LANJUTKAN LANGKAHMU</p><h2 className="mt-2 text-2xl font-bold">Sudah punya akun siswa?</h2><p className="mt-2 text-sm leading-6 text-slate-600">Masuk untuk melanjutkan kegiatan belajar bersama Euclide.</p></div><Link href="/login" className="eu-button-primary shrink-0">Masuk ke akun<ArrowRight size={17} /></Link></div></section>
     </div>
   );
 }

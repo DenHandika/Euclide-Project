@@ -1,199 +1,366 @@
 'use client';
+import Pagination from '@/components/common/Pagination';
+import usePagination from '@/hooks/usePagination';
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { User, UserStatus } from '@/types';
+import { UserStatus } from '@/types';
 import StudentBulkImportModal from '@/components/admin/StudentBulkImportModal';
+import { AccountStatusBadge } from '@/components/common/StatusBadge';
 import {
-  Users,
   Search,
-  CheckCircle2,
-  AlertTriangle,
-  GraduationCap,
-  Filter,
-  FileSpreadsheet,
   Upload,
+  Users,
+  UserCheck,
+  GraduationCap,
+  ChevronDown,
 } from 'lucide-react';
+
+const statusFilters = [
+  { id: 'all', label: 'Semua' },
+  { id: 'active', label: 'Aktif' },
+  { id: 'nonactive', label: 'Nonaktif' },
+  { id: 'suspended', label: 'SPP tertunggak' },
+  { id: 'graduated', label: 'Lulus' },
+  { id: 'leave', label: 'Cuti' },
+];
+const statusOptions: { value: UserStatus; label: string }[] = [
+  { value: 'active', label: 'Aktif' },
+  { value: 'nonactive', label: 'Nonaktif' },
+  { value: 'suspended', label: 'SPP tertunggak' },
+  { value: 'graduated', label: 'Lulus' },
+  { value: 'leave', label: 'Cuti' },
+];
 
 export default function AdminStudentsPage() {
   const { students, toggleStudentStatus, batches } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-
-  const filteredStudents = students.filter((stu) => {
-    const matchesSearch =
-      stu.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (stu.nis && stu.nis.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (stu.targetPTN1 && stu.targetPTN1.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesStatus = statusFilter === 'all' || stu.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  const filteredStudents = students.filter((student) => {
+    const matches =
+      `${student.name} ${student.nis ?? ''} ${student.email} ${student.targetPTN1 ?? ''}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase().trim());
+    return (
+      matches && (statusFilter === 'all' || student.status === statusFilter)
+    );
   });
+  const studentsPagination = usePagination(
+    filteredStudents,
+    5,
+    searchTerm + '|' + statusFilter
+  );
 
-  const getBatchName = (batchId?: string) => {
-    if (!batchId) return 'Reguler SNBT';
-    const b = batches.find((x) => x.id === batchId);
-    return b ? b.name : 'Reguler SNBT';
-  };
+  const batchName = (id?: string) =>
+    batches.find((batch) => batch.id === id)?.name ?? 'Belum ditempatkan';
+  const initial = (name: string) =>
+    name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase();
+  const statusSelect = (id: string, name: string, status: UserStatus) => (
+    <div className="relative inline-block">
+      <select
+        aria-label={`Ubah status ${name}`}
+        value={status}
+        onChange={(event) =>
+          toggleStudentStatus(id, event.target.value as UserStatus)
+        }
+        className="min-h-11 w-44 appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-9 text-xs font-medium text-slate-600 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+      >
+        {statusOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        size={14}
+        className="pointer-events-none absolute right-3 top-3.5 text-slate-400"
+      />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#13224E] pb-4">
+    <div className="min-h-screen bg-[#F6F8FC] py-8 font-sans text-slate-700 sm:py-10">
+      <div className="mx-auto w-full space-y-6 px-5 sm:px-8">
+        <header className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <span className="font-mono text-[10px] font-bold uppercase text-[#1B3B8C] block mb-1">
-              ROSTER PESERTA & AKSES CBT BIMBEL
-            </span>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
-              Daftar Siswa & Pengendalian Status Akun
+            <p className="mb-2 text-sm font-medium text-slate-500">
+              Ruang pengelola
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-[#213B64] sm:text-4xl">
+              Siswa bimbingan
             </h1>
-            <p className="text-xs sm:text-sm text-[#637096] mt-0.5">
-              Basis data 600–700 siswa bimbingan, kendali status keaktifan peserta, dan arsip riwayat alumni.
+            <p className="mt-3 text-sm leading-7 text-slate-500">
+              Kenali siswa, pantau kelasnya, dan kelola akses belajarnya.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#2E578F] px-5 text-sm font-semibold text-white hover:bg-[#234573]"
+          >
+            <Upload size={17} />
+            Impor siswa
+          </button>
+        </header>
+
+        <dl className="flex flex-wrap gap-x-8 gap-y-4 rounded-2xl bg-white px-5 py-5 sm:gap-x-14 sm:px-6">
+          {[
+            {
+              label: 'Total siswa',
+              value: students.length,
+              Icon: Users,
+              color: 'bg-blue-50 text-blue-600',
+            },
+            {
+              label: 'Siswa aktif',
+              value: students.filter((student) => student.status === 'active')
+                .length,
+              Icon: UserCheck,
+              color: 'bg-emerald-50 text-emerald-700',
+            },
+            {
+              label: 'Alumni',
+              value: students.filter(
+                (student) => student.status === 'graduated'
+              ).length,
+              Icon: GraduationCap,
+              color: 'bg-violet-50 text-violet-600',
+            },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-3">
+              <span
+                className={`flex h-11 w-11 items-center justify-center rounded-2xl ${item.color}`}
+              >
+                <item.Icon size={21} strokeWidth={1.7} />
+              </span>
+              <div>
+                <dt className="text-xs text-slate-500">{item.label}</dt>
+                <dd className="mt-1 text-xl font-bold text-[#263D5F]">
+                  {item.value}
+                </dd>
+              </div>
+            </div>
+          ))}
+        </dl>
+
+        <section
+          aria-labelledby="student-list-title"
+          className="overflow-hidden rounded-[24px] bg-white shadow-[0_3px_24px_-12px_rgba(38,62,100,0.12)]"
+        >
+          <div className="flex flex-col justify-between gap-5 border-b border-slate-100 p-5 xl:flex-row xl:items-center sm:px-6">
+            <div
+              className="flex flex-wrap items-center gap-2"
+              role="group"
+              aria-label="Filter status siswa"
+            >
+              {statusFilters.map((filter) => {
+                const count =
+                  filter.id === 'all'
+                    ? students.length
+                    : students.filter((student) => student.status === filter.id)
+                        .length;
+                return (
+                  <button
+                    key={filter.id}
+                    aria-pressed={statusFilter === filter.id}
+                    onClick={() => setStatusFilter(filter.id)}
+                    className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-3.5 text-xs font-semibold transition ${statusFilter === filter.id ? 'bg-[#EDF2FA] text-[#315D97]' : 'text-slate-500 hover:bg-slate-50'}`}
+                  >
+                    {filter.label}
+                    <span
+                      className={`rounded-md px-1.5 py-0.5 text-[11px] ${statusFilter === filter.id ? 'bg-white text-[#315D97]' : 'bg-slate-100 text-slate-500'}`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <label className="flex w-full items-center gap-2.5 rounded-xl bg-[#F6F8FC] px-3.5 focus-within:ring-2 focus-within:ring-blue-100 xl:w-80">
+              <Search size={17} className="shrink-0 text-slate-500" />
+              <span className="sr-only">
+                Cari nama, Kode Siswa, email, atau PTN
+              </span>
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Cari nama, kode, email, atau PTN…"
+                className="min-h-11 w-full min-w-0 bg-transparent text-sm outline-none"
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 sm:px-6">
+            <h2
+              id="student-list-title"
+              className="text-sm font-bold text-[#263D5F]"
+            >
+              Daftar siswa
+            </h2>
+            <p aria-live="polite" className="text-xs text-slate-500">
+              {filteredStudents.length} siswa ditampilkan
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 font-mono text-xs">
-            <button
-              onClick={() => setIsImportModalOpen(true)}
-              className="inline-flex items-center space-x-1.5 bg-[#1B3B8C] hover:bg-[#274DB8] text-white px-3.5 py-2 transition font-bold"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              <span>Upload Data Siswa (.xlsx)</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Filter & Search Bar */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-4 flex flex-col sm:flex-row gap-3 items-center justify-between">
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-[#637096] absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder="Cari NIS, nama, atau target PTN..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-xs text-[#13224E] font-mono focus:outline-none focus:border-[#13224E]"
-            />
-          </div>
-
-          <div className="flex items-center space-x-2 font-mono text-xs w-full sm:w-auto overflow-x-auto">
-            <Filter className="w-3.5 h-3.5 text-[#637096] shrink-0" />
-            {[
-              { id: 'all', label: `Semua (${students.length})` },
-              { id: 'active', label: 'Aktif' },
-              { id: 'nonactive', label: 'Nonaktif' },
-              { id: 'suspended', label: 'SPP Overdue' },
-              { id: 'graduated', label: 'Alumni (Lulus)' },
-              { id: 'leave', label: 'Cuti' },
-            ].map((st) => (
-              <button
-                key={st.id}
-                onClick={() => setStatusFilter(st.id)}
-                className={`px-2.5 py-1 border whitespace-nowrap transition ${
-                  statusFilter === st.id
-                    ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
-                    : 'bg-[#FAFAF7] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
-                }`}
-              >
-                {st.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Students Table */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-2 font-mono text-xs">
-            <span>Menampilkan {filteredStudents.length} Siswa Terdaftar</span>
-            <span className="text-[10px] text-[#637096]">Retensi Data: Tersimpan Selamanya (Read-Only)</span>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-sans">
-              <thead>
-                <tr className="border-b border-[#13224E] font-mono text-[10px] text-[#637096] uppercase tracking-wider">
-                  <th className="pb-2 px-2">NIS</th>
-                  <th className="pb-2 px-2">Nama Siswa</th>
-                  <th className="pb-2 px-2">Batch Kelas</th>
-                  <th className="pb-2 px-2">Target PTN & Prodi</th>
-                  <th className="pb-2 px-2">No. WhatsApp</th>
-                  <th className="pb-2 px-2">Status Akun</th>
-                  <th className="pb-2 px-2 text-right">Ubah Status</th>
+          <div className="hidden overflow-x-auto lg:block">
+            <table className="w-full min-w-[1340px] text-left text-sm">
+              <thead className="bg-[#F8FAFD] text-xs font-medium text-slate-500">
+                <tr>
+                  <th scope="col" className="w-16 px-6 py-3.5 font-medium">
+                    No.
+                  </th>
+                  <th className="px-4 py-3.5 font-medium whitespace-nowrap">
+                    Kode Siswa
+                  </th>
+                  <th scope="col" className="px-6 py-3.5 font-medium">
+                    Siswa
+                  </th>
+                  <th className="px-4 py-3.5 font-medium">Kelas bimbingan</th>
+                  <th className="px-4 py-3.5 font-medium">
+                    Target kampus & prodi
+                  </th>
+                  <th className="px-4 py-3.5 font-medium whitespace-nowrap">
+                    WhatsApp
+                  </th>
+                  <th className="px-4 py-3.5 font-medium whitespace-nowrap">
+                    Status akun
+                  </th>
+                  <th className="px-6 py-3.5 text-right font-medium whitespace-nowrap">
+                    Kelola status
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E4E4DC]">
-                {filteredStudents.map((stu) => (
-                  <tr key={stu.id} className="hover:bg-[#FAFAF7] transition">
-                    <td className="py-3 px-2 font-mono font-semibold text-[#13224E]">{stu.nis || 'EUC-2026-XXXX'}</td>
-                    <td className="py-3 px-2">
-                      <div className="font-semibold text-[#13224E]">{stu.name}</div>
-                      <div className="text-[10px] text-[#637096] font-mono">{stu.email}</div>
+              <tbody className="divide-y divide-slate-100">
+                {studentsPagination.pageItems.map((student, index) => (
+                  <tr
+                    key={student.id}
+                    className="transition hover:bg-[#FAFBFE]"
+                  >
+                    <td className="px-6 py-5 text-xs tabular-nums text-slate-500">
+                      {studentsPagination.offset + index + 1}
                     </td>
-                    <td className="py-3 px-2 font-mono text-[#1B3B8C] font-semibold">
-                      {getBatchName(stu.batchId)}
+                    <td className="whitespace-nowrap px-4 py-5 text-xs font-medium tabular-nums text-slate-500">
+                      {student.nis || 'Belum tersedia'}
                     </td>
-                    <td className="py-3 px-2">
-                      <div className="font-serif font-bold text-[#13224E]">{stu.targetPTN1 || 'Universitas Indonesia (UI)'}</div>
-                      <div className="text-[10px] text-[#637096] font-mono">{stu.targetProdi1 || 'Pendidikan Dokter'}</div>
+                    <td className="min-w-[280px] px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <span
+                          aria-hidden="true"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#EDF2FA] text-xs font-bold text-[#6686B0]"
+                        >
+                          {initial(student.name)}
+                        </span>
+                        <div>
+                          <p className="font-semibold text-[#263D5F]">
+                            {student.name}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {student.email}
+                          </p>
+                        </div>
+                      </div>
                     </td>
-                    <td className="py-3 px-2 font-mono text-[#637096] text-[11px]">
-                      {stu.phone || '081234567890'}
+                    <td className="min-w-[200px] max-w-[260px] px-4 py-5 text-xs leading-6 text-[#526B8C]">
+                      {batchName(student.batchId)}
                     </td>
-                    <td className="py-3 px-2 font-mono text-[10px]">
-                      <span
-                        className={`inline-block px-2 py-0.5 font-semibold ${
-                          stu.status === 'active'
-                            ? 'bg-[#EAF7F0] text-[#126340] border border-[#1B8A5A]/30'
-                            : stu.status === 'suspended'
-                            ? 'bg-[#FDECEB] text-[#A6211A] border border-[#D0342C]/30'
-                            : stu.status === 'graduated'
-                            ? 'bg-[#F3F3ED] text-[#637096] border border-[#CECEC2]'
-                            : stu.status === 'leave'
-                            ? 'bg-[#FDF3E3] text-[#C8831A] border border-[#EFA93B]/40'
-                            : 'bg-[#F3F3ED] text-[#9EABC7] border border-[#CECEC2]'
-                        }`}
-                      >
-                        {stu.status === 'active'
-                          ? 'Aktif'
-                          : stu.status === 'suspended'
-                          ? 'SPP Overdue'
-                          : stu.status === 'graduated'
-                          ? 'Alumni (Lulus)'
-                          : stu.status === 'leave'
-                          ? 'Cuti'
-                          : 'Nonaktif'}
-                      </span>
+                    <td className="min-w-[220px] max-w-[300px] px-4 py-5">
+                      <p className="text-xs font-semibold leading-6 text-[#405C80]">
+                        {student.targetPTN1 || 'Belum dipilih'}
+                      </p>
+                      <p className="mt-0.5 text-xs leading-6 text-slate-500">
+                        {student.targetProdi1 || 'Belum dipilih'}
+                      </p>
                     </td>
-                    <td className="py-3 px-2 text-right font-mono text-[10px]">
-                      <select
-                        value={stu.status}
-                        onChange={(e) =>
-                          toggleStudentStatus(stu.id, e.target.value as UserStatus)
-                        }
-                        className="bg-[#FAFAF7] border border-[#CECEC2] px-2 py-1 text-xs text-[#13224E] focus:outline-none focus:border-[#13224E]"
-                      >
-                        <option value="active">Aktif (Bisa CBT)</option>
-                        <option value="nonactive">Nonaktif</option>
-                        <option value="suspended">SPP Overdue (Blokir)</option>
-                        <option value="graduated">Alumni (Lulus)</option>
-                        <option value="leave">Cuti</option>
-                      </select>
+                    <td className="whitespace-nowrap px-4 py-5 text-xs tabular-nums text-slate-500">
+                      {student.phone || 'Belum tersedia'}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-5">
+                      <AccountStatusBadge status={student.status} />
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      {statusSelect(student.id, student.name, student.status)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
 
-        {/* Bulk Import Modal */}
-        <StudentBulkImportModal
-          isOpen={isImportModalOpen}
-          onClose={() => setIsImportModalOpen(false)}
-        />
+          <div className="divide-y divide-slate-100 lg:hidden">
+            {studentsPagination.pageItems.map((student, index) => (
+              <article key={student.id} className="p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="mb-2 text-xs font-medium tabular-nums text-slate-500">
+                      No. {studentsPagination.offset + index + 1} ·{' '}
+                      {student.nis || 'Kode belum tersedia'}
+                    </p>
+                    <h3 className="text-sm font-bold text-[#263D5F]">
+                      {student.name}
+                    </h3>
+                  </div>
+                  <AccountStatusBadge status={student.status} />
+                </div>
+                <p className="mt-4 text-xs leading-6 text-slate-500">
+                  {batchName(student.batchId)}
+                </p>
+                <p className="mt-1 text-xs leading-6 text-[#526B8C]">
+                  {student.targetPTN1 || 'Target belum dipilih'}
+                </p>
+                <p className="mt-1 text-xs leading-6 text-slate-500">
+                  {student.targetProdi1}
+                </p>
+                <p className="mt-1 break-all text-xs leading-6 text-slate-500">
+                  {student.email}
+                </p>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-slate-500">
+                    {student.phone || 'Nomor belum tersedia'}
+                  </p>
+                  {statusSelect(student.id, student.name, student.status)}
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="px-5 sm:px-6">
+            <Pagination pagination={studentsPagination} label="siswa" />
+          </div>
+          {!filteredStudents.length && (
+            <div className="px-5 py-14 text-center">
+              <Search size={27} className="mx-auto text-slate-400" />
+              <h3 className="mt-4 font-bold text-[#263D5F]">
+                Siswa belum ditemukan
+              </h3>
+              <p className="mt-2 text-sm text-slate-500">
+                Coba kata kunci atau filter status lain.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setStatusFilter('all');
+                }}
+                className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"
+              >
+                Tampilkan semua siswa
+              </button>
+            </div>
+          )}
+        </section>
+        <p className="text-xs leading-6 text-slate-500">
+          Data contoh untuk uji frontend. Pengelolaan siswa belum terhubung ke
+          server.
+        </p>
       </div>
+      <StudentBulkImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+      />
     </div>
   );
 }
-

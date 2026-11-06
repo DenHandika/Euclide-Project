@@ -60,55 +60,55 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
   ];
 
   return (
-    <div className="bg-[#FFFFFF] border border-[#13224E] p-2 space-y-2 font-sans">
+    <div className="bg-[#FFFFFF] border border-slate-200 p-2 space-y-2 font-sans rounded-xl">
       {/* Category Tabs & Info */}
-      <div className="flex items-center justify-between border-b border-[#E4E4DC] pb-1.5 text-xs">
-        <div className="flex items-center space-x-1 font-mono text-[11px]">
-          <span className="text-[#637096] text-[10px] font-bold mr-1 hidden sm:inline">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-1.5 text-xs">
+        <div className="flex items-center space-x-1 font-sans text-xs">
+          <span className="text-slate-500 text-xs font-bold mr-1 hidden sm:inline">
             TOOLBAR RUMUS:
           </span>
           <button
             type="button"
             onClick={() => setActiveCategory('aljabar')}
-            className={`px-2.5 py-0.5 border transition ${
-              activeCategory === 'aljabar'
-                ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
-                : 'bg-[#FAFAF7] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
-            }`}
+            className={`px-2.5 py-0.5 border transition rounded-xl min-h-9 min-w-9 ${
+              activeCategory === "aljabar"
+                ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
+                : "bg-[#F6F8FC] text-slate-500 border-slate-100 hover:border-slate-200"
+            } `}
           >
             Aljabar & Pecahan
           </button>
           <button
             type="button"
             onClick={() => setActiveCategory('kalkulus')}
-            className={`px-2.5 py-0.5 border transition ${
-              activeCategory === 'kalkulus'
-                ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
-                : 'bg-[#FAFAF7] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
-            }`}
+            className={`px-2.5 py-0.5 border transition rounded-xl min-h-9 min-w-9 ${
+              activeCategory === "kalkulus"
+                ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
+                : "bg-[#F6F8FC] text-slate-500 border-slate-100 hover:border-slate-200"
+            } `}
           >
             Kalkulus & Matriks
           </button>
           <button
             type="button"
             onClick={() => setActiveCategory('simbol')}
-            className={`px-2.5 py-0.5 border transition ${
-              activeCategory === 'simbol'
-                ? 'bg-[#13224E] text-white border-[#13224E] font-semibold'
-                : 'bg-[#FAFAF7] text-[#637096] border-[#E4E4DC] hover:border-[#CECEC2]'
-            }`}
+            className={`px-2.5 py-0.5 border transition rounded-xl min-h-9 min-w-9 ${
+              activeCategory === "simbol"
+                ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
+                : "bg-[#F6F8FC] text-slate-500 border-slate-100 hover:border-slate-200"
+            } `}
           >
             Simbol Sains
           </button>
         </div>
 
-        <span className="font-mono text-[10px] text-[#C8831A] font-medium hidden md:inline">
+        <span className="font-sans text-xs text-[#C8831A] font-medium hidden md:inline">
           Klik tombol untuk menyisipkan rumus otomatis
         </span>
       </div>
 
       {/* Button Row by Category */}
-      <div className="flex flex-wrap gap-1.5 items-center font-mono text-xs">
+      <div className="flex flex-wrap gap-1.5 items-center font-sans text-xs">
         {activeCategory === 'aljabar' && (
           <>
             {aljabarSnippets.map((item, idx) => (
@@ -117,10 +117,10 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
                 type="button"
                 title={item.title}
                 onClick={() => onInsert(`$${item.snippet}$`)}
-                className="px-2.5 py-1 bg-[#FAFAF7] hover:bg-[#1B3B8C] hover:text-white text-[#13224E] border border-[#CECEC2] text-xs font-bold transition flex items-center space-x-1"
+                className="px-2.5 py-1 bg-[#F6F8FC] hover:bg-[#234573] hover:text-white text-[#263D5F] border border-slate-200 text-xs font-bold transition flex items-center space-x-1 rounded-xl min-h-9 min-w-9"
               >
                 <span>{item.label}</span>
-                <span className="text-[9px] opacity-70 hidden lg:inline font-sans">({item.title})</span>
+                <span className="text-xs opacity-70 hidden lg:inline font-sans">({item.title})</span>
               </button>
             ))}
           </>
@@ -134,10 +134,10 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
                 type="button"
                 title={item.title}
                 onClick={() => onInsert(`$${item.snippet}$`)}
-                className="px-2.5 py-1 bg-[#FAFAF7] hover:bg-[#1B3B8C] hover:text-white text-[#13224E] border border-[#CECEC2] text-xs font-bold transition flex items-center space-x-1"
+                className="px-2.5 py-1 bg-[#F6F8FC] hover:bg-[#234573] hover:text-white text-[#263D5F] border border-slate-200 text-xs font-bold transition flex items-center space-x-1 rounded-xl min-h-9 min-w-9"
               >
                 <span>{item.label}</span>
-                <span className="text-[9px] opacity-70 hidden lg:inline font-sans">({item.title})</span>
+                <span className="text-xs opacity-70 hidden lg:inline font-sans">({item.title})</span>
               </button>
             ))}
           </>
@@ -150,7 +150,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
                 key={idx}
                 type="button"
                 onClick={() => onInsert(`$${item.snippet}$`)}
-                className="w-7 h-7 bg-[#FAFAF7] hover:bg-[#1B3B8C] hover:text-white text-[#13224E] border border-[#CECEC2] text-sm font-bold transition flex items-center justify-center"
+                className="w-7 h-7 bg-[#F6F8FC] hover:bg-[#234573] hover:text-white text-[#263D5F] border border-slate-200 text-sm font-bold transition flex items-center justify-center rounded-xl min-h-9 min-w-9"
               >
                 {item.label}
               </button>

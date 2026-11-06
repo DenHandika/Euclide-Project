@@ -23,7 +23,7 @@ export function RoleSwitcher() {
   const { currentRole, currentUser, switchRole, switchUser } = useApp();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (isExamScreen) {
+  if (isExamScreen || pathname !== '/login') {
     return null;
   }
 
@@ -77,18 +77,18 @@ export function RoleSwitcher() {
     <div className="fixed bottom-4 right-4 z-50 max-w-sm sm:max-w-md font-sans">
       {/* Expanded Control Box */}
       {isOpen && (
-        <div className="mb-2 bg-[#FFFFFF] border-2 border-[#13224E] p-4 rounded-sm animate-in fade-in slide-in-from-bottom-2">
+        <div className="mb-2 bg-[#FFFFFF] border border-slate-200 p-4 rounded-sm animate-in fade-in slide-in-from-bottom-2">
           {/* Header */}
-          <div className="flex items-center justify-between pb-2.5 border-b border-[#E4E4DC]">
+          <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-[#1B8A5A]" />
-              <span className="font-mono text-xs font-semibold text-[#13224E] uppercase tracking-wider">
+              <span className="font-sans text-xs font-semibold text-[#263D5F] uppercase tracking-wider">
                 Panel Pengalih Peran Demo
               </span>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-[#637096] hover:text-[#13224E] text-xs font-mono px-2 py-0.5 border border-[#E4E4DC] hover:bg-[#FAFAF7]"
+              className="text-slate-500 hover:text-[#263D5F] text-xs font-sans px-2 py-0.5 border border-slate-100 hover:bg-[#F6F8FC] rounded-xl min-h-11"
             >
               Tutup [✕]
             </button>
@@ -102,47 +102,47 @@ export function RoleSwitcher() {
                 <div
                   key={item.role}
                   onClick={() => switchRole(item.role)}
-                  className={`p-3 border cursor-pointer transition-all ${
+                  className={`p-3 border cursor-pointer transition-all rounded-xl ${
                     isCurrent
-                      ? 'border-[#1B3B8C] bg-[#FAFAF7]'
-                      : 'border-[#E4E4DC] hover:border-[#CECEC2] bg-[#FFFFFF]'
-                  }`}
+                      ? "border-[#1B3B8C] bg-[#F6F8FC]"
+                      : "border-slate-100 hover:border-slate-200 bg-[#FFFFFF]"
+                  } `}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2.5">
                       {/* OMR Bubble Selector */}
                       <span
-                        className={`w-5 h-5 rounded-full border flex items-center justify-center font-mono text-[10px] ${
+                        className={`w-5 h-5 rounded-full border flex items-center justify-center font-sans text-xs ${
                           isCurrent
-                            ? 'bg-[#1B3B8C] border-[#13224E] text-white font-bold'
-                            : 'border-[#CECEC2] bg-[#FFFFFF] text-[#637096]'
+                            ? "bg-[#1B3B8C] border-slate-200 text-white font-bold"
+                            : "border-slate-200 bg-[#FFFFFF] text-slate-500"
                         }`}
                       >
                         {isCurrent ? <Check className="w-3 h-3" /> : ''}
                       </span>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-serif font-bold text-sm text-[#13224E]">{item.title}</span>
+                          <span className="font-sans font-bold text-sm text-[#263D5F]">{item.title}</span>
                           {isCurrent && (
-                            <span className="text-[10px] font-mono bg-[#EFA93B]/25 text-[#13224E] font-semibold px-1.5 py-0.2">
+                            <span className="text-xs font-sans bg-[#EFA93B]/25 text-[#263D5F] font-semibold px-1.5 py-1 rounded-full">
                               Aktif
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-[#637096] leading-tight mt-0.5">{item.description}</p>
+                        <p className="text-xs text-slate-500 leading-tight mt-0.5">{item.description}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick links */}
                   {isCurrent && (
-                    <div className="mt-2.5 pt-2 border-t border-[#E4E4DC] flex flex-wrap gap-1.5">
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 flex flex-wrap gap-1.5">
                       {item.quickLinks.map((link) => (
                         <Link
                           key={link.href}
                           href={link.href}
                           onClick={() => setIsOpen(false)}
-                          className="inline-flex items-center space-x-1 text-[10px] font-mono bg-[#FFFFFF] text-[#1B3B8C] hover:bg-[#1B3B8C] hover:text-white px-2 py-0.5 border border-[#1B3B8C]/40 transition"
+                          className="inline-flex items-center space-x-1 text-xs font-sans bg-[#FFFFFF] text-[#1B3B8C] hover:bg-[#234573] hover:text-white px-2 py-0.5 border border-[#1B3B8C]/40 transition rounded-xl"
                         >
                           <span>{link.label}</span>
                           <ExternalLink className="w-2.5 h-2.5" />
@@ -156,12 +156,12 @@ export function RoleSwitcher() {
           </div>
 
           {/* Student Account Status Simulators */}
-          <div className="mt-3 pt-2.5 border-t border-[#E4E4DC]">
-            <div className="text-[10px] font-mono text-[#637096] uppercase tracking-wider mb-1.5 flex items-center justify-between">
+          <div className="mt-3 pt-2.5 border-t border-slate-100">
+            <div className="text-xs font-sans text-slate-500 uppercase tracking-wider mb-1.5 flex items-center justify-between">
               <span>Uji Status Akun Siswa:</span>
               <span className="text-[#C8831A]">Cek Banner Akses</span>
             </div>
-            <div className="grid grid-cols-3 gap-1.5 font-mono text-[10px]">
+            <div className="grid grid-cols-3 gap-1.5 font-sans text-xs">
               {studentAccounts.slice(0, 3).map((stu) => {
                 const isSelected = currentUser.id === stu.id;
                 let statusLabel = 'Aktif';
@@ -178,12 +178,12 @@ export function RoleSwitcher() {
                   <button
                     key={stu.id}
                     onClick={() => switchUser(stu)}
-                    className={`p-1.5 text-left border transition ${
-                      isSelected ? 'border-[#13224E] bg-[#FAFAF7] font-bold' : borderCol
-                    }`}
+                    className={`p-1.5 text-left border transition rounded-xl min-h-11 ${
+                      isSelected ? "border-slate-200 bg-[#F6F8FC] font-bold" : borderCol
+                    } `}
                   >
                     <div className="truncate font-sans font-medium">{stu.name.split(' ')[0]}</div>
-                    <div className="text-[9px] opacity-75">{statusLabel}</div>
+                    <div className="text-xs opacity-75">{statusLabel}</div>
                   </button>
                 );
               })}
@@ -195,7 +195,7 @@ export function RoleSwitcher() {
       {/* Floating Pill Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 bg-[#13224E] hover:bg-[#1B3B8C] text-white px-3.5 py-2 border border-[#13224E] transition text-xs font-mono"
+        className="flex items-center space-x-2 bg-[#2E578F] hover:bg-[#234573] text-white px-3.5 py-2 border border-slate-200 transition text-xs font-sans rounded-xl min-h-11"
       >
         <span className="w-2 h-2 rounded-full bg-[#EFA93B]" />
         <span>Peran: <strong className="text-[#EFA93B] uppercase">{currentRole}</strong></span>

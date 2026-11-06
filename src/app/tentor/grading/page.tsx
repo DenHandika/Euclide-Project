@@ -1,242 +1,549 @@
 'use client';
+import Pagination from '@/components/common/Pagination';
+import usePagination from '@/hooks/usePagination';
 
-import React, { useState } from 'react';
+import StatusBadge from '@/components/common/StatusBadge';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/context/AppContext';
 import { EssaySubmission } from '@/types';
 import MathRenderer from '@/components/common/MathRenderer';
 import {
-  FileCheck2,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  Award,
+  ArrowRight,
+  BookOpen,
+  Check,
+  CheckCheck,
   ChevronRight,
+  Clock3,
+  FilePenLine,
+  MessageCircle,
+  Search,
   X,
 } from 'lucide-react';
 
+type Filter = 'pending' | 'graded' | 'all';
+const filters: { id: Filter; label: string }[] = [
+  { id: 'pending', label: 'Perlu dikoreksi' },
+  { id: 'graded', label: 'Sudah dinilai' },
+  { id: 'all', label: 'Semua jawaban' },
+];
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+
 export default function TentorGradingPage() {
-  const { essaySubmissions, gradeEssay, showToast } = useApp();
-  const [selectedEssay, setSelectedEssay] = useState<EssaySubmission | null>(null);
-  const [scoreInput, setScoreInput] = useState<number>(85);
-  const [feedbackInput, setFeedbackInput] = useState<string>(
-    'Struktur penalaran logis sudah sangat kuat. Pertajam estimasi galat numerik pada pembuktian akhir.'
+  const { essaySubmissions, gradeEssay, showToast, currentUser } = useApp();
+  const [selectedEssay, setSelectedEssay] = useState<EssaySubmission | null>(
+    null
   );
+  const [scoreInput, setScoreInput] = useState('');
+  const [feedbackInput, setFeedbackInput] = useState('');
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<Filter>('pending');
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
-  const handleOpenGrading = (essay: EssaySubmission) => {
-    setSelectedEssay(essay);
-    setScoreInput(essay.score ?? 85);
-    setFeedbackInput(
-      essay.feedback ??
-        'Struktur penalaran logis sudah sangat kuat. Pertajam estimasi galat numerik pada pembuktian akhir.'
-    );
-  };
-
-  const handleSaveGrade = (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
     if (!selectedEssay) return;
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      dialog?.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedEssay]);
 
-    gradeEssay(selectedEssay.id, scoreInput, feedbackInput);
+  const openGrading = (essay: EssaySubmission) => {
+    setSelectedEssay(essay);
+    setScoreInput(essay.score === undefined ? '' : String(essay.score));
+    setFeedbackInput(essay.feedback ?? '');
+  };
+  const saveGrade = (event: React.FormEvent) => {
+    event.preventDefault();
+    const score = Number(scoreInput);
+    if (
+      !selectedEssay ||
+      !scoreInput.trim() ||
+      !Number.isInteger(score) ||
+      score < 0 ||
+      score > 100
+    ) {
+      showToast('Isi nilai antara 0 dan 100.', 'warning');
+      return;
+    }
+    if (!feedbackInput.trim()) {
+      showToast('Tambahkan umpan balik untuk siswa.', 'warning');
+      return;
+    }
+    gradeEssay(selectedEssay.id, score, feedbackInput.trim());
     setSelectedEssay(null);
   };
 
-  const pendingList = essaySubmissions.filter((e) => !e.isGraded);
-  const gradedList = essaySubmissions.filter((e) => e.isGraded);
+  const pending = essaySubmissions.filter((essay) => !essay.isGraded);
+  const graded = essaySubmissions.filter((essay) => essay.isGraded);
+  const progress = essaySubmissions.length
+    ? Math.round((graded.length / essaySubmissions.length) * 100)
+    : 0;
+  const filtered = essaySubmissions.filter((essay) => {
+    const matchesFilter =
+      filter === 'all' ||
+      (filter === 'graded' ? essay.isGraded : !essay.isGraded);
+    const text = `${essay.studentName} ${essay.studentNis} ${essay.tryoutTitle} ${essay.subtestId.replace(/_/g, ' ')}`;
+    return (
+      matchesFilter && text.toLowerCase().includes(query.toLowerCase().trim())
+    );
+  });
+  const essaysPagination = usePagination(filtered, 5, query + '|' + filter);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] py-8 font-sans text-[#13224E]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#13224E] pb-4">
+    <div className="min-h-screen bg-[#F6F8FC] pb-12 pt-7 font-sans text-slate-800 sm:pt-10">
+      <div className="mx-auto w-full space-y-7 px-5 sm:px-8">
+        <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span className="font-mono text-[10px] font-bold uppercase text-[#C8831A] block mb-1">
-              PORTAL PENILAIAN TENTOR
-            </span>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#13224E]">
-              Antrean Koreksi Esai Argumentatif Siswa
+            <p className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Ruang pengajar
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-[#213B64] sm:text-4xl">
+              Koreksi esai
             </h1>
-            <p className="text-xs sm:text-sm text-[#637096] mt-0.5">
-              Evaluasi lembar jawaban esai dengan rubrik penilaian manual (0–100) dan umpan balik personal.
+            <p className="mt-3 max-w-xl text-sm leading-7 text-slate-500">
+              Setiap umpan balik membantu siswa melangkah lebih jauh.
             </p>
           </div>
-
-          <div className="flex items-center space-x-3 font-mono text-xs">
-            <div className="bg-[#FFFFFF] border border-[#13224E] px-3 py-1.5">
-              <span className="text-[#637096] block text-[10px] uppercase">Menunggu Penilaian:</span>
-              <span className="font-bold text-[#C8831A] text-sm">{pendingList.length} Berkas</span>
-            </div>
-            <div className="bg-[#FFFFFF] border border-[#13224E] px-3 py-1.5">
-              <span className="text-[#637096] block text-[10px] uppercase">Telah Dinilai:</span>
-              <span className="font-bold text-[#1B8A5A] text-sm">{gradedList.length} Berkas</span>
-            </div>
+          <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-medium text-slate-500 shadow-sm">
+            <FilePenLine size={16} className="text-[#486FA7]" />
+            Penilaian manual · 0–100
           </div>
-        </div>
+        </header>
 
-        {/* Submissions Table Sheet */}
-        <div className="bg-[#FFFFFF] border border-[#13224E] p-6 space-y-4">
-          <div className="border-b border-[#E4E4DC] pb-3 flex items-center justify-between">
-            <h2 className="font-serif text-lg font-bold text-[#13224E]">
-              Daftar Berkas Jawaban Masuk
-            </h2>
-            <span className="font-mono text-xs text-[#637096]">
-              Total: {essaySubmissions.length} Berkas
-            </span>
-          </div>
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_310px]">
+          <div className="min-w-0 space-y-6">
+            <section
+              aria-label="Ringkasan koreksi"
+              className="relative overflow-hidden rounded-[28px] bg-[#E8EEF9] p-6 sm:p-8"
+            >
+              <div
+                aria-hidden="true"
+                className="absolute -right-10 -top-16 h-52 w-52 rounded-full border-[28px] border-white/30"
+              />
+              <div className="relative flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-[#52719A]">
+                    Halo, {currentUser.name.split(' ')[0]} 👋
+                  </p>
+                  <h2 className="mt-2 max-w-md text-xl font-bold leading-snug text-[#244676] sm:text-2xl">
+                    {pending.length
+                      ? 'Ada cerita belajar yang menunggu tanggapanmu.'
+                      : 'Semua jawaban sudah mendapat perhatianmu.'}
+                  </h2>
+                </div>
+                <div
+                  aria-hidden="true"
+                  className="hidden h-16 w-16 shrink-0 rotate-6 items-center justify-center rounded-2xl bg-white/80 text-[#5277A8] sm:flex"
+                >
+                  <BookOpen size={31} strokeWidth={1.5} />
+                </div>
+              </div>
+              <dl className="relative mt-7 flex flex-wrap gap-x-9 gap-y-4 sm:gap-x-12">
+                <div>
+                  <dt className="text-xs text-[#52719A]">Perlu dikoreksi</dt>
+                  <dd className="mt-1.5 flex items-center gap-2 text-3xl font-bold text-[#244676]">
+                    {pending.length}
+                    <span className="mt-1 rounded-full bg-white/70 p-1.5 text-[#A67932]">
+                      <Clock3 size={15} />
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-[#52719A]">Sudah dinilai</dt>
+                  <dd className="mt-1.5 flex items-center gap-2 text-3xl font-bold text-[#244676]">
+                    {graded.length}
+                    <span className="mt-1 rounded-full bg-white/70 p-1.5 text-[#34856D]">
+                      <CheckCheck size={15} />
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-[#52719A]">Total jawaban</dt>
+                  <dd className="mt-1.5 text-3xl font-bold text-[#244676]">
+                    {essaySubmissions.length}
+                  </dd>
+                </div>
+              </dl>
+            </section>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-sans">
-              <thead>
-                <tr className="border-b border-[#13224E] font-mono text-[10px] text-[#637096] uppercase tracking-wider">
-                  <th className="pb-2 px-2">Nama Siswa / NIS</th>
-                  <th className="pb-2 px-2">Subtest Ujian</th>
-                  <th className="pb-2 px-2">Waktu Pengumpulan</th>
-                  <th className="pb-2 px-2">Status Koreksi</th>
-                  <th className="pb-2 px-2">Skor Rubrik</th>
-                  <th className="pb-2 px-2 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E4E4DC]">
-                {essaySubmissions.map((sub) => (
-                  <tr key={sub.id} className="hover:bg-[#FAFAF7] transition">
-                    <td className="py-3 px-2">
-                      <div className="font-semibold text-[#13224E]">{sub.studentName}</div>
-                      <div className="text-[10px] font-mono text-[#637096]">{sub.studentNis}</div>
-                    </td>
-                    <td className="py-3 px-2">
-                      <div className="text-[#13224E] font-medium capitalize">{sub.subtestId.replace(/_/g, ' ')}</div>
-                      <div className="text-[10px] text-[#637096] truncate max-w-[200px]">{sub.questionText}</div>
-                    </td>
-                    <td className="py-3 px-2 font-mono text-[10px] text-[#637096]">{sub.submittedAt}</td>
-                    <td className="py-3 px-2 font-mono text-[10px]">
+            <section
+              aria-labelledby="submission-title"
+              className="overflow-hidden rounded-[24px] bg-white shadow-[0_3px_24px_-12px_rgba(38,62,100,0.12)]"
+            >
+              <div className="px-5 pt-6 sm:px-7">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2
+                    id="submission-title"
+                    className="text-lg font-bold text-[#253C5C]"
+                  >
+                    Jawaban siswa
+                  </h2>
+                  <span aria-live="polite" className="text-xs text-slate-500">
+                    {filtered.length} jawaban ditampilkan
+                  </span>
+                </div>
+                <label className="mt-5 flex items-center gap-3 rounded-xl border border-transparent bg-[#F6F8FC] px-4 focus-within:border-[#7796C2] focus-within:ring-2 focus-within:ring-blue-100">
+                  <Search size={18} className="shrink-0 text-slate-500" />
+                  <span className="sr-only">
+                    Cari siswa, kode siswa, atau tryout
+                  </span>
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Cari siswa atau tryout…"
+                    className="min-h-12 w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-500"
+                  />
+                </label>
+                <div
+                  role="group"
+                  aria-label="Filter status koreksi"
+                  className="mt-5 flex gap-1 overflow-x-auto border-b border-slate-100"
+                >
+                  {filters.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      aria-pressed={filter === item.id}
+                      onClick={() => setFilter(item.id)}
+                      className={`min-h-12 shrink-0 border-b-2 px-3 text-xs font-semibold transition sm:px-4 sm:text-sm ${filter === item.id ? 'border-[#426DA8] text-[#315D97]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                    >
+                      {item.label}
                       <span
-                        className={`inline-block px-1.5 py-0.2 font-semibold ${
-                          sub.isGraded
-                            ? 'bg-[#EAF7F0] text-[#126340] border border-[#1B8A5A]/30'
-                            : 'bg-[#FDF3E3] text-[#C8831A] border border-[#EFA93B]/40'
-                        }`}
+                        className={`ml-2 rounded-md px-1.5 py-0.5 text-[11px] ${filter === item.id ? 'bg-[#EDF2FA]' : 'bg-slate-50'}`}
                       >
-                        {sub.isGraded ? 'Selesai Dinilai' : 'Menunggu Koreksi'}
+                        {item.id === 'pending'
+                          ? pending.length
+                          : item.id === 'graded'
+                            ? graded.length
+                            : essaySubmissions.length}
                       </span>
-                    </td>
-                    <td className="py-3 px-2 font-mono font-bold text-sm">
-                      {sub.score !== undefined ? (
-                        <span className="text-[#1B8A5A]">{sub.score} / 100</span>
-                      ) : (
-                        <span className="text-[#9EABC7]">—</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-2 text-right font-mono">
-                      <button
-                        onClick={() => handleOpenGrading(sub)}
-                        className={`inline-flex items-center space-x-1 px-3 py-1 text-xs font-semibold transition ${
-                          sub.isGraded
-                            ? 'bg-[#FAFAF7] hover:bg-[#F3F3ED] text-[#13224E] border border-[#CECEC2]'
-                            : 'bg-[#13224E] hover:bg-[#1B3B8C] text-white'
-                        }`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <ul className="divide-y divide-slate-100/80">
+                {essaysPagination.pageItems.map((essay, index) => (
+                  <li
+                    key={essay.id}
+                    className="p-5 transition hover:bg-[#FAFBFE] sm:px-7 sm:py-6"
+                  >
+                    <div className="flex items-start gap-3.5">
+                      <div
+                        aria-hidden="true"
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${index % 2 ? 'bg-[#F3EDFA] text-[#8B6BA5]' : 'bg-[#ECF2FC] text-[#6183B2]'}`}
                       >
-                        <span>{sub.isGraded ? 'Ubah Nilai' : 'Beri Nilai'}</span>
-                        <ChevronRight className="w-3 h-3" />
-                      </button>
-                    </td>
-                  </tr>
+                        {initials(essay.studentName)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <h3 className="text-sm font-bold leading-6 text-[#263D5F]">
+                              {essay.studentName}
+                            </h3>
+                            <p className="mt-0.5 text-xs text-slate-500">
+                              {essay.studentNis}
+                            </p>
+                          </div>
+                          <StatusBadge
+                            tone={essay.isGraded ? 'success' : 'warning'}
+                          >
+                            {essay.isGraded
+                              ? 'Sudah dinilai'
+                              : 'Menunggu koreksi'}
+                          </StatusBadge>
+                        </div>
+                        <p className="mt-4 text-xs font-medium capitalize text-[#5A7294]">
+                          {essay.subtestId.replace(/_/g, ' ')}{' '}
+                          <span className="mx-1 text-slate-300">·</span> Soal{' '}
+                          {essay.questionNumber}
+                        </p>
+                        <p className="mt-1 text-xs leading-6 text-slate-500">
+                          {essay.tryoutTitle}
+                        </p>
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                          <p className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
+                            <Clock3 size={13} />
+                            {essay.submittedAt}
+                            <span className="mx-1 text-slate-200">|</span>
+                            {essay.wordCount} kata
+                          </p>
+                          <div className="flex items-center gap-4">
+                            {essay.isGraded && (
+                              <p className="text-lg font-bold text-[#2F745C]">
+                                {essay.score}
+                                <span className="ml-1 text-xs font-normal text-slate-500">
+                                  /100
+                                </span>
+                              </p>
+                            )}
+                            <button
+                              onClick={() => openGrading(essay)}
+                              aria-label={`${essay.isGraded ? 'Lihat penilaian' : 'Koreksi jawaban'} ${essay.studentName}`}
+                              className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-xs font-semibold transition ${essay.isGraded ? 'bg-[#F0F4FA] text-[#42668F] hover:bg-[#E5ECF6]' : 'bg-[#2E578F] text-white shadow-sm hover:bg-[#234573]'}`}
+                            >
+                              {essay.isGraded
+                                ? 'Lihat penilaian'
+                                : 'Koreksi jawaban'}
+                              <ChevronRight size={15} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
                 ))}
-              </tbody>
-            </table>
+              </ul>
+              <div className="px-5 sm:px-7">
+                <Pagination
+                  pagination={essaysPagination}
+                  label="jawaban esai"
+                />
+              </div>
+
+              {!filtered.length && (
+                <div className="px-6 py-14 text-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#F1F5FA] text-[#6D8EB7]">
+                    {filter === 'pending' && !query ? (
+                      <CheckCheck size={26} />
+                    ) : (
+                      <Search size={24} />
+                    )}
+                  </div>
+                  <h3 className="mt-4 text-sm font-bold">
+                    {query
+                      ? 'Belum ada jawaban yang cocok'
+                      : filter === 'pending'
+                        ? 'Antreanmu sudah selesai'
+                        : 'Belum ada jawaban di sini'}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    {query
+                      ? 'Coba nama siswa, Kode Siswa, atau judul tryout lain.'
+                      : 'Jawaban siswa akan muncul sesuai status koreksinya.'}
+                  </p>
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery('')}
+                      className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"
+                    >
+                      Hapus pencarian
+                    </button>
+                  )}
+                </div>
+              )}
+            </section>
           </div>
+
+          <aside className="space-y-5 lg:pt-1">
+            <section className="rounded-[24px] bg-white p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold text-[#263D5F]">
+                  Progres koreksi
+                </h2>
+                <CheckCheck size={18} className="text-[#73A48F]" />
+              </div>
+              <div className="mt-5 flex items-end justify-between">
+                <p className="text-3xl font-bold tracking-tight text-[#315D7B]">
+                  {progress}
+                  <span className="text-lg">%</span>
+                </p>
+                <p className="pb-1 text-xs text-slate-500">
+                  {graded.length} dari {essaySubmissions.length} jawaban
+                </p>
+              </div>
+              <div
+                role="progressbar"
+                aria-label="Progres koreksi esai"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                className="mt-3 h-2 overflow-hidden rounded-full bg-[#F0F4F6]"
+              >
+                <div
+                  className="h-full rounded-full bg-[#8DB7A8] transition-all"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="mt-4 text-xs leading-6 text-slate-500">
+                {pending.length
+                  ? 'Luangkan waktu untuk membaca sebelum memberi nilai.'
+                  : 'Terima kasih sudah memberi umpan balik untuk siswa.'}
+              </p>
+            </section>
+            <section className="rounded-[24px] bg-[#FDF5E8] p-6">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/80 text-[#B48A4B]">
+                <MessageCircle size={21} />
+              </div>
+              <h2 className="text-base font-bold text-[#826336]">
+                Nilai membantu mengukur.
+                <br />
+                Umpan balik membantu tumbuh.
+              </h2>
+              <p className="mt-3 text-xs leading-7 text-[#806841]">
+                Sebutkan satu hal yang sudah baik dan satu langkah kecil yang
+                bisa siswa perbaiki pada latihan berikutnya.
+              </p>
+            </section>
+            <p className="px-2 text-xs leading-6 text-slate-500">
+              Data contoh · Penilaian belum terhubung ke server.
+            </p>
+          </aside>
         </div>
       </div>
 
-      {/* Grading Worksheet Modal */}
       {selectedEssay && (
-        <div className="fixed inset-0 z-50 bg-[#13224E]/70 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#FFFFFF] max-w-2xl w-full p-6 border-2 border-[#13224E] space-y-4 font-sans my-8">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E4E4DC]">
-              <div>
-                <h3 className="font-serif font-bold text-base text-[#13224E]">
-                  Lembar Penilaian Esai Tentor
+        <dialog
+          ref={dialogRef}
+          aria-labelledby="grading-title"
+          onCancel={() => setSelectedEssay(null)}
+          className="fixed inset-0 m-auto max-h-[92dvh] w-[calc(100%_-_1.5rem)] max-w-5xl overflow-y-auto rounded-[24px] border-0 bg-[#F8FAFD] p-0 text-slate-700 shadow-2xl backdrop:bg-[#182D4D]/40 backdrop:backdrop-blur-sm sm:w-[calc(100%_-_3rem)]"
+        >
+          <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-100 bg-white px-5 py-4 sm:px-7">
+            <div>
+              <p className="text-xs font-medium text-[#7188A6]">
+                Ruang koreksi
+              </p>
+              <h2
+                id="grading-title"
+                className="mt-1 text-lg font-bold text-[#263D5F]"
+              >
+                {selectedEssay.studentName}
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                {selectedEssay.studentNis} · Soal {selectedEssay.questionNumber}
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label="Tutup penilaian"
+              onClick={() => setSelectedEssay(null)}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:bg-slate-100"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <div className="grid gap-5 p-4 sm:p-7 lg:grid-cols-[1.2fr_1fr]">
+            <div className="min-w-0 space-y-5">
+              <section className="rounded-2xl bg-white p-5">
+                <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-[#385C8C]">
+                  <BookOpen size={17} />
+                  Pertanyaan
                 </h3>
-                <p className="font-mono text-[10px] text-[#637096]">
-                  Siswa: <strong>{selectedEssay.studentName}</strong> ({selectedEssay.studentNis})
+                <div className="text-sm leading-7 text-slate-600">
+                  <MathRenderer content={selectedEssay.questionText} />
+                </div>
+              </section>
+              <section className="rounded-2xl bg-white p-5">
+                <div className="mb-4 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-[#385C8C]">
+                    Jawaban siswa
+                  </h3>
+                  <span className="text-xs text-slate-500">
+                    {selectedEssay.wordCount} kata
+                  </span>
+                </div>
+                <p className="whitespace-pre-wrap text-sm leading-8 text-slate-600">
+                  {selectedEssay.studentAnswer}
                 </p>
-              </div>
-              <button onClick={() => setSelectedEssay(null)} className="text-[#637096]">
-                <X className="w-5 h-5" />
-              </button>
+              </section>
             </div>
-
-            {/* Prompt */}
-            <div className="p-3 bg-[#FAFAF7] border border-[#E4E4DC] text-xs">
-              <span className="font-mono text-[9px] uppercase font-bold text-[#637096] block mb-1">
-                [ PERTANYAAN SOAL ]
-              </span>
-              <div className="font-serif font-semibold text-[#13224E]">
-                <MathRenderer content={selectedEssay.questionText} />
-              </div>
-            </div>
-
-            {/* Student's Ruled Answer Sheet */}
-            <div className="space-y-1">
-              <span className="font-mono text-[10px] text-[#1B3B8C] uppercase font-bold">
-                Lembar Jawaban Siswa:
-              </span>
-              <div className="p-4 bg-[#FFFFFF] border-2 border-[#CECEC2] text-xs sm:text-sm text-[#13224E] leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap font-sans">
-                {selectedEssay.studentAnswer}
-              </div>
-            </div>
-
-            <form onSubmit={handleSaveGrade} className="space-y-4 pt-2 border-t border-[#E4E4DC] text-xs">
-              {/* Score Slider & Numeric Input */}
-              <div className="bg-[#FAFAF7] p-3.5 border border-[#E4E4DC] space-y-2 font-mono">
-                <div className="flex items-center justify-between">
-                  <label className="font-bold text-[#13224E]">
-                    Skor Rubrik (Rentang 0 — 100):
+            <div className="min-w-0 space-y-5">
+              <section className="rounded-2xl bg-[#EDF3FA] p-5">
+                <h3 className="text-sm font-bold text-[#385C8C]">
+                  Panduan penilaian
+                </h3>
+                <p className="mt-3 whitespace-pre-wrap text-xs leading-7 text-[#637E9F]">
+                  {selectedEssay.rubricGuide ||
+                    'Gunakan rubrik yang ditetapkan untuk soal ini.'}
+                </p>
+              </section>
+              <form onSubmit={saveGrade} className="rounded-2xl bg-white p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <label
+                    htmlFor="essay-score"
+                    className="text-sm font-bold text-[#385C8C]"
+                  >
+                    Nilai esai
                   </label>
-                  <div className="flex items-baseline space-x-1">
-                    <span className="text-2xl font-bold text-[#1B8A5A]">{scoreInput}</span>
-                    <span className="text-[#637096] text-xs">/ 100</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="essay-score"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="1"
+                      required
+                      value={scoreInput}
+                      onChange={(event) => setScoreInput(event.target.value)}
+                      placeholder="—"
+                      className="min-h-12 w-20 rounded-xl border border-slate-200 bg-[#F8FAFD] px-3 text-center text-xl font-bold text-[#315D7B] focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                    <span className="text-xs text-slate-500">/ 100</span>
                   </div>
                 </div>
                 <input
+                  aria-label="Geser nilai esai"
                   type="range"
                   min="0"
                   max="100"
-                  value={scoreInput}
-                  onChange={(e) => setScoreInput(Number(e.target.value))}
-                  className="w-full accent-[#1B8A5A]"
+                  value={scoreInput || 0}
+                  onChange={(event) => setScoreInput(event.target.value)}
+                  className="mt-5 min-h-8 w-full accent-[#527FA7]"
                 />
-              </div>
-
-              {/* Tentor Feedback */}
-              <div>
-                <label className="block font-semibold text-[#13224E] mb-1">
-                  Catatan Evaluasi & Rekomendasi Tentor
+                <p className="mt-1 text-xs text-slate-500">
+                  Isi nilai setelah membaca jawaban dan panduan.
+                </p>
+                <label
+                  htmlFor="essay-feedback"
+                  className="mb-3 mt-6 block text-sm font-bold text-[#385C8C]"
+                >
+                  Umpan balik untuk siswa
                 </label>
                 <textarea
-                  rows={3}
+                  id="essay-feedback"
+                  rows={5}
                   required
+                  maxLength={5000}
                   value={feedbackInput}
-                  onChange={(e) => setFeedbackInput(e.target.value)}
-                  className="w-full p-2.5 bg-[#FAFAF7] border border-[#CECEC2] text-xs focus:outline-none focus:border-[#13224E] font-sans"
+                  onChange={(event) => setFeedbackInput(event.target.value)}
+                  placeholder="Apa yang sudah baik? Apa yang bisa diperbaiki?"
+                  className="w-full rounded-xl border border-slate-200 bg-[#F8FAFD] p-3.5 text-sm leading-7 placeholder:text-slate-500 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
                 />
-              </div>
-
-              <div className="pt-2 border-t border-[#E4E4DC] flex justify-end space-x-2 font-mono">
-                <button
-                  type="button"
-                  onClick={() => setSelectedEssay(null)}
-                  className="px-3 py-1.5 bg-[#FAFAF7] border border-[#CECEC2] text-[#637096]"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 bg-[#13224E] hover:bg-[#1B3B8C] text-white font-semibold"
-                >
-                  Simpan Nilai & Terbitkan Ulasan
-                </button>
-              </div>
-            </form>
+                <div className="mt-5 flex flex-wrap justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedEssay(null)}
+                    className="min-h-11 rounded-xl px-4 text-sm font-semibold text-slate-500 hover:bg-slate-50"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#2E578F] px-5 text-sm font-semibold text-white hover:bg-[#234573]"
+                  >
+                    Simpan penilaian
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </dialog>
       )}
     </div>
   );
