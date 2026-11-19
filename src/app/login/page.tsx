@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { MOCK_USERS } from "@/data/mockData";
+import { roleHome } from "@/lib/navigation";
 import {
   ShieldCheck,
   GraduationCap,
@@ -11,14 +12,13 @@ import {
   Mail,
   ArrowRight,
   AlertTriangle,
-  Sparkles,
   Users,
   FileCheck2,
 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { switchRole, switchUser, signInWithGoogle } = useApp();
+  const { switchRole, switchUser, signInWithGoogle, students } = useApp();
   const [customEmail, setCustomEmail] = useState("");
 
   const handleGoogleLogin = (e: React.FormEvent) => {
@@ -26,7 +26,10 @@ export default function LoginPage() {
     const emailToUse = customEmail.trim() || "raihan.pratama@siswa.euclide.edu";
     const success = signInWithGoogle(emailToUse);
     if (success) {
-      router.push("/tryouts");
+      const account = [...MOCK_USERS, ...students].find(
+        (user) => user.email.toLowerCase() === emailToUse.toLowerCase(),
+      );
+      router.push(roleHome[account?.role ?? "siswa"]);
     }
   };
 
@@ -110,7 +113,7 @@ export default function LoginPage() {
           <div className="relative flex py-1 items-center">
             <div className="flex-grow border-t border-slate-200"></div>
             <span className="flex-shrink mx-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-              Atau Pilih Akses Cepat Demo
+              Atau pilih akses cepat
             </span>
             <div className="flex-grow border-t border-slate-200"></div>
           </div>
@@ -118,7 +121,7 @@ export default function LoginPage() {
           {/* 2. Demo Role Shortcuts */}
           <div className="space-y-2.5">
             <button
-              onClick={() => handleRoleQuickLogin("siswa", "/tryouts")}
+              onClick={() => handleRoleQuickLogin("siswa", roleHome.siswa)}
               className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-blue-500 bg-slate-50/70 hover:bg-blue-50/40 transition group text-left shadow-2xs"
             >
               <div className="flex items-center space-x-3">
@@ -138,7 +141,7 @@ export default function LoginPage() {
             </button>
 
             <button
-              onClick={() => handleRoleQuickLogin("tentor", "/tentor/grading")}
+              onClick={() => handleRoleQuickLogin("tentor", roleHome.tentor)}
               className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-amber-500 bg-slate-50/70 hover:bg-amber-50/40 transition group text-left shadow-2xs"
             >
               <div className="flex items-center space-x-3">

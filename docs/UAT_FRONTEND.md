@@ -121,7 +121,7 @@ sebelumnya sudah terkunci atau aturan simulasi SNBT ketat sudah terpenuhi.
 |---|---|---|---|
 | FE-32 | Dari menu pengajar/admin, buka Bank soal. Pilih tiap filter subtes. | Semua tujuh subtes punya soal; jumlah sesuai data; rumus, bacaan, dan kunci dapat dibaca pada halaman pengelola. | Belum diuji |
 | FE-33 | Buat soal fiktif berjudul `UAT — soal percobaan`, pilih subtes, isi opsi/kunci/pembahasan; simpan dan refresh. | Soal baru muncul dan bertahan di browser. Belum otomatis dimasukkan ke paket statis; lihat K-04. | Belum diuji |
-| FE-34 | Buka `/drilling`, pilih setiap subtes, jawab soal objektif, lihat pembahasan, lalu soal berikutnya. | Setiap subtes memiliki soal; opsi/isian dapat digunakan; pembahasan tampil; pindah soal membersihkan jawaban soal sebelumnya. | Belum diuji |
+| FE-34 | Buka `/drilling`, pilih setiap subtes, jawab soal objektif, lihat pembahasan, lalu soal berikutnya dan sebelumnya. | Setiap subtes memiliki soal; opsi/isian dapat digunakan; pembahasan tampil. Soal baru belum terisi; kembali ke soal yang sudah dikerjakan memulihkan jawaban dan status pemeriksaannya. | Belum diuji |
 | FE-35 | Ulangi FE-03, 06, 13–20, 24, 28–31 pada HP portrait, lalu landscape. | Tidak ada tombol terpotong/tertutup; teks terbaca; halaman/dialog dapat digulir; palet, bacaan, dan form penilaian bisa diakses dengan sentuhan. | Belum diuji |
 
 ### Pagination daftar dan pratinjau impor
@@ -184,7 +184,7 @@ Masalah tampilan yang menutup tombol utama juga bisa menjadi P0/P1 sesuai dampak
 
 | Ukuran | Hasil |
 |---|---|
-| Skenario disiapkan | 46 |
+| Skenario disiapkan | 54 |
 | Skenario dijalankan | … |
 | Lulus | … |
 | Gagal | … |
@@ -213,3 +213,11 @@ Jalankan pada Chrome Android dan Safari iPhone, dengan keyboard asli. Perubahan 
 | FE-44 | Di CBT berbaca panjang, baca, isi jawaban, gulir kembali ke bacaan lalu ke jawaban | Bacaan dan jawaban selalu ada tanpa tab; jawaban tetap tersimpan saat menggulir | Belum diuji |
 | FE-45 | Fokus isian/esai di latihan dan CBT; ubah posisi kursor, sembunyikan keyboard; uji portrait/landscape | Tidak terjadi zoom otomatis; input tetap terjangkau dengan gulir; navigasi bawah tidak menutup field saat fokus; zoom manual tetap bisa | Belum diuji |
 | FE-46 | Di CBT, buka/tutup keyboard beberapa kali lalu benar-benar pindah tab/aplikasi | Membuka keyboard tidak menambah pelanggaran; tab/aplikasi tersembunyi tetap tercatat sekali per kejadian visibilitychange | Belum diuji |
+| FE-47 | Pada hasil paket 35 soal, buka pembahasan; pindah halaman dari kontrol atas/bawah; pilih 1/5/10 per halaman; ubah filter Matematika dan kembali ke Semua. Ulangi dengan keyboard pada lebar 320px. | Awalnya 5 soal dari 35, total 7 halaman. Halaman berikutnya menampilkan nomor asli 6–10; perpindahan halaman membawa fokus ke judul pembahasan. Filter/ukuran halaman kembali ke halaman 1. Nomor soal setelah filter tetap sesuai paket; Semua tetap berjumlah 35. Kontrol tidak keluar layar dan tidak ada soal hilang/berulang antarhalaman. | Belum diuji |
+| FE-48 | Pada latihan, jawab/periksa soal pilihan ganda lalu lanjut dan kembali. Ulangi untuk pilihan jamak, isian dan esai; coba berpindah subtes lalu kembali. Periksa soal pertama dan terakhir, serta navigasi keyboard pada HP. | Jawaban dan status pemeriksaan masing-masing soal bertahan selama halaman terbuka, tanpa tertukar ke soal/subtes lain. Sebelumnya nonaktif pada nomor 1; Berikutnya nonaktif di akhir dan tidak melompat diam-diam ke nomor 1. Fokus pindah ke judul soal. Refresh atau meninggalkan halaman belum dijamin memulihkan latihan ini. | Belum diuji |
+| FE-49 | Masuk melalui akses cepat siswa, tentor dan admin. Coba Beranda/Ringkasan, logo internal serta menu HP. | Siswa menuju `/dashboard`, tentor `/tentor`, admin `/admin`. Isi dashboard sesuai pekerjaan peran; landing publik tetap dapat dibuka di `/`. | Belum diuji |
+| FE-50 | Di Analisis siswa, ubah Ringkasan kelas / Per siswa, pilih kelas, lalu siswa dengan dan tanpa hasil. | Profil mengikuti ID siswa terpilih. Siswa tanpa hasil tidak mendapat skor pinjaman. Rerata kelas memakai satu hasil terbaru per peserta dan jumlah cakupan mengikuti filter. | Belum diuji |
+| FE-51 | Pada browser khusus uji, dua siswa menyelesaikan paket yang sama; kembali ke masing-masing akun dan analisisnya. Gunakan juga fixture hasil dengan tanggal berbeda, rincian parsial dan skor nol. | Hasil siswa pertama tidak tertimpa siswa kedua. Riwayat diurutkan tanggal, prioritas mengikuti dua skor subtes terendah yang valid, nol tidak diganti, rincian kosong tidak mendapat angka akurasi buatan. | Belum diuji |
+| FE-52 | Periksa dashboard, katalog, hasil, latihan dan persiapan di 320/390/768/1440/1920px serta zoom 200%. Coba tautan latihan prioritas. | Desktop memakai lebar area kerja. Bacaan tetap nyaman, stimulus/jawaban berdampingan saat cukup ruang dan berurutan di HP. Tidak ada overflow halaman; tautan prioritas membuka subtes yang sesuai. | Belum diuji |
+| FE-53 | Buka koreksi esai, cari siswa, buka jawaban, nilai dengan rubrik lalu simpan. Periksa juga link profil dari dashboard pengajar. | Sapaan cerita dan emoji lambaian tidak tampil; antrean/jumlah dinilai mengikuti catatan. Alur koreksi tetap bekerja dan link profil menuju siswa yang dimaksud. | Belum diuji |
+| FE-54 | Pada pencarian tryout, siswa, kelas, esai dan kampus/prodi: ketik tanpa submit; tekan Enter; ubah draf; tekan Cari; kosongkan lalu Enter; uji reset dan pencarian ulang dari halaman kedua. Ulangi memakai keyboard HP dan komposisi IME bila tersedia. | Mengetik/menghapus draf tidak mengubah hasil atau halaman. Enter/Cari menerapkan kata kunci yang sudah dipangkas spasinya dan kembali ke halaman pertama. Draf baru tidak mengganti pencarian lama sebelum submit. Submit kosong menampilkan semua hasil dalam filter aktif; reset membersihkan draf dan kata kunci. Enter konfirmasi IME tidak memicu submit buatan. | Belum diuji |

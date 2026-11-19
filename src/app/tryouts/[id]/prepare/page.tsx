@@ -82,7 +82,7 @@ export default function PrepareTryoutPage() {
     );
   return (
     <div className="bg-[#F7F9FC] pb-10">
-      <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
+      <div className="mx-auto w-full px-5 py-8 sm:px-8">
         <Link
           href="/tryouts"
           className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500"
@@ -147,8 +147,7 @@ export default function PrepareTryoutPage() {
                 />
                 <span className="text-sm leading-7 text-slate-600">
                   Saya sudah memeriksa urutan prioritas. Saya memahami bahwa
-                  kampus dan skor target pada demo ini adalah contoh, bukan
-                  hasil seleksi resmi.
+                  target skor adalah acuan latihan, bukan hasil seleksi resmi.
                 </span>
               </label>
               {error && (

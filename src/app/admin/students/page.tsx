@@ -1,8 +1,10 @@
 "use client";
+import SearchForm from "@/components/common/SearchForm";
+import useSubmittedSearch from "@/hooks/useSubmittedSearch";
 import Pagination from "@/components/common/Pagination";
 import usePagination from "@/hooks/usePagination";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useApp } from "@/context/AppContext";
 import { UserStatus } from "@/types";
 import StudentBulkImportModal from "@/components/admin/StudentBulkImportModal";
@@ -34,22 +36,33 @@ const statusOptions: { value: UserStatus; label: string }[] = [
 
 export default function AdminStudentsPage() {
   const { students, toggleStudentStatus, batches } = useApp();
-  const [searchTerm, setSearchTerm] = useState("");
+  const {
+    query: searchTerm,
+    draft: searchDraft,
+    setDraft: setSearchDraft,
+    submit: submitSearch,
+    clear: clearSearch,
+    revision: searchRevision,
+  } = useSubmittedSearch();
   const [statusFilter, setStatusFilter] = useState("all");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const filteredStudents = students.filter((student) => {
-    const matches =
-      `${student.name} ${student.nis ?? ""} ${student.email} ${student.targetPTN1 ?? ""}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase().trim());
-    return (
-      matches && (statusFilter === "all" || student.status === statusFilter)
-    );
-  });
+  const filteredStudents = useMemo(
+    () =>
+      students.filter((student) => {
+        const matches =
+          `${student.name} ${student.nis ?? ""} ${student.email} ${student.targetPTN1 ?? ""}`
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase().trim());
+        return (
+          matches && (statusFilter === "all" || student.status === statusFilter)
+        );
+      }),
+    [students, searchTerm, statusFilter],
+  );
   const studentsPagination = usePagination(
     filteredStudents,
     5,
-    searchTerm + "|" + statusFilter,
+    searchTerm + "|" + statusFilter + "|" + searchRevision,
   );
 
   const batchName = (id?: string) =>
@@ -181,19 +194,14 @@ export default function AdminStudentsPage() {
                 );
               })}
             </div>
-            <label className="flex w-full items-center gap-2.5 rounded-xl bg-[#F6F8FC] px-3.5 focus-within:ring-2 focus-within:ring-blue-100 xl:w-80">
-              <Search size={17} className="shrink-0 text-slate-500" />
-              <span className="sr-only">
-                Cari nama, Kode Siswa, email, atau PTN
-              </span>
-              <input
-                type="search"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Cari nama, kode, email, atau PTN…"
-                className="min-h-11 w-full min-w-0 bg-transparent text-sm outline-none"
-              />
-            </label>
+            <SearchForm
+              label="Cari siswa"
+              placeholder="Nama, kode, email, atau PTN"
+              value={searchDraft}
+              onChange={setSearchDraft}
+              onSearch={submitSearch}
+              className="xl:w-96"
+            />
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 sm:px-6">
             <h2
@@ -342,7 +350,7 @@ export default function AdminStudentsPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setSearchTerm("");
+                  clearSearch();
                   setStatusFilter("all");
                 }}
                 className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"

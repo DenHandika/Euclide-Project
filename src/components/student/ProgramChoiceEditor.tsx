@@ -1,11 +1,12 @@
 "use client";
+import SearchForm from "@/components/common/SearchForm";
+import useSubmittedSearch from "@/hooks/useSubmittedSearch";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
   CheckCircle2,
-  Search,
   Trash2,
   Plus,
   AlertCircle,
@@ -20,15 +21,24 @@ export default function ProgramChoiceEditor({
   choices: StudyProgram[];
   onChange: (choices: StudyProgram[]) => void;
 }) {
-  const [search, setSearch] = useState("");
+  const {
+    query: search,
+    draft: searchDraft,
+    setDraft: setSearchDraft,
+    submit: submitSearch,
+  } = useSubmittedSearch();
   const [degree, setDegree] = useState<Degree | "all">("all");
   const validation = validateChoices(choices);
-  const programs = DEMO_PROGRAMS.filter(
-    (p) =>
-      (degree === "all" || p.degree === degree) &&
-      `${p.name} ${p.institution}`
-        .toLowerCase()
-        .includes(search.trim().toLowerCase()),
+  const programs = useMemo(
+    () =>
+      DEMO_PROGRAMS.filter(
+        (p) =>
+          (degree === "all" || p.degree === degree) &&
+          `${p.name} ${p.institution}`
+            .toLowerCase()
+            .includes(search.trim().toLowerCase()),
+      ),
+    [degree, search],
   );
   const move = (index: number, delta: number) => {
     const next = [...choices];
@@ -72,7 +82,7 @@ export default function ProgramChoiceEditor({
                   </span>
                 </div>
               </div>
-              <div className="mt-3 flex justify-end gap-2">
+              <div className="mt-3 flex justify-end gap-3 flex-wrap">
                 <button
                   type="button"
                   aria-label={`Naikkan prioritas ${p.name}`}
@@ -95,9 +105,9 @@ export default function ProgramChoiceEditor({
                   type="button"
                   aria-label={`Hapus ${p.name}`}
                   onClick={() => onChange(choices.filter((c) => c.id !== p.id))}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-rose-100 text-rose-600"
+                  className="eu-button-danger-icon"
                 >
-                  <Trash2 size={17} />
+                  <Trash2 aria-hidden="true" size={18} />
                 </button>
               </div>
             </li>
@@ -127,16 +137,14 @@ export default function ProgramChoiceEditor({
         <h2 id="program-heading" className="mb-4 font-bold">
           Cari kampus & program studi
         </h2>
-        <label className="mb-3 flex items-center gap-2 rounded-xl border border-slate-200 px-3">
-          <Search size={18} className="shrink-0 text-slate-400" />
-          <input
-            aria-label="Cari kampus atau prodi"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Nama kampus atau prodi..."
-            className="min-w-0 w-full bg-transparent py-3.5 text-sm outline-none"
-          />
-        </label>
+        <SearchForm
+          label="Cari kampus atau prodi"
+          placeholder="Nama kampus atau prodi"
+          value={searchDraft}
+          onChange={setSearchDraft}
+          onSearch={submitSearch}
+          className="mb-3"
+        />
         <div
           role="group"
           aria-label="Filter jenjang"
@@ -155,9 +163,17 @@ export default function ProgramChoiceEditor({
           ))}
         </div>
         <p className="mb-4 text-xs leading-6 text-slate-500">
-          Kampus, prodi, dan target skor berikut adalah data fiktif untuk demo
-          alur.
+          Target skor adalah acuan latihan, bukan ambang kelulusan resmi.
         </p>
+        <p role="status" className="mb-3 text-sm text-slate-600">
+          {programs.length} program studi ditemukan
+        </p>
+        {programs.length === 0 && (
+          <p className="mb-4 text-sm leading-7 text-slate-600">
+            Tidak ada prodi yang sesuai. Ubah kata kunci, lalu tekan Enter atau
+            Cari.
+          </p>
+        )}
         <div className="space-y-3">
           {programs.map((p) => {
             const selected = choices.some((c) => c.id === p.id);

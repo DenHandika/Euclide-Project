@@ -1,10 +1,13 @@
 "use client";
+import SearchForm from "@/components/common/SearchForm";
+import useSubmittedSearch from "@/hooks/useSubmittedSearch";
 import Pagination from "@/components/common/Pagination";
 import usePagination from "@/hooks/usePagination";
 
 import StatusBadge from "@/components/common/StatusBadge";
+import ClassEditor from "@/components/admin/ClassEditor";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useMemo, useEffect, useRef, useState } from "react";
 import { useApp } from "@/context/AppContext";
 import { ClassBatch } from "@/types";
 import {
@@ -15,6 +18,7 @@ import {
   ChevronDown,
   MapPin,
   Pencil,
+  Plus,
   Search,
   Users,
   X,
@@ -29,11 +33,21 @@ const accents = [
 ];
 
 export default function AdminClassesPage() {
-  const { batches, updateBatchCapacity } = useApp();
+  const { batches, updateBatchCapacity, isHydrated } = useApp();
+  const [classEditor, setClassEditor] = useState<{
+    batch: ClassBatch | null;
+  } | null>(null);
   const [editingBatch, setEditingBatch] = useState<ClassBatch | null>(null);
   const [capacity, setCapacity] = useState("");
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
+  const {
+    query: search,
+    draft: searchDraft,
+    setDraft: setSearchDraft,
+    submit: submitSearch,
+    clear: clearSearch,
+    revision: searchRevision,
+  } = useSubmittedSearch();
   const [availability, setAvailability] = useState<Availability>("all");
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -58,23 +72,27 @@ export default function AdminClassesPage() {
       sum + Math.max(0, batch.maxCapacity - batch.currentStudents),
     0,
   );
-  const filtered = batches.filter((batch) => {
-    const matches =
-      `${batch.name} ${batch.program} ${batch.tutorName} ${batch.room}`
-        .toLowerCase()
-        .includes(search.toLowerCase().trim());
-    return (
-      matches &&
-      (availability === "all" ||
-        (availability === "full"
-          ? batch.currentStudents >= batch.maxCapacity
-          : batch.currentStudents < batch.maxCapacity))
-    );
-  });
+  const filtered = useMemo(
+    () =>
+      batches.filter((batch) => {
+        const matches =
+          `${batch.name} ${batch.program} ${batch.tutorName} ${batch.room}`
+            .toLowerCase()
+            .includes(search.toLowerCase().trim());
+        return (
+          matches &&
+          (availability === "all" ||
+            (availability === "full"
+              ? batch.currentStudents >= batch.maxCapacity
+              : batch.currentStudents < batch.maxCapacity))
+        );
+      }),
+    [batches, search, availability],
+  );
   const classesPagination = usePagination(
     filtered,
     6,
-    search + "|" + availability,
+    search + "|" + availability + "|" + searchRevision,
     [3, 6, 12, 24],
   );
 
@@ -120,10 +138,15 @@ export default function AdminClassesPage() {
               Atur ruang untuk belajar, bertemu, dan bertumbuh bersama.
             </p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-medium text-[#567393] shadow-sm">
-            <BookOpen size={16} />
-            Program bimbingan Euclide
-          </span>
+          <button
+            type="button"
+            disabled={!isHydrated}
+            onClick={() => setClassEditor({ batch: null })}
+            className="eu-button-primary disabled:opacity-50"
+          >
+            <Plus size={18} aria-hidden="true" />
+            Tambah kelas
+          </button>
         </header>
 
         <section
@@ -178,20 +201,15 @@ export default function AdminClassesPage() {
                 {filtered.length} kelas ditampilkan
               </p>
             </div>
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <label className="flex items-center gap-2 rounded-xl border border-transparent bg-white px-4 focus-within:border-[#8DA9CE] focus-within:ring-2 focus-within:ring-blue-100">
-                <Search size={17} className="shrink-0 text-slate-500" />
-                <span className="sr-only">
-                  Cari kelas, pengajar, atau ruang
-                </span>
-                <input
-                  type="search"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Cari kelas atau pengajar…"
-                  className="min-h-12 w-full min-w-0 bg-transparent text-sm outline-none sm:w-52"
-                />
-              </label>
+            <div className="flex w-full min-w-0 flex-col gap-3 sm:w-auto sm:flex-row sm:items-start">
+              <SearchForm
+                label="Cari kelas"
+                placeholder="Nama kelas atau pengajar"
+                value={searchDraft}
+                onChange={setSearchDraft}
+                onSearch={submitSearch}
+                className="sm:w-80"
+              />
               <div className="relative">
                 <label htmlFor="class-availability" className="sr-only">
                   Filter ketersediaan kursi
@@ -202,7 +220,7 @@ export default function AdminClassesPage() {
                   onChange={(event) =>
                     setAvailability(event.target.value as Availability)
                   }
-                  className="min-h-12 w-full appearance-none rounded-xl border border-transparent bg-white py-3 pl-4 pr-10 text-sm font-medium text-slate-600 focus:border-[#8DA9CE] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  className="min-h-[54px] w-full appearance-none rounded-xl border border-slate-300 bg-white py-3 pl-4 pr-10 text-sm font-medium text-slate-600 focus:border-[#244676] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#244676]"
                 >
                   <option value="all">Semua kapasitas</option>
                   <option value="available">Masih tersedia</option>
@@ -210,7 +228,8 @@ export default function AdminClassesPage() {
                 </select>
                 <ChevronDown
                   size={15}
-                  className="pointer-events-none absolute right-3 top-4 text-slate-500"
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
                 />
               </div>
             </div>
@@ -330,16 +349,27 @@ export default function AdminClassesPage() {
                           </>
                         )}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => editCapacity(batch)}
-                        aria-label={`Ubah kuota ${batch.name}`}
-                        className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#F0F4FA] px-4 text-xs font-semibold text-[#42668F] transition hover:bg-[#E3EBF7]"
-                      >
-                        <Pencil size={14} />
-                        Ubah kuota
-                        <ArrowUpRight size={14} />
-                      </button>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setClassEditor({ batch })}
+                          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#244676] px-4 text-xs font-semibold text-white hover:bg-[#19365F]"
+                          aria-label={`Ubah kelas dan jadwal ${batch.name}`}
+                        >
+                          <Pencil size={14} aria-hidden="true" />
+                          Ubah kelas
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => editCapacity(batch)}
+                          aria-label={`Ubah kuota ${batch.name}`}
+                          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#F0F4FA] px-4 text-xs font-semibold text-[#42668F] transition hover:bg-[#E3EBF7]"
+                        >
+                          <Pencil size={14} />
+                          Ubah kuota
+                          <ArrowUpRight size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -360,7 +390,7 @@ export default function AdminClassesPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setSearch("");
+                  clearSearch();
                   setAvailability("all");
                 }}
                 className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"
@@ -376,6 +406,16 @@ export default function AdminClassesPage() {
         </p>
       </div>
 
+      {classEditor && (
+        <ClassEditor
+          batch={classEditor.batch}
+          onClose={() => setClassEditor(null)}
+          onSaved={() => {
+            clearSearch();
+            setAvailability("all");
+          }}
+        />
+      )}
       {editingBatch && (
         <dialog
           ref={dialogRef}
@@ -445,7 +485,7 @@ export default function AdminClassesPage() {
                 {error}
               </p>
             </div>
-            <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+            <div className="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
               <button
                 type="button"
                 onClick={() => setEditingBatch(null)}

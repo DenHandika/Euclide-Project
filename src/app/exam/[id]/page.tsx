@@ -6,6 +6,7 @@ import { useApp } from "@/context/AppContext";
 import { Question, UserAnswer, ExamSession } from "@/types";
 import MathRenderer from "@/components/common/MathRenderer";
 import WrittenAnswer from "@/components/common/WrittenAnswer";
+import ChoiceStrip from "@/components/common/ChoiceStrip";
 import {
   Clock,
   Maximize,
@@ -507,13 +508,22 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
       {/* ========================================================================= */}
       {/* 2. SUBTEST PROGRESS CHIP BAR (HORIZONTAL SCROLLABLE)                      */}
       {/* ========================================================================= */}
-      <nav className="bg-white border-b border-slate-200/80 px-3 sm:px-6 py-1.5 flex items-center justify-between text-xs select-none overflow-x-auto gap-2">
-        <div className="flex items-center space-x-1.5">
+      <nav
+        aria-label="Navigasi subtes ujian"
+        className="bg-white border-b border-slate-200/80 px-3 sm:px-6 py-1.5 flex min-w-0 items-center justify-between text-xs select-none gap-3"
+      >
+        <ChoiceStrip
+          label="Subtes ujian"
+          value={currentSubtestIndex}
+          className="flex-1"
+        >
           {tryout.subtests.map((st, idx) => {
             const isActive = idx === currentSubtestIndex;
             const isDone = idx < currentSubtestIndex;
             return (
               <button
+                type="button"
+                aria-pressed={isActive}
                 key={st.id}
                 onClick={() => setCurrentSubtestIndex(idx)}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center space-x-1.5 ${
@@ -525,7 +535,7 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                 }`}
               >
                 <span>
-                  {idx + 1}. {st.name.split(" ")[0]}
+                  {idx + 1}. {st.name}
                 </span>
                 {isDone && (
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -533,9 +543,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
               </button>
             );
           })}
-        </div>
+        </ChoiceStrip>
 
-        <div className="hidden lg:flex items-center space-x-2 text-[11px] text-slate-500">
+        <div className="hidden shrink-0 lg:flex items-center space-x-2 text-[11px] text-slate-500">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>Screen Lock Aktif</span>
         </div>
@@ -618,7 +628,7 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
         </div>
       </div>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 select-none">
+      <main className="flex-1 w-full mx-auto p-3 sm:p-5 select-none">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* QUESTION + OPTIONS WORKSPACE (9 COLS ON DESKTOP, FULL ON MOBILE) */}
           <div className="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl border border-slate-200 shadow-card flex flex-col justify-between min-h-[520px]">
@@ -1170,7 +1180,7 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
               </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-end space-x-2 text-xs font-bold">
+            <div className="pt-2 flex flex-wrap items-center justify-end gap-3 text-sm font-semibold">
               <button
                 type="button"
                 onClick={() => setSubmitModalOpen(false)}

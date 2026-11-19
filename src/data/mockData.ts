@@ -14,7 +14,7 @@ import {
 export const MOCK_USERS: User[] = [
   {
     id: "user-admin",
-    name: "Dr. Ir. Hendra Wijaya, M.Sc.",
+    name: "Panjie Wicaksono",
     email: "admin@euclide.edu",
     role: "admin",
     avatarUrl:
@@ -25,7 +25,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: "user-tentor",
-    name: "Ahmad Fauzi, S.Si.",
+    name: "Epri",
     email: "tentor.fauzi@euclide.edu",
     role: "tentor",
     avatarUrl:
@@ -36,7 +36,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: "user-siswa-active",
-    name: "Muhammad Raihan Pratama",
+    name: "Sakhi",
     email: "raihan.pratama@siswa.euclide.edu",
     role: "siswa",
     nis: "EUC-2026-0042",
@@ -54,7 +54,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: "user-siswa-graduated",
-    name: "Siti Nurhaliza",
+    name: "Ara Kusuma",
     email: "siti.nurhaliza@alumni.euclide.edu",
     role: "siswa",
     nis: "EUC-2025-0012",
@@ -235,7 +235,7 @@ const ORIGINAL_QUESTIONS: Question[] = [
     explanation:
       "Langkah analisis:\n1. $\\det(B) = (4)(3) - (1)(2) = 12 - 2 = 10$ (Pernyataan A Benar).\n2. $\\det(A) = \\det(B) - 2 = 10 - 2 = 8$ (Pernyataan C Benar).\n3. Rumus $\\det(A) = (2)(5) - (x)(3) = 10 - 3x = 8 \\implies 3x = 2 \\implies x = \\frac{2}{3}$ (Pernyataan B Benar).\n4. Karena $\\det(A) = 8 \\neq 0$, maka matriks $A$ **bukan** singular dan memiliki invers (Pernyataan E Benar, D Salah).\n\nJawaban benar: **A, B, C, E**.",
     maxScore: 50,
-    difficulty: "Sukar",
+    difficulty: "Sulit",
   },
   {
     id: "q-pk-1",
@@ -304,7 +304,7 @@ const ORIGINAL_QUESTIONS: Question[] = [
     rubricGuide:
       "Skor 85-100: Analisis mendalam dengan argumen logis, menyinggung transparansi penilaian AI, integritas, dan rekomendasi konkrit.\nSkor 70-84: Argumen jelas namun kurang mendalam pada aspek metakognisi.\nSkor <70: Kalimat tidak efektif atau keluar dari topik utama.",
     maxScore: 100,
-    difficulty: "Sukar",
+    difficulty: "Sulit",
   },
   {
     id: "q-li-1",

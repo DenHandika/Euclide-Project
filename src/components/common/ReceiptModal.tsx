@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { PaymentRecord } from "@/types";
-import { Printer, X, ShieldCheck } from "lucide-react";
+import { Printer, X } from "lucide-react";
 
 interface ReceiptModalProps {
   payment: PaymentRecord | null;
@@ -10,7 +11,34 @@ interface ReceiptModalProps {
 }
 
 export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
-  if (!payment) return null;
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => setPortalTarget(document.body), []);
+  useEffect(() => {
+    if (!payment || !portalTarget) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const trigger =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const previousOverflow = document.body.style.overflow;
+    const previousPrintMode = document.body.getAttribute("data-print-receipt");
+    if (!dialog.open) dialog.showModal();
+    document.body.style.overflow = "hidden";
+    document.body.setAttribute("data-print-receipt", "true");
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+      if (previousPrintMode === null)
+        document.body.removeAttribute("data-print-receipt");
+      else document.body.setAttribute("data-print-receipt", previousPrintMode);
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+    };
+  }, [payment, portalTarget]);
+
+  if (!payment || !portalTarget) return null;
 
   const formatIDR = (val: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -24,28 +52,39 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
     window.print();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-[#182D4D]/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#FFFFFF] max-w-lg w-full border border-slate-200 p-6 space-y-5 font-sans rounded-3xl shadow-xl">
+  return createPortal(
+    <dialog
+      ref={dialogRef}
+      aria-labelledby={titleId}
+      className="receipt-dialog m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-xl sm:p-6"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
+      <div className="min-w-0 space-y-5 font-sans">
         {/* Modal Top Actions (Hidden on Print) */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3 no-print">
-          <div className="flex items-center space-x-2 font-sans text-xs font-bold text-[#263D5F]">
-            <span className="w-2.5 h-2.5 bg-[#1B8A5A]" />
-            <span>KUITANSI PEMBAYARAN RESMI</span>
-          </div>
-          <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3 no-print">
+          <h2 id={titleId} className="text-lg font-bold">
+            Pratinjau kuitansi
+          </h2>
+          <div className="flex items-center flex-wrap gap-3">
             <button
+              type="button"
               onClick={handlePrint}
-              className="inline-flex items-center space-x-1 font-sans text-xs bg-[#2E578F] hover:bg-[#234573] text-white px-3 py-1.5 transition rounded-xl min-h-11"
+              className="inline-flex cursor-pointer items-center space-x-1 font-sans text-xs bg-[#2E578F] hover:bg-[#234573] text-white px-3 py-1.5 transition rounded-xl min-h-11"
             >
-              <Printer className="w-3 h-3" />
+              <Printer aria-hidden="true" className="w-4 h-4" />
               <span>Cetak Kuitansi</span>
             </button>
             <button
+              type="button"
+              autoFocus
+              aria-label="Tutup pratinjau kuitansi"
               onClick={onClose}
-              className="p-1 text-slate-500 hover:text-[#263D5F] rounded-xl min-h-11"
+              className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100"
             >
-              <X className="w-5 h-5" />
+              <X aria-hidden="true" className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -53,35 +92,32 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
         {/* Printable Physical Receipt Sheet */}
         <div
           id="printable-receipt"
-          className="border border-slate-200 p-6 bg-[#FFFFFF] space-y-4 font-sans text-xs rounded-2xl shadow-sm print:rounded-none print:shadow-none"
+          className="min-w-0 space-y-5 bg-white font-sans text-sm"
         >
           {/* Header */}
-          <div className="border-b-2 border-slate-200 pb-3 flex items-start justify-between">
+          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
               <div className="font-sans font-black text-xl text-[#263D5F] tracking-tight">
                 EUCLIDE
               </div>
-              <p className="text-xs text-slate-500 uppercase font-sans">
-                Bimbel & CBT Management System
-              </p>
-              <p className="text-xs text-slate-500">
-                Jl. Geometri No. 2026, Kampus Klaster 1
+              <p className="text-sm text-slate-600">
+                Bimbingan belajar Euclide
               </p>
             </div>
             <div className="text-right font-sans">
-              <span className="inline-block px-2 py-0.5 bg-[#EAF7F0] text-[#126340] font-bold border border-[#1B8A5A]/30 rounded-full">
-                LUNAS TERVERIFIKASI
+              <span className="text-sm font-semibold text-slate-800">
+                {payment.status}
               </span>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-xs text-slate-600 mt-1">
                 No: {payment.invoiceNumber}
               </div>
             </div>
           </div>
 
           {/* Metadata Grid */}
-          <div className="grid grid-cols-2 gap-3 p-3 bg-[#F6F8FC] border border-slate-100 font-sans text-xs rounded-xl">
+          <div className="grid grid-cols-1 gap-4 border-b border-slate-200 pb-4 font-sans text-sm sm:grid-cols-2">
             <div>
-              <span className="text-xs text-slate-500 block uppercase">
+              <span className="text-xs text-slate-600 block uppercase">
                 Nama Siswa / Wajib Bayar
               </span>
               <span className="font-bold text-[#263D5F]">
@@ -89,19 +125,19 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
               </span>
             </div>
             <div>
-              <span className="text-xs text-slate-500 block uppercase">
-                Nomor Induk Siswa (NIS)
+              <span className="text-xs text-slate-600 block uppercase">
+                Kode siswa
               </span>
               <span className="font-bold text-[#263D5F]">{payment.nis}</span>
             </div>
             <div>
-              <span className="text-xs text-slate-500 block uppercase">
+              <span className="text-xs text-slate-600 block uppercase">
                 Periode Pembayaran
               </span>
               <span className="text-[#263D5F]">{payment.month}</span>
             </div>
             <div>
-              <span className="text-xs text-slate-500 block uppercase">
+              <span className="text-xs text-slate-600 block uppercase">
                 Metode Pembayaran
               </span>
               <span className="text-[#263D5F]">{payment.paymentMethod}</span>
@@ -110,10 +146,17 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
 
           {/* Details Table */}
           <table className="w-full text-left">
+            <caption className="sr-only">
+              Rincian pembayaran {payment.invoiceNumber}
+            </caption>
             <thead>
-              <tr className="border-b border-slate-200 font-sans text-xs uppercase text-slate-500">
-                <th className="py-1.5">Deskripsi Transaksi</th>
-                <th className="py-1.5 text-right">Jumlah</th>
+              <tr className="border-b border-slate-200 font-sans text-xs uppercase text-slate-600">
+                <th scope="col" className="py-1.5">
+                  Deskripsi transaksi
+                </th>
+                <th scope="col" className="py-1.5 text-right">
+                  Jumlah
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -122,7 +165,7 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
                   <div className="font-semibold text-[#263D5F]">
                     Biaya SPP Program Bimbingan SNBT
                   </div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-slate-600">
                     {payment.notes || "Pembayaran SPP Reguler"}
                   </div>
                 </td>
@@ -144,23 +187,18 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
           </table>
 
           {/* Signatures */}
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-sans text-slate-500">
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-sans text-slate-600">
             <div>
               <div>
                 Dicatat oleh: <strong>{payment.recordedBy}</strong>
               </div>
               <div>Waktu Bayar: {payment.paidAt}</div>
             </div>
-            <div className="text-right">
-              <div className="flex items-center space-x-1 text-[#1B8A5A]">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Sah Elektronik EUCLIDE</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-    </div>
+    </dialog>,
+    portalTarget,
   );
 }
 

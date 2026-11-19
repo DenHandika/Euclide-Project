@@ -1,47 +1,62 @@
 "use client";
+import SearchForm from "@/components/common/SearchForm";
+import useSubmittedSearch from "@/hooks/useSubmittedSearch";
 import Pagination from "@/components/common/Pagination";
 import usePagination from "@/hooks/usePagination";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Search, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import TryoutCard from "@/components/common/TryoutCard";
 
 export default function TryoutsCatalogPage() {
   const { tryouts, currentUser } = useApp();
   const [category, setCategory] = useState("all");
-  const [search, setSearch] = useState("");
+  const {
+    query: search,
+    draft: searchDraft,
+    setDraft: setSearchDraft,
+    submit: submitSearch,
+    clear: clearSearch,
+    revision: searchRevision,
+  } = useSubmittedSearch();
   const categories = [
     { id: "all", label: "Semua tryout" },
     { id: "grand", label: "UTBK lengkap" },
     { id: "tps", label: "TPS & matematika" },
     { id: "literasi", label: "Literasi" },
   ];
-  const filtered = tryouts.filter(
-    (t) =>
-      (category === "all" ||
-        (category === "grand"
-          ? t.subtests.length >= 7
-          : category === "literasi"
-            ? t.subtests.every((subtest) => subtest.category === "Literasi")
-            : t.subtests.length < 7 &&
-              t.subtests.some((subtest) => subtest.category !== "Literasi"))) &&
-      `${t.title} ${t.description} ${t.subtests.map((s) => s.name).join(" ")}`
-        .toLowerCase()
-        .includes(search.toLowerCase().trim()),
+  const filtered = useMemo(
+    () =>
+      tryouts.filter(
+        (t) =>
+          (category === "all" ||
+            (category === "grand"
+              ? t.subtests.length >= 7
+              : category === "literasi"
+                ? t.subtests.every((subtest) => subtest.category === "Literasi")
+                : t.subtests.length < 7 &&
+                  t.subtests.some(
+                    (subtest) => subtest.category !== "Literasi",
+                  ))) &&
+          `${t.title} ${t.description} ${t.subtests.map((s) => s.name).join(" ")}`
+            .toLowerCase()
+            .includes(search.toLowerCase().trim()),
+      ),
+    [tryouts, category, search],
   );
   const tryoutsPagination = usePagination(
     filtered,
     6,
-    search + "|" + category,
+    search + "|" + category + "|" + searchRevision,
     [3, 6, 12, 24],
   );
 
   return (
     <div className="min-h-screen bg-[#F7F9FC]">
       <div className="border-b border-slate-200/70 bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
+        <div className="mx-auto w-full px-5 py-10 sm:px-8">
           <p className="eu-eyebrow">RUANG BELAJAR</p>
           <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
             Siap latihan, {currentUser.name.split(" ")[0]}?
@@ -52,7 +67,7 @@ export default function TryoutsCatalogPage() {
           </p>
         </div>
       </div>
-      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+      <div className="mx-auto w-full px-5 py-8 sm:px-8">
         <div className="mb-8 flex flex-col justify-between gap-5 rounded-2xl border border-[#E0E7F0] bg-[#EAF0FA] p-6 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-base font-bold">
@@ -88,20 +103,17 @@ export default function TryoutsCatalogPage() {
               </button>
             ))}
           </div>
-          <label className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 xl:w-64">
-            <Search size={17} className="shrink-0 text-slate-400" />
-            <input
-              aria-label="Cari tryout"
-              placeholder="Cari materi atau tryout..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="min-w-0 w-full bg-transparent py-3 text-sm outline-none"
-            />
-          </label>
+          <SearchForm
+            label="Cari tryout"
+            placeholder="Materi atau nama tryout"
+            value={searchDraft}
+            onChange={setSearchDraft}
+            onSearch={submitSearch}
+            className="xl:w-80"
+          />
         </div>
-        <p className="mb-4 text-sm text-slate-500">
+        <p role="status" className="mb-4 text-sm text-slate-500">
           {filtered.length} paket tersedia{" "}
-          <span className="text-slate-400">· Data contoh versi demo</span>
         </p>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {tryoutsPagination.pageItems.map((t) => (
@@ -118,8 +130,9 @@ export default function TryoutsCatalogPage() {
               Coba kata kunci lain atau tampilkan semua kategori.
             </p>
             <button
+              type="button"
               onClick={() => {
-                setSearch("");
+                clearSearch();
                 setCategory("all");
               }}
               className="eu-button-secondary mt-5"

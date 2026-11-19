@@ -1,10 +1,12 @@
 "use client";
+import SearchForm from "@/components/common/SearchForm";
+import useSubmittedSearch from "@/hooks/useSubmittedSearch";
 import Pagination from "@/components/common/Pagination";
 import usePagination from "@/hooks/usePagination";
 
 import StatusBadge from "@/components/common/StatusBadge";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useMemo, useEffect, useRef, useState } from "react";
 import { useApp } from "@/context/AppContext";
 import { EssaySubmission } from "@/types";
 import MathRenderer from "@/components/common/MathRenderer";
@@ -42,7 +44,14 @@ export default function TentorGradingPage() {
   );
   const [scoreInput, setScoreInput] = useState("");
   const [feedbackInput, setFeedbackInput] = useState("");
-  const [query, setQuery] = useState("");
+  const {
+    query: query,
+    draft: searchDraft,
+    setDraft: setSearchDraft,
+    submit: submitSearch,
+    clear: clearSearch,
+    revision: searchRevision,
+  } = useSubmittedSearch();
   const [filter, setFilter] = useState<Filter>("pending");
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -89,16 +98,25 @@ export default function TentorGradingPage() {
   const progress = essaySubmissions.length
     ? Math.round((graded.length / essaySubmissions.length) * 100)
     : 0;
-  const filtered = essaySubmissions.filter((essay) => {
-    const matchesFilter =
-      filter === "all" ||
-      (filter === "graded" ? essay.isGraded : !essay.isGraded);
-    const text = `${essay.studentName} ${essay.studentNis} ${essay.tryoutTitle} ${essay.subtestId.replace(/_/g, " ")}`;
-    return (
-      matchesFilter && text.toLowerCase().includes(query.toLowerCase().trim())
-    );
-  });
-  const essaysPagination = usePagination(filtered, 5, query + "|" + filter);
+  const filtered = useMemo(
+    () =>
+      essaySubmissions.filter((essay) => {
+        const matchesFilter =
+          filter === "all" ||
+          (filter === "graded" ? essay.isGraded : !essay.isGraded);
+        const text = `${essay.studentName} ${essay.studentNis} ${essay.tryoutTitle} ${essay.subtestId.replace(/_/g, " ")}`;
+        return (
+          matchesFilter &&
+          text.toLowerCase().includes(query.toLowerCase().trim())
+        );
+      }),
+    [essaySubmissions, query, filter],
+  );
+  const essaysPagination = usePagination(
+    filtered,
+    5,
+    query + "|" + filter + "|" + searchRevision,
+  );
 
   return (
     <div className="min-h-screen bg-[#F6F8FC] pb-12 pt-7 font-sans text-slate-800 sm:pt-10">
@@ -106,14 +124,14 @@ export default function TentorGradingPage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Ruang pengajar
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-[#213B64] sm:text-4xl">
               Koreksi esai
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-7 text-slate-500">
-              Setiap umpan balik membantu siswa melangkah lebih jauh.
+              Nilai jawaban dengan rubrik 0–100 dan berikan catatan perbaikan
+              yang jelas.
             </p>
           </div>
           <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-medium text-slate-500 shadow-sm">
@@ -126,52 +144,28 @@ export default function TentorGradingPage() {
           <div className="min-w-0 space-y-6">
             <section
               aria-label="Ringkasan koreksi"
-              className="relative overflow-hidden rounded-[28px] bg-[#E8EEF9] p-6 sm:p-8"
+              className="workspace-feature"
             >
-              <div
-                aria-hidden="true"
-                className="absolute -right-10 -top-16 h-52 w-52 rounded-full border-[28px] border-white/30"
-              />
-              <div className="relative flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-[#52719A]">
-                    Halo, {currentUser.name.split(" ")[0]} 👋
-                  </p>
-                  <h2 className="mt-2 max-w-md text-xl font-bold leading-snug text-[#244676] sm:text-2xl">
-                    {pending.length
-                      ? "Ada cerita belajar yang menunggu tanggapanmu."
-                      : "Semua jawaban sudah mendapat perhatianmu."}
-                  </h2>
-                </div>
-                <div
-                  aria-hidden="true"
-                  className="hidden h-16 w-16 shrink-0 rotate-6 items-center justify-center rounded-2xl bg-white/80 text-[#5277A8] sm:flex"
-                >
-                  <BookOpen size={31} strokeWidth={1.5} />
-                </div>
+              <div>
+                <p className="text-sm text-[#D3E0EF]">Antrean penilaian</p>
+                <h2 className="mt-2 text-2xl font-bold text-white">
+                  {pending.length
+                    ? pending.length + " esai menunggu penilaian"
+                    : "Seluruh esai sudah dinilai"}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-[#D3E0EF]">
+                  Periksa argumen, berikan skor sesuai rubrik, lalu tulis
+                  langkah perbaikan.
+                </p>
               </div>
-              <dl className="relative mt-7 flex flex-wrap gap-x-9 gap-y-4 sm:gap-x-12">
+              <dl className="flex flex-wrap gap-7">
                 <div>
-                  <dt className="text-xs text-[#52719A]">Perlu dikoreksi</dt>
-                  <dd className="mt-1.5 flex items-center gap-2 text-3xl font-bold text-[#244676]">
-                    {pending.length}
-                    <span className="mt-1 rounded-full bg-white/70 p-1.5 text-[#A67932]">
-                      <Clock3 size={15} />
-                    </span>
-                  </dd>
+                  <dt className="text-sm text-[#D3E0EF]">Sudah dinilai</dt>
+                  <dd className="mt-2 text-3xl font-bold">{graded.length}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-[#52719A]">Sudah dinilai</dt>
-                  <dd className="mt-1.5 flex items-center gap-2 text-3xl font-bold text-[#244676]">
-                    {graded.length}
-                    <span className="mt-1 rounded-full bg-white/70 p-1.5 text-[#34856D]">
-                      <CheckCheck size={15} />
-                    </span>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-[#52719A]">Total jawaban</dt>
-                  <dd className="mt-1.5 text-3xl font-bold text-[#244676]">
+                  <dt className="text-sm text-[#D3E0EF]">Total jawaban</dt>
+                  <dd className="mt-2 text-3xl font-bold">
                     {essaySubmissions.length}
                   </dd>
                 </div>
@@ -194,19 +188,14 @@ export default function TentorGradingPage() {
                     {filtered.length} jawaban ditampilkan
                   </span>
                 </div>
-                <label className="mt-5 flex items-center gap-3 rounded-xl border border-transparent bg-[#F6F8FC] px-4 focus-within:border-[#7796C2] focus-within:ring-2 focus-within:ring-blue-100">
-                  <Search size={18} className="shrink-0 text-slate-500" />
-                  <span className="sr-only">
-                    Cari siswa, kode siswa, atau tryout
-                  </span>
-                  <input
-                    type="search"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Cari siswa atau tryout…"
-                    className="min-h-12 w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-500"
-                  />
-                </label>
+                <SearchForm
+                  label="Cari jawaban siswa"
+                  placeholder="Nama siswa atau tryout"
+                  value={searchDraft}
+                  onChange={setSearchDraft}
+                  onSearch={submitSearch}
+                  className="mt-5"
+                />
                 <div
                   role="group"
                   aria-label="Filter status koreksi"
@@ -338,7 +327,7 @@ export default function TentorGradingPage() {
                   {query && (
                     <button
                       type="button"
-                      onClick={() => setQuery("")}
+                      onClick={() => clearSearch()}
                       className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"
                     >
                       Hapus pencarian
@@ -524,7 +513,7 @@ export default function TentorGradingPage() {
                   placeholder="Apa yang sudah baik? Apa yang bisa diperbaiki?"
                   className="w-full rounded-xl border border-slate-200 bg-[#F8FAFD] p-3.5 text-sm leading-7 placeholder:text-slate-500 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
                 />
-                <div className="mt-5 flex flex-wrap justify-end gap-2">
+                <div className="mt-5 flex flex-wrap justify-end gap-3">
                   <button
                     type="button"
                     onClick={() => setSelectedEssay(null)}

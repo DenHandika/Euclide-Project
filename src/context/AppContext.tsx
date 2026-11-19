@@ -1,4 +1,11 @@
 "use client";
+import { normalizeDifficulty } from "@/lib/questionDifficulty";
+import {
+  ClassInput,
+  formatMeetings,
+  validateClass,
+} from "@/lib/classManagement";
+import { readStudentResult, storeStudentResult } from "@/lib/resultStorage";
 
 import React, {
   createContext,
@@ -93,6 +100,7 @@ interface AppContextType {
   students: User[];
   payments: PaymentRecord[];
   updateBatchCapacity: (batchId: string, maxCapacity: number) => void;
+  saveBatch: (input: ClassInput, id?: string) => string | null;
   toggleStudentStatus: (studentId: string, status: UserStatus) => void;
   importStudentsBulk: (rows: StudentImportRow[]) => {
     importedCount: number;
@@ -177,7 +185,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       const storedQuestions = localStorage.getItem("euclide_questions");
       if (storedQuestions) {
-        const saved: Question[] = JSON.parse(storedQuestions);
+        const saved: Question[] = JSON.parse(storedQuestions).map(
+          (question: Question) => ({
+            ...question,
+            difficulty: normalizeDifficulty(question.difficulty),
+          }),
+        );
         const savedIds = new Set(saved.map((question) => question.id));
         // Add newly shipped examples without deleting questions edited by the user.
         setQuestions([
@@ -522,7 +535,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return next;
     });
 
-    const updatedResults = { ...examResults, [tryoutId]: result };
+    const updatedResults = storeStudentResult(examResults, result);
     setExamResults(updatedResults);
     saveState("euclide_results", updatedResults);
 
@@ -534,7 +547,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const getExamResult = (tryoutId: string): ExamResult => {
-    const result = examResults[tryoutId];
+    const result = readStudentResult(examResults, currentUser.id, tryoutId);
     return result?.userId === currentUser.id
       ? result
       : {
@@ -748,6 +761,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   };
 
+  const saveBatch = (input: ClassInput, id?: string): string | null => {
+    const error = validateClass(input, batches, id);
+    if (error) return error;
+    const existing = batches.find((batch) => batch.id === id);
+    const saved: ClassBatch = {
+      ...input,
+      id: existing?.id ?? crypto.randomUUID(),
+      name: input.name.trim(),
+      room: input.room.trim(),
+      tutorName: input.tutorName.trim(),
+      currentStudents: existing?.currentStudents ?? 0,
+      schedule: formatMeetings(input.meetings ?? []),
+    };
+    const updated = existing
+      ? batches.map((batch) => (batch.id === existing.id ? saved : batch))
+      : [saved, ...batches];
+    setBatches(updated);
+    saveState("euclide_batches", updated);
+    showToast(
+      existing ? "Kelas dan jadwal diperbarui." : "Kelas berhasil ditambahkan.",
+      "success",
+    );
+    return null;
+  };
+
   const updateBatchCapacity = (batchId: string, maxCapacity: number) => {
     setBatches((prev) => {
       const updated = prev.map((b) =>
@@ -790,6 +828,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         students,
         payments,
         updateBatchCapacity,
+        saveBatch,
         toggleStudentStatus,
         importStudentsBulk,
         addManualPayment,

@@ -1,242 +1,299 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { useApp } from "@/context/AppContext";
+import {
+  cohortLearningRows,
+  latestResultsByStudent,
+  learningProfile,
+} from "@/lib/learningAnalytics";
+import LearningProfile from "@/components/student/LearningProfile";
 import Pagination from "@/components/common/Pagination";
 import usePagination from "@/hooks/usePagination";
 
-import React from "react";
-import { useApp } from "@/context/AppContext";
-import { TrendingUp, BarChart2, Users, Target, Sparkles } from "lucide-react";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  CartesianGrid,
-} from "recharts";
-
 export default function TentorAnalyticsPage() {
-  const { students } = useApp();
-
-  const cohortPerformanceData = [
-    { subtest: "Penalaran Umum", rerataEuclide: 742, rerataNasional: 580 },
-    {
-      subtest: "Pengetahuan Kuantitatif",
-      rerataEuclide: 765,
-      rerataNasional: 545,
-    },
-    { subtest: "PBM", rerataEuclide: 680, rerataNasional: 560 },
-    { subtest: "PPU", rerataEuclide: 695, rerataNasional: 550 },
-    { subtest: "Literasi B. Indo", rerataEuclide: 688, rerataNasional: 570 },
-    { subtest: "Literasi B. Inggris", rerataEuclide: 720, rerataNasional: 530 },
-    { subtest: "Penalaran MTK", rerataEuclide: 739, rerataNasional: 520 },
-  ];
-
-  const ptnPassingGradeBenchmarks = [
-    {
-      ptn: "Universitas Indonesia (UI)",
-      prodi: "Pendidikan Dokter",
-      target: 745,
-      euclideEligible: "32 Siswa",
-    },
-    {
-      ptn: "Institut Teknologi Bandung (ITB)",
-      prodi: "STEI - Rekayasa",
-      target: 725,
-      euclideEligible: "48 Siswa",
-    },
-    {
-      ptn: "Universitas Indonesia (UI)",
-      prodi: "Teknik Informatika",
-      target: 700,
-      euclideEligible: "65 Siswa",
-    },
-    {
-      ptn: "Universitas Gadjah Mada (UGM)",
-      prodi: "Kedokteran",
-      target: 740,
-      euclideEligible: "30 Siswa",
-    },
-    {
-      ptn: "Institut Teknologi Sepuluh Nopember (ITS)",
-      prodi: "Sistem Informasi",
-      target: 680,
-      euclideEligible: "84 Siswa",
-    },
-  ];
-  const benchmarksPagination = usePagination(ptnPassingGradeBenchmarks, 5);
+  const { students, batches, examResults, isHydrated } = useApp();
+  const [mode, setMode] = useState<"cohort" | "student">("cohort");
+  const [batchId, setBatchId] = useState("all");
+  const [studentId, setStudentId] = useState("");
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get(
+      "student",
+    );
+    if (requested) {
+      setStudentId(requested);
+      setMode("student");
+    }
+  }, []);
+  const scopedStudents = students.filter(
+    (student) => batchId === "all" || student.batchId === batchId,
+  );
+  const studentIds = new Set(scopedStudents.map((student) => student.id));
+  const results = Object.values(examResults).filter((result) =>
+    studentIds.has(result.userId),
+  );
+  const latest = latestResultsByStudent(results);
+  const rows = cohortLearningRows(results);
+  const weakest = [...rows].sort((a, b) => a.score - b.score)[0];
+  const average = latest.length
+    ? Math.round(
+        (latest.reduce((sum, result) => sum + result.totalScore, 0) /
+          latest.length) *
+          10,
+      ) / 10
+    : null;
+  const selected = studentId
+    ? scopedStudents.find((student) => student.id === studentId)
+    : scopedStudents[0];
+  const profile = selected ? learningProfile(results, selected.id) : null;
+  const historyPagination = usePagination(
+    profile?.history ?? [],
+    5,
+    selected?.id ?? "",
+  );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-10 font-sans text-slate-900">
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
-          <div>
-            <div className="inline-flex items-center space-x-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs font-semibold text-amber-800 mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Analisis Kohort & Daya Saing Siswa</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-              Statistik 7 Subtest & Pemetaan PTN
-            </h1>
-            <p className="text-sm text-slate-600 mt-1">
-              Komparasi capaian siswa Euclide terhadap standar nasional dan
-              pemetaan kuota lolos PTN Klaster 1.
-            </p>
-          </div>
-        </div>
-
-        {/* 1. Metric Overview Strip */}
+    <div className="workspace-page">
+      <header className="workspace-heading">
         <div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-card">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                Rerata Skor Tertimbang Angkatan
-              </span>
-              <div className="text-3xl font-extrabold text-slate-900">
-                718.4{" "}
-                <span className="text-xs text-slate-400 font-normal">
-                  / 1000
-                </span>
-              </div>
-              <div className="mt-2 text-xs text-emerald-600 font-bold flex items-center space-x-1">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>+168 Poin di atas Rata-rata BPPP Nasional</span>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-card">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                Subtest Paling Unggul
-              </span>
-              <div className="text-lg font-bold text-blue-700 truncate">
-                Pengetahuan Kuantitatif (PK)
-              </div>
-              <div className="mt-2 text-xs text-slate-600">
-                Rata-rata 765 Poin (Akurasi 86.4%)
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-card">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
-                Subtest Butuh Drilling Ekstra
-              </span>
-              <div className="text-lg font-bold text-rose-600 truncate">
-                Pemahaman Bacaan & Menulis (PBM)
-              </div>
-              <div className="mt-2 text-xs text-rose-600 font-medium">
-                Rata-rata 680 Poin (Waktu 72s per Soal)
-              </div>
-            </div>
-          </div>
+          <p className="text-sm font-semibold text-[#42668E]">
+            Pendampingan belajar
+          </p>
+          <h1 className="workspace-title mt-2">Analisis siswa</h1>
+          <p className="mt-3 max-w-prose text-base leading-7 text-slate-600">
+            Lihat kebutuhan kelas, lalu tentukan langkah pendampingan untuk
+            setiap siswa.
+          </p>
         </div>
-
-        {/* 2. Recharts Bar Chart: Euclide vs Nasional */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 shadow-card">
-          <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Komparasi Skor Subtest: Siswa Euclide vs Rata-rata Nasional
-              </h2>
-              <p className="text-xs text-slate-500">
-                Data agregat dari 642 peserta simulasi UTBK 2026 (Angkatan
-                Bimbel Euclide).
-              </p>
-            </div>
-          </div>
-
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={cohortPerformanceData}
-                margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                <XAxis
-                  dataKey="subtest"
-                  tick={{ fill: "#64748B", fontSize: 10 }}
-                />
-                <YAxis
-                  domain={[0, 1000]}
-                  tick={{ fill: "#64748B", fontSize: 10 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#0F172A",
-                    color: "#FFFFFF",
-                    borderRadius: "8px",
-                    fontSize: "11px",
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-                <Bar
-                  dataKey="rerataEuclide"
-                  name="Rerata Siswa Euclide"
-                  fill="#2563EB"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="rerataNasional"
-                  name="Rerata Nasional BPPP"
-                  fill="#CBD5E1"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div
+          role="group"
+          aria-label="Tampilan analisis"
+          className="flex flex-wrap gap-3"
+        >
+          <button
+            type="button"
+            aria-pressed={mode === "cohort"}
+            onClick={() => setMode("cohort")}
+            className={
+              mode === "cohort" ? "eu-button-primary" : "eu-button-secondary"
+            }
+          >
+            Ringkasan kelas
+          </button>
+          <button
+            type="button"
+            aria-pressed={mode === "student"}
+            onClick={() => setMode("student")}
+            className={
+              mode === "student" ? "eu-button-primary" : "eu-button-secondary"
+            }
+          >
+            Per siswa
+          </button>
         </div>
-
-        {/* 3. PTN Benchmark Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 shadow-card">
-          <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Benchmark Passing Grade & Estimasi Kelulusan Siswa
-              </h2>
-              <p className="text-xs text-slate-500">
-                Jumlah siswa Euclide yang saat ini berada di Zona Aman target
-                PTN Klaster 1.
-              </p>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-sans">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-400 font-semibold uppercase tracking-wider text-xs">
-                  <th className="pb-3 px-3">Perguruan Tinggi (PTN)</th>
-                  <th className="pb-3 px-3">Program Studi</th>
-                  <th className="pb-3 px-3">Target Passing Grade</th>
-                  <th className="pb-3 px-3 text-right">Siswa di Zona Aman</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {benchmarksPagination.pageItems.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50 transition">
-                    <td className="py-3.5 px-3 font-bold text-slate-900">
-                      {item.ptn}
-                    </td>
-                    <td className="py-3.5 px-3 text-blue-700 font-semibold">
-                      {item.prodi}
-                    </td>
-                    <td className="py-3.5 px-3 font-sans font-bold text-slate-800">
-                      {item.target}
-                    </td>
-                    <td className="py-3.5 px-3 text-right font-sans font-bold text-emerald-600">
-                      {item.euclideEligible}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <Pagination
-            pagination={benchmarksPagination}
-            label="benchmark prodi"
-          />
-        </div>
+      </header>
+      <div className="workspace-panel flex flex-wrap items-end gap-5">
+        <label className="grid w-full min-w-0 gap-2 text-sm font-semibold sm:min-w-56 sm:flex-1">
+          Kelas bimbingan
+          <select
+            value={batchId}
+            onChange={(event) => {
+              setBatchId(event.target.value);
+              setStudentId("");
+            }}
+            className="workspace-select"
+          >
+            <option value="all">Semua kelas</option>
+            {batches.map((batch) => (
+              <option key={batch.id} value={batch.id}>
+                {batch.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        {mode === "student" && (
+          <label className="grid w-full min-w-0 gap-2 text-sm font-semibold sm:min-w-56 sm:flex-1">
+            Siswa
+            <select
+              value={selected?.id ?? ""}
+              onChange={(event) => setStudentId(event.target.value)}
+              className="workspace-select"
+              disabled={!scopedStudents.length}
+            >
+              {!selected && (
+                <option value="" disabled>
+                  {scopedStudents.length
+                    ? "Pilih siswa"
+                    : "Belum ada siswa di kelas ini"}
+                </option>
+              )}
+              {scopedStudents.map((student) => (
+                <option key={student.id} value={student.id}>
+                  {student.name}
+                  {student.nis ? ` · ${student.nis}` : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <p className="max-w-prose text-sm leading-6 text-slate-600">
+          {scopedStudents.length} siswa dalam cakupan · {latest.length} memiliki
+          hasil. Ringkasan kelas memakai satu hasil terbaru per siswa.
+        </p>
       </div>
+      {!isHydrated ? (
+        <p role="status">Memuat hasil belajar…</p>
+      ) : mode === "student" ? (
+        <>
+          {selected ? (
+            <>
+              <section className="workspace-feature">
+                <div>
+                  <p className="text-sm font-medium text-[#D3E0EF]">
+                    Profil belajar
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">
+                    {selected.name}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-[#D3E0EF]">
+                    {selected.nis || "Kode siswa belum tersedia"} ·{" "}
+                    {batches.find((batch) => batch.id === selected.batchId)
+                      ?.name ?? "Belum terhubung ke kelas"}
+                  </p>
+                </div>
+                <dl className="flex flex-wrap gap-8">
+                  <div>
+                    <dt className="text-sm text-[#D3E0EF]">Hasil tersedia</dt>
+                    <dd className="mt-2 text-3xl font-bold">
+                      {profile?.history.length ?? 0}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-[#D3E0EF]">Skor terbaru</dt>
+                    <dd className="mt-2 text-3xl font-bold">
+                      {profile?.latest.totalScore ?? "Belum ada"}
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+              <LearningProfile results={results} studentId={selected.id} />
+              {profile && (
+                <section className="workspace-panel">
+                  <h2 id="student-history-title" className="text-xl font-bold">
+                    Riwayat hasil {selected.name.split(" ")[0]}
+                  </h2>
+                  <div
+                    className="overview-table-scroll mt-5"
+                    role="region"
+                    tabIndex={0}
+                    aria-labelledby="student-history-title"
+                  >
+                    <table className="overview-table">
+                      <caption className="sr-only">
+                        Riwayat tryout siswa terpilih
+                      </caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Tryout</th>
+                          <th scope="col">Tanggal</th>
+                          <th scope="col">Skor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {historyPagination.pageItems.map((result) => (
+                          <tr key={result.id}>
+                            <th scope="row" className="overview-row-heading">
+                              {result.tryoutTitle}
+                            </th>
+                            <td>{result.date}</td>
+                            <td className="font-semibold tabular-nums">
+                              {result.totalScore}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <Pagination
+                    pagination={historyPagination}
+                    label="riwayat siswa"
+                  />
+                </section>
+              )}
+            </>
+          ) : (
+            <p className="workspace-panel text-slate-600">
+              Belum ada siswa di kelas ini. Pilih kelas lain untuk melihat
+              analisis.
+            </p>
+          )}
+        </>
+      ) : (
+        <>
+          <section className="workspace-feature">
+            <div>
+              <p className="text-sm text-[#D3E0EF]">Gambaran kelas</p>
+              <h2 className="mt-2 text-2xl font-bold text-white">
+                {weakest
+                  ? `Prioritaskan ${weakest.name}`
+                  : "Kumpulkan hasil tryout pertama"}
+              </h2>
+              <p className="mt-3 max-w-prose text-sm leading-7 text-[#D3E0EF]">
+                {weakest
+                  ? "Subtes ini memiliki rerata terendah pada hasil yang tersedia. Buka Per siswa untuk membedakan kebutuhan tiap peserta."
+                  : "Setelah hasil tersedia, kebutuhan belajar kelas akan ditampilkan di sini."}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-[#D3E0EF]">
+                Rerata skor hasil terbaru
+              </p>
+              <p className="mt-2 text-4xl font-bold">
+                {average ?? "Belum ada"}
+              </p>
+              <p className="mt-2 text-sm text-[#D3E0EF]">
+                Berdasarkan {latest.length} siswa
+              </p>
+            </div>
+          </section>
+          <section className="workspace-panel">
+            <h2 className="text-xl font-bold">
+              Subtes mana yang perlu pendampingan?
+            </h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Jumlah peserta per subtes dapat berbeda jika rincian hasil belum
+              lengkap.
+            </p>
+            {rows.length ? (
+              <ul className="mt-6 grid gap-x-10 md:grid-cols-2">
+                {rows.map((row) => (
+                  <li key={row.id} className="border-t border-slate-200 py-5">
+                    <div className="flex flex-wrap justify-between gap-2 text-sm">
+                      <h3 className="font-semibold">{row.name}</h3>
+                      <p className="tabular-nums">{row.score} / 1000</p>
+                    </div>
+                    <progress
+                      className="learning-progress mt-3"
+                      value={row.score}
+                      max={1000}
+                      aria-label={`Rerata ${row.name}`}
+                    >
+                      {row.score}
+                    </progress>
+                    <p className="mt-2 text-xs text-slate-600">
+                      {row.count} siswa dengan rincian skor
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-6 text-sm text-slate-600">
+                Belum ada rincian skor untuk kelas yang dipilih.
+              </p>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 }

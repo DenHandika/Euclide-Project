@@ -6,6 +6,21 @@ import {
   SUBTEST_CONFIGS,
 } from "../src/data/mockData";
 import { DEMO_QUESTIONS } from "../src/data/demoQuestions";
+import {
+  normalizeDifficulty,
+  QUESTION_DIFFICULTIES,
+} from "../src/lib/questionDifficulty";
+
+test("question difficulty uses the three canonical labels and accepts legacy saved/imported labels", () => {
+  assert.deepEqual(QUESTION_DIFFICULTIES, ["Mudah", "Sedang", "Sulit"]);
+  for (const question of MOCK_QUESTIONS)
+    assert.ok(QUESTION_DIFFICULTIES.includes(question.difficulty));
+  assert.equal(normalizeDifficulty("Sukar"), "Sulit");
+  assert.equal(normalizeDifficulty(" sukar "), "Sulit");
+  assert.equal(normalizeDifficulty("SULIT"), "Sulit");
+  assert.equal(normalizeDifficulty("mudah"), "Mudah");
+  assert.equal(normalizeDifficulty(undefined), "Sedang");
+});
 
 test("frontend bank covers all subtests and four input types with valid objective keys", () => {
   assert.equal(MOCK_QUESTIONS.length, 80);

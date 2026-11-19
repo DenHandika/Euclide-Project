@@ -1,4 +1,6 @@
 "use client";
+import ChoiceStrip from "@/components/common/ChoiceStrip";
+import DifficultyBadge from "@/components/common/DifficultyBadge";
 import Pagination from "@/components/common/Pagination";
 import usePagination from "@/hooks/usePagination";
 
@@ -16,7 +18,6 @@ import {
   X,
   Image as ImageIcon,
   CheckCircle2,
-  Sparkles,
   ClipboardPaste,
   BookOpen,
   ArrowRight,
@@ -185,7 +186,7 @@ export default function AdminQuestionsPage() {
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 font-sans text-xs">
+          <div className="flex items-center font-sans text-xs flex-wrap gap-3">
             <button
               onClick={() => setBulkModalOpen(true)}
               className="inline-flex items-center space-x-1.5 bg-[#FFFFFF] hover:bg-[#EDF2F9] text-[#263D5F] border border-slate-200 px-3.5 py-2 font-semibold transition rounded-xl min-h-11"
@@ -205,8 +206,14 @@ export default function AdminQuestionsPage() {
         </div>
 
         {/* Subtest Filter Tabs */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto font-sans text-xs pb-1">
+        <ChoiceStrip
+          label="Filter subtes bank soal"
+          value={filterSubtest}
+          className="font-sans text-sm"
+        >
           <button
+            type="button"
+            aria-pressed={filterSubtest === "all"}
             onClick={() => setFilterSubtest("all")}
             className={`px-3 py-1 border whitespace-nowrap transition rounded-xl min-h-11 ${
               filterSubtest === "all"
@@ -218,6 +225,8 @@ export default function AdminQuestionsPage() {
           </button>
           {SUBTEST_CONFIGS.map((st) => (
             <button
+              type="button"
+              aria-pressed={filterSubtest === st.id}
               key={st.id}
               onClick={() => setFilterSubtest(st.id)}
               className={`px-3 py-1 border whitespace-nowrap transition rounded-xl min-h-11 ${
@@ -230,7 +239,7 @@ export default function AdminQuestionsPage() {
               )
             </button>
           ))}
-        </div>
+        </ChoiceStrip>
 
         {/* Questions Grid List */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -241,8 +250,8 @@ export default function AdminQuestionsPage() {
             >
               <div className="space-y-3">
                 {/* Meta Header */}
-                <div className="flex items-center justify-between font-sans text-xs pb-2 border-b border-slate-100">
-                  <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 font-sans text-xs pb-2 border-b border-slate-100">
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
                     <span className="font-bold text-[#263D5F] bg-[#F6F8FC] px-2 py-0.5 border border-slate-200 rounded-full">
                       #{q.number}
                     </span>
@@ -250,16 +259,16 @@ export default function AdminQuestionsPage() {
                       {q.subtestId.replace(/_/g, " ")}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[#C8831A] bg-[#EFA93B]/20 px-2 py-1 font-bold rounded-full">
-                      {q.difficulty}
-                    </span>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <DifficultyBadge value={q.difficulty} />
                     <button
+                      type="button"
+                      aria-label={`Hapus soal nomor ${q.number}`}
                       onClick={() => deleteQuestion(q.id)}
-                      className="text-slate-500 hover:text-[#D0342C] transition p-0.5 rounded-xl min-h-11"
+                      className="eu-button-danger-icon"
                       title="Hapus Soal"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 aria-hidden="true" size={18} />
                     </button>
                   </div>
                 </div>
@@ -393,7 +402,7 @@ export default function AdminQuestionsPage() {
                   >
                     <option value="Mudah">Mudah</option>
                     <option value="Sedang">Sedang</option>
-                    <option value="Sukar">Sukar</option>
+                    <option value="Sulit">Sulit</option>
                   </select>
                 </div>
 
@@ -580,7 +589,7 @@ export default function AdminQuestionsPage() {
               </div>
 
               {/* Actions */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2 font-sans">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end font-sans flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}

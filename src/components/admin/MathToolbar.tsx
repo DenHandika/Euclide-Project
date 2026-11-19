@@ -5,7 +5,6 @@ import {
   Divide,
   Sigma,
   Pi,
-  Sparkles,
   FunctionSquare,
   Binary,
   Grid3X3,
@@ -130,7 +129,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
     <div className="bg-[#FFFFFF] border border-slate-200 p-2 space-y-2 font-sans rounded-xl">
       {/* Category Tabs & Info */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-1.5 text-xs">
-        <div className="flex items-center space-x-1 font-sans text-xs">
+        <div className="flex flex-wrap items-center gap-2 font-sans text-xs">
           <span className="text-slate-500 text-xs font-bold mr-1 hidden sm:inline">
             TOOLBAR RUMUS:
           </span>
@@ -175,7 +174,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
       </div>
 
       {/* Button Row by Category */}
-      <div className="flex flex-wrap gap-1.5 items-center font-sans text-xs">
+      <div className="flex flex-wrap gap-2 items-center font-sans text-xs">
         {activeCategory === "aljabar" && (
           <>
             {aljabarSnippets.map((item, idx) => (

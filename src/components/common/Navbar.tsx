@@ -11,6 +11,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import { roleHome } from "@/lib/navigation";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -19,18 +20,19 @@ export function Navbar() {
   const isPublicPage = pathname === "/";
   const links = {
     siswa: [
-      { name: "Beranda", href: "/" },
+      { name: "Beranda", href: "/dashboard" },
       { name: "Tryout", href: "/tryouts" },
       { name: "Latihan soal", href: "/drilling" },
       { name: "Hasil & target PTN", href: "/exam/to-utbk-national-01/result" },
     ],
     tentor: [
+      { name: "Dashboard", href: "/tentor" },
       { name: "Bank soal", href: "/admin/questions" },
       { name: "Koreksi esai", href: "/tentor/grading" },
       { name: "Analisis siswa", href: "/tentor/analytics" },
     ],
     admin: [
-      { name: "Ringkasan", href: "/admin" },
+      { name: "Dashboard", href: "/admin" },
       { name: "Pembayaran", href: "/admin/payments" },
       { name: "Kelas", href: "/admin/classes" },
       { name: "Siswa", href: "/admin/students" },
@@ -66,7 +68,7 @@ export function Navbar() {
           className={`mx-auto flex w-full items-center justify-between gap-5 px-5 py-4 sm:px-8 ${isPublicPage ? "max-w-7xl" : ""}`}
         >
           <Link
-            href="/"
+            href={isPublicPage ? "/" : roleHome[currentRole]}
             aria-label="Euclide, beranda"
             className="flex shrink-0 items-center gap-2.5"
           >

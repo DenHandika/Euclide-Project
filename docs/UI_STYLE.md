@@ -27,6 +27,11 @@ Tujuan: platform belajar yang mudah dibaca siswa, pengajar, dan admin di desktop
   halaman kembali ke halaman pertama, dan nomor urut memakai offset halaman.
   Ringkasan jumlah/validasi impor tetap berdasarkan seluruh data. Tampilan HP
   menyederhanakan kontrol nomor menjadi sebelumnya/berikutnya dan halaman aktif.
+- Pencarian memakai `SearchForm` dan `useSubmittedSearch`. Draf input terpisah
+  dari kata kunci yang dipakai filter; hanya submit native melalui Enter/tombol
+  Cari yang menerapkan pencarian. Hasil filter di-memo berdasarkan data, kata
+  kunci terapan dan filter lain; draf bukan dependensinya. Reset eksplisit
+  membersihkan keduanya dan submit ulang mengembalikan halaman pertama.
 
 Penyelarasan mencakup siswa, bank soal, pembayaran/kasir, dialog impor siswa/soal,
 toolbar rumus, kuitansi layar, notifikasi, pemilih peran demo, latihan soal,

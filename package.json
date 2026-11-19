@@ -14,7 +14,7 @@
     "db:migrate": "node scripts/migrate.mjs",
     "test:backend": "tsx --test tests/backend.test.ts tests/choices.test.ts",
     "test:demo": "tsx --test tests/demoData.test.ts",
-    "test:ui": "tsx --test tests/pagination.test.ts tests/demoData.test.ts",
+    "test:ui": "tsx --test tests/pagination.test.ts tests/demoData.test.ts tests/learningAnalytics.test.ts tests/searchState.test.ts tests/adminDashboard.test.ts tests/classManagement.test.ts",
     "db:setup": "node scripts/setup-db.mjs",
     "db:bootstrap-admin": "node scripts/bootstrap-admin.mjs"
   },

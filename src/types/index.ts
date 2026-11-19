@@ -1,4 +1,5 @@
 import type { StudyProgram } from "@/lib/snbtChoices";
+import type { QuestionDifficulty } from "@/lib/questionDifficulty";
 
 export type UserRole = "admin" | "tentor" | "siswa";
 
@@ -82,7 +83,7 @@ export interface Question {
   explanation: string; // KaTeX explanation / Pembahasan
   rubricGuide?: string; // For essay grading
   maxScore: number;
-  difficulty: "Mudah" | "Sedang" | "Sukar";
+  difficulty: QuestionDifficulty;
 }
 
 export interface Tryout {
@@ -174,6 +175,12 @@ export interface ExamResult {
   };
 }
 
+export interface ClassMeeting {
+  day: number;
+  start: string;
+  end: string;
+}
+
 export interface ClassBatch {
   id: string;
   name: string;
@@ -187,6 +194,7 @@ export interface ClassBatch {
   currentStudents: number;
   maxCapacity: number;
   schedule: string;
+  meetings?: ClassMeeting[];
   status: "active" | "upcoming" | "completed";
 }
 

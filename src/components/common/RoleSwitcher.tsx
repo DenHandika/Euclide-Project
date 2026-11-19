@@ -54,6 +54,7 @@ export function RoleSwitcher() {
       description:
         "Koreksi Esai Manual (0-100), Bank Soal KaTeX, Analitik Subtest",
       quickLinks: [
+        { label: "Dashboard pengajar", href: "/tentor" },
         { label: "Koreksi Esai", href: "/tentor/grading" },
         { label: "Bank Soal KaTeX", href: "/admin/questions" },
         { label: "Analitik Subtest", href: "/tentor/analytics" },
@@ -65,6 +66,7 @@ export function RoleSwitcher() {
       icon: <BookOpen className="w-3.5 h-3.5" />,
       description: "Player CBT Mobile-First, Timer Subtest, Rasionalisasi SNBT",
       quickLinks: [
+        { label: "Beranda siswa", href: "/dashboard" },
         { label: "Katalog Tryout", href: "/tryouts" },
         { label: "Simulasi CBT", href: "/exam/to-utbk-national-01" },
         { label: "Rasionalisasi", href: "/exam/to-utbk-national-01/result" },
@@ -85,7 +87,7 @@ export function RoleSwitcher() {
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-[#1B8A5A]" />
               <span className="font-sans text-xs font-semibold text-[#263D5F] uppercase tracking-wider">
-                Panel Pengalih Peran Demo
+                Ganti peran
               </span>
             </div>
             <button

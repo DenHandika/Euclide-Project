@@ -26,7 +26,7 @@ export default function MobileBottomNav() {
   }
 
   const studentNav = [
-    { name: "Beranda", href: "/", icon: <Home className="w-5 h-5" /> },
+    { name: "Beranda", href: "/dashboard", icon: <Home className="w-5 h-5" /> },
     {
       name: "Tryout",
       href: "/tryouts",
@@ -41,7 +41,7 @@ export default function MobileBottomNav() {
   ];
 
   const tentorNav = [
-    { name: "Beranda", href: "/", icon: <Home className="w-5 h-5" /> },
+    { name: "Dashboard", href: "/tentor", icon: <Home className="w-5 h-5" /> },
     {
       name: "Koreksi",
       href: "/tentor/grading",
@@ -55,15 +55,15 @@ export default function MobileBottomNav() {
   ];
 
   const adminNav = [
-    { name: "Beranda", href: "/", icon: <Home className="w-5 h-5" /> },
+    { name: "Dashboard", href: "/admin", icon: <Home className="w-5 h-5" /> },
     {
-      name: "Kas & SPP",
-      href: "/admin",
+      name: "Pembayaran",
+      href: "/admin/payments",
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
     {
-      name: "Import SPP",
-      href: "/admin/payments",
+      name: "Kelas",
+      href: "/admin/classes",
       icon: <BookOpen className="w-5 h-5" />,
     },
     {

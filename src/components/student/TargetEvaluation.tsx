@@ -47,7 +47,7 @@ export default function TargetEvaluation({
           </span>
           <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4 text-center">
             <div>
-              <dt className="text-xs text-slate-500">Skor demo</dt>
+              <dt className="text-xs text-slate-500">Skor tryout</dt>
               <dd className="mt-1 text-sm font-bold">{score}</dd>
             </div>
             <div>
@@ -78,9 +78,8 @@ export default function TargetEvaluation({
       <div>
         <h2 className="text-lg font-bold">Hasil terhadap pilihan awalmu</h2>
         <p className="mt-2 text-sm leading-7 text-slate-500">
-          Urutan di bawah adalah preferensi saat ujian dimulai. Skor serta
-          target pada prototipe masih data contoh; lolos target bukan pengumuman
-          diterima PTN.
+          Urutan di bawah mengikuti pilihan saat ujian dimulai. Pencapaian
+          target skor bukan pengumuman diterima PTN.
         </p>
       </div>
       {choices.length ? (

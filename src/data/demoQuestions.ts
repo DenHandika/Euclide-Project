@@ -24,7 +24,7 @@ function choice(
       : letters[correct],
     explanation,
     maxScore: 10,
-    difficulty: n % 3 === 0 ? "Sukar" : n % 2 === 0 ? "Mudah" : "Sedang",
+    difficulty: n % 3 === 0 ? "Sulit" : n % 2 === 0 ? "Mudah" : "Sedang",
   };
 }
 function numeric(
@@ -507,7 +507,7 @@ const reading: Question[] = [
     rubricGuide:
       "Kesesuaian teks (0–30): memahami kendala air dan kerja sama. Alasan dan saran (0–40): usulan konkret dengan alasan. Bahasa dan struktur (0–30): runtut dan mudah dipahami.",
     maxScore: 100,
-    difficulty: "Sukar",
+    difficulty: "Sulit",
   },
 ];
 

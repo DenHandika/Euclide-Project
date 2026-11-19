@@ -1,4 +1,5 @@
 "use client";
+import { normalizeDifficulty } from "@/lib/questionDifficulty";
 import Pagination from "@/components/common/Pagination";
 import usePagination from "@/hooks/usePagination";
 
@@ -8,7 +9,6 @@ import MathRenderer from "@/components/common/MathRenderer";
 import {
   FileText,
   Upload,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
   Copy,
@@ -118,17 +118,11 @@ export default function BulkImportModal({
       const subtestId: SubtestId =
         (subtestMatch?.[1] as SubtestId) || "penalaran_matematika";
 
-      // Extract difficulty (Mudah | Sedang | Sukar/Sulit)
+      // Accept the old Sukar label when importing older question files.
       const diffMatch = block.match(
         /\[KESULITAN\]\s*(Mudah|Sedang|Sulit|Sukar)/i,
       );
-      let difficulty: "Mudah" | "Sedang" | "Sukar" = "Sedang";
-      if (diffMatch) {
-        const d = diffMatch[1].toLowerCase();
-        if (d === "mudah") difficulty = "Mudah";
-        else if (d === "sulit" || d === "sukar") difficulty = "Sukar";
-        else difficulty = "Sedang";
-      }
+      const difficulty = normalizeDifficulty(diffMatch?.[1]);
 
       // Extract Stimulus (optional)
       const stimMatch = block.match(
@@ -247,7 +241,7 @@ export default function BulkImportModal({
 PETUNJUK PENGISIAN UNTUK TENTOR / PENYUSUN SOAL:
 1. Gunakan tag [SOAL 1], [SOAL 2], dst untuk memisahkan nomor soal.
 2. Tag [SUBTEST] diisi id subtest (contoh: penalaran_matematika, penalaran_umum, literasi_indonesia).
-3. Tag [KESULITAN] diisi: Mudah, Sedang, atau Sukar.
+3. Tag [KESULITAN] diisi: Mudah, Sedang, atau Sulit.
 4. Pilihan jawaban diisi pada tag [A], [B], [C], [D], [E].
 5. Kunci jawaban ditulis pada tag [KUNCI] (misal: B).
 6. Pembahasan ditulis pada tag [PEMBAHASAN].
@@ -318,7 +312,7 @@ NASKAH SOAL:
 
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-[#F6F8FC] border border-slate-100 text-xs font-sans shrink-0 rounded-xl">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={handleDownloadWordTemplate}
@@ -482,7 +476,7 @@ NASKAH SOAL:
             <strong>{parsedQuestions.length} butir soal</strong>
           </span>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-3">
             <button
               type="button"
               onClick={onClose}

@@ -196,7 +196,7 @@ export default function AdminPaymentsPage() {
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 font-sans text-xs">
+          <div className="flex items-center font-sans text-xs flex-wrap gap-3">
             <button
               onClick={handleDownloadTemplate}
               className="inline-flex items-center space-x-1.5 bg-[#FFFFFF] hover:bg-[#F6F8FC] text-[#263D5F] px-3.5 py-2 border border-slate-200 transition rounded-xl min-h-11"
@@ -282,7 +282,7 @@ export default function AdminPaymentsPage() {
                 </p>
               </div>
 
-              <div className="flex items-center space-x-2 font-sans text-xs">
+              <div className="flex items-center font-sans text-xs flex-wrap gap-3">
                 <button
                   onClick={() => setParsedRows([])}
                   className="px-3 py-1.5 text-slate-500 hover:text-[#263D5F] bg-[#F6F8FC] border border-slate-200 rounded-xl min-h-11"
@@ -543,7 +543,7 @@ export default function AdminPaymentsPage() {
                 </select>
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-end space-x-2 font-sans">
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-end font-sans flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={() => setManualModalOpen(false)}

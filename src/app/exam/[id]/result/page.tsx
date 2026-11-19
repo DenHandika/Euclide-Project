@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import MathRenderer from "@/components/common/MathRenderer";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 import TargetEvaluation from "@/components/student/TargetEvaluation";
 import { evaluateTarget } from "@/lib/snbtChoices";
 import {
@@ -30,7 +32,6 @@ import {
   TrendingUp,
   RotateCcw,
   ArrowRight,
-  Sparkles,
   User,
   GraduationCap,
   FileCheck2,
@@ -42,9 +43,7 @@ export default function ExamResultPage() {
   const params = useParams();
   const tryoutId = (params?.id as string) || "to-utbk-national-01";
   const { getExamResult, tryouts } = useApp();
-  const [filterReview, setFilterReview] = useState<"all" | "math" | "wrong">(
-    "all",
-  );
+  const [filterReview, setFilterReview] = useState<"all" | "math">("all");
 
   const result = getExamResult(tryoutId);
   const tryout = tryouts.find((t) => t.id === tryoutId) || tryouts[0];
@@ -71,30 +70,41 @@ export default function ExamResultPage() {
       );
     return true;
   });
+  const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
+  const reviewPagination = usePagination(
+    reviewQuestions,
+    5,
+    `${tryoutId}:${filterReview}`,
+    [1, 5, 10],
+  );
+  const returnToReview = () => {
+    requestAnimationFrame(() => {
+      reviewHeadingRef.current?.focus({ preventScroll: true });
+      reviewHeadingRef.current?.scrollIntoView({ block: "start" });
+    });
+  };
+  const reviewControls = {
+    ...reviewPagination,
+    setPage: (page: number) => {
+      reviewPagination.setPage(page);
+      returnToReview();
+    },
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-10 font-sans text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <p
-          role="status"
-          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900"
-        >
-          Prototipe untuk demo: skor, statistik, dan evaluasi materi masih
-          menggunakan data contoh. Pilihan prodi berasal dari preferensi saat
-          sesi dimulai.
-        </p>
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* 1. Official Evaluation Header Card */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-            <div className="space-y-1.5">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 bg-blue-50 border border-blue-200/80 rounded-full text-xs font-semibold text-blue-700">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Lembar Hasil Ujian CBT & Evaluasi Rasionalisasi PTN</span>
+            <div className="min-w-0 space-y-2">
+              <div className="text-sm font-semibold text-slate-600">
+                <span>Hasil tryout dan evaluasi</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
                 {result.tryoutTitle}
               </h1>
-              <p className="text-xs text-slate-500 font-sans">
+              <p className="text-sm leading-relaxed text-slate-600">
                 Peserta:{" "}
                 <strong className="text-slate-800">{result.userName}</strong> •
                 Tanggal Uji: {result.date} • Metodologi: Skor Tertimbang Subtest
@@ -102,20 +112,19 @@ export default function ExamResultPage() {
               </p>
             </div>
 
-            <div className="flex items-center space-x-2 text-xs font-bold">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 href={`/tryouts/${tryoutId}/prepare`}
-                className="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 px-4 py-2.5 rounded-xl transition"
+                className="eu-button-secondary w-full sm:w-auto"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw aria-hidden="true" className="h-4 w-4 shrink-0" />
                 <span>Ulangi Ujian</span>
               </Link>
               <Link
                 href="/tryouts"
-                className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4.5 py-2.5 rounded-xl shadow-xs transition"
+                className="eu-button-primary w-full sm:w-auto"
               >
-                <span>Katalog Tryout</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Katalog tryout</span>
               </Link>
             </div>
           </div>
@@ -407,26 +416,39 @@ export default function ExamResultPage() {
         </div>
 
         {/* 6. Question Review List with KaTeX Explanations */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <section
+          aria-labelledby="review-heading"
+          className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-8 space-y-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">
+              <h2
+                id="review-heading"
+                ref={reviewHeadingRef}
+                tabIndex={-1}
+                className="scroll-mt-4 text-lg font-bold text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#244676]"
+              >
                 Pembahasan Lengkap & Kunci Jawaban
-              </h3>
-              <p className="text-xs text-slate-500">
-                Telaah langkah pengerjaan dan pembahasan KaTeX per butir soal
+              </h2>
+              <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                Pelajari pembahasan bertahap. Pilih satu soal per halaman jika
+                ingin membaca lebih fokus.
               </p>
             </div>
 
-            <div className="flex items-center space-x-2 text-xs">
-              {[
-                { id: "all", label: `Semua (${reviewQuestions.length})` },
-                { id: "math", label: "Matematika & Kuantitatif" },
-              ].map((tab) => (
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              {(
+                [
+                  { id: "all", label: `Semua (${tryout.questions.length})` },
+                  { id: "math", label: "Matematika & Kuantitatif" },
+                ] as const
+              ).map((tab) => (
                 <button
+                  type="button"
                   key={tab.id}
-                  onClick={() => setFilterReview(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-lg font-semibold transition min-h-11 ${
+                  aria-pressed={filterReview === tab.id}
+                  onClick={() => setFilterReview(tab.id)}
+                  className={`px-4 py-2.5 rounded-xl font-semibold transition min-h-11 ${
                     filterReview === tab.id
                       ? "bg-slate-900 text-white"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -438,21 +460,29 @@ export default function ExamResultPage() {
             </div>
           </div>
 
+          <Pagination
+            pagination={reviewControls}
+            label="pembahasan soal, atas"
+            announce={false}
+          />
           <div className="space-y-4">
-            {reviewQuestions.map((q, idx) => (
-              <div
+            {reviewPagination.pageItems.map((q) => (
+              <article
                 key={q.id}
                 className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center font-sans font-bold text-xs">
-                      {idx + 1}
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="min-w-8 h-8 shrink-0 rounded-md bg-slate-900 text-white flex items-center justify-center font-sans font-bold text-xs"
+                    >
+                      {q.number}
                     </span>
-                    <span className="text-xs font-bold text-slate-800">
-                      Soal #{idx + 1} •{" "}
+                    <h3 className="text-sm font-bold text-slate-800">
+                      Soal #{q.number} •{" "}
                       {q.subtestId.replace(/_/g, " ").toUpperCase()}
-                    </span>
+                    </h3>
                   </div>
 
                   <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">
@@ -463,24 +493,35 @@ export default function ExamResultPage() {
                   </span>
                 </div>
 
-                <div className="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed">
+                <div className="text-base font-medium text-slate-900 leading-relaxed">
                   <MathRenderer content={q.question} />
                 </div>
 
                 {q.explanation && (
-                  <div className="p-3.5 bg-white rounded-lg border border-slate-200 space-y-1.5 text-xs">
-                    <span className="font-bold text-blue-700 block">
-                      Pembahasan Langkah Pengerjaan:
-                    </span>
+                  <div className="border-t border-slate-200 pt-4 space-y-2 text-base">
+                    <h4 className="text-sm font-semibold text-slate-600">
+                      Pembahasan
+                    </h4>
                     <div className="text-slate-700 leading-relaxed font-sans">
                       <MathRenderer content={q.explanation} />
                     </div>
                   </div>
                 )}
-              </div>
+              </article>
             ))}
           </div>
-        </div>
+          {reviewQuestions.length === 0 ? (
+            <p className="text-sm text-slate-600">
+              Tidak ada soal pada filter ini. Pilih Semua untuk melihat
+              pembahasan lainnya.
+            </p>
+          ) : (
+            <Pagination
+              pagination={reviewControls}
+              label="pembahasan soal, bawah"
+            />
+          )}
+        </section>
       </div>
     </div>
   );

@@ -192,7 +192,7 @@ export default function StudentBulkImportModal({
 
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-[#F6F8FC] border border-slate-100 text-xs font-sans shrink-0 rounded-xl">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-3">
             <button
               type="button"
               onClick={handleDownloadTemplate}
@@ -316,7 +316,7 @@ export default function StudentBulkImportModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100 shrink-0 font-sans text-xs">
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100 shrink-0 font-sans text-xs flex-wrap gap-3">
           <button
             type="button"
             onClick={onClose}

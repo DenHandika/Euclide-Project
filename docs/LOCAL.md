@@ -83,3 +83,14 @@ memerlukan internet meskipun aplikasi dan PostgreSQL berjalan lokal.
 Validasi lokal: `npm run test:backend` dan `npm run build`. Tes backend memakai
 PGlite terisolasi, bukan membuktikan koneksi ke layanan PostgreSQL komputer.
 Kontrak API dan kebijakan timer ada di [SETUP.md](SETUP.md).
+
+## Output development dan produksi
+
+`npm run dev` menulis ke `.next-dev`; `npm run build` dan `npm run start`
+tetap memakai `.next`. Pemisahan di `next.config.mjs` mencegah build produksi
+menimpa manifest/aset server development yang sedang berjalan. Kedua direktori
+diabaikan Git. Next.js menyertakan `.next-dev/types/**/*.ts` dalam tsconfig
+untuk pemeriksaan tipe development.
+
+Jika tab lama masih merujuk aset sebelum server berganti mode, lakukan hard
+refresh (Ctrl+Shift+R). Tidak perlu menghapus LocalStorage atau data siswa.

@@ -7,9 +7,11 @@ import { pageNumbers } from "@/lib/pagination";
 export default function Pagination({
   pagination: p,
   label,
+  announce = true,
 }: {
   pagination: PaginationState;
   label: string;
+  announce?: boolean;
 }) {
   if (p.totalItems === 0) return null;
   return (
@@ -18,7 +20,10 @@ export default function Pagination({
       className="flex shrink-0 flex-wrap items-center justify-between gap-4 border-t border-slate-100 px-1 py-4 text-xs text-slate-500"
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <p role="status" aria-live="polite">
+        <p
+          role={announce ? "status" : undefined}
+          aria-live={announce ? "polite" : undefined}
+        >
           Menampilkan{" "}
           <strong className="font-semibold text-slate-700">
             {p.from}–{p.to}
