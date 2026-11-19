@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Divide,
   Sigma,
@@ -10,53 +10,120 @@ import {
   Binary,
   Grid3X3,
   ChevronDown,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface MathToolbarProps {
   onInsert: (snippet: string) => void;
 }
 
 export default function MathToolbar({ onInsert }: MathToolbarProps) {
-  const [activeCategory, setActiveCategory] = useState<'aljabar' | 'kalkulus' | 'simbol'>('aljabar');
+  const [activeCategory, setActiveCategory] = useState<
+    "aljabar" | "kalkulus" | "simbol"
+  >("aljabar");
 
   const aljabarSnippets = [
-    { label: 'a/b', title: 'Pecahan', snippet: '\\frac{a}{b}', display: '\\frac{a}{b}' },
-    { label: '√x', title: 'Akar Kuadrat', snippet: '\\sqrt{x}', display: '\\sqrt{x}' },
-    { label: 'ⁿ√x', title: 'Akar Pangkat-n', snippet: '\\sqrt[n]{x}', display: '\\sqrt[3]{x}' },
-    { label: 'xⁿ', title: 'Pangkat / Eksponen', snippet: 'x^{n}', display: 'x^2' },
-    { label: 'xₙ', title: 'Indeks / Subskrip', snippet: 'x_{n}', display: 'x_1' },
-    { label: '|x|', title: 'Nilai Mutlak', snippet: '|x|', display: '|x|' },
-    { label: '( )', title: 'Kurung Otomatis', snippet: '\\left( x \\right)', display: '(x)' },
+    {
+      label: "a/b",
+      title: "Pecahan",
+      snippet: "\\frac{a}{b}",
+      display: "\\frac{a}{b}",
+    },
+    {
+      label: "√x",
+      title: "Akar Kuadrat",
+      snippet: "\\sqrt{x}",
+      display: "\\sqrt{x}",
+    },
+    {
+      label: "ⁿ√x",
+      title: "Akar Pangkat-n",
+      snippet: "\\sqrt[n]{x}",
+      display: "\\sqrt[3]{x}",
+    },
+    {
+      label: "xⁿ",
+      title: "Pangkat / Eksponen",
+      snippet: "x^{n}",
+      display: "x^2",
+    },
+    {
+      label: "xₙ",
+      title: "Indeks / Subskrip",
+      snippet: "x_{n}",
+      display: "x_1",
+    },
+    { label: "|x|", title: "Nilai Mutlak", snippet: "|x|", display: "|x|" },
+    {
+      label: "( )",
+      title: "Kurung Otomatis",
+      snippet: "\\left( x \\right)",
+      display: "(x)",
+    },
   ];
 
   const kalkulusSnippets = [
-    { label: '∫ dx', title: 'Integral Tak Tentu', snippet: '\\int f(x) \\, dx', display: '\\int dx' },
-    { label: '∫ₐᵇ dx', title: 'Integral Tentu', snippet: '\\int_{a}^{b} f(x) \\, dx', display: '\\int_0^t' },
-    { label: 'lim', title: 'Limit Fungsi', snippet: '\\lim_{x \\to 0} f(x)', display: '\\lim_{x\\to 0}' },
-    { label: '∑', title: 'Sigma / Deret', snippet: '\\sum_{i=1}^{n} x_i', display: '\\sum_{i=1}^n' },
-    { label: 'df/dx', title: 'Turunan / Diferensial', snippet: '\\frac{df}{dx}', display: '\\frac{df}{dx}' },
-    { label: '[2x2]', title: 'Matriks 2x2', snippet: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}', display: '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}' },
-    { label: 'det(A)', title: 'Determinan', snippet: '\\det(A)', display: '\\det(A)' },
-    { label: 'x⃗', title: 'Vektor', snippet: '\\vec{v}', display: '\\vec{v}' },
+    {
+      label: "∫ dx",
+      title: "Integral Tak Tentu",
+      snippet: "\\int f(x) \\, dx",
+      display: "\\int dx",
+    },
+    {
+      label: "∫ₐᵇ dx",
+      title: "Integral Tentu",
+      snippet: "\\int_{a}^{b} f(x) \\, dx",
+      display: "\\int_0^t",
+    },
+    {
+      label: "lim",
+      title: "Limit Fungsi",
+      snippet: "\\lim_{x \\to 0} f(x)",
+      display: "\\lim_{x\\to 0}",
+    },
+    {
+      label: "∑",
+      title: "Sigma / Deret",
+      snippet: "\\sum_{i=1}^{n} x_i",
+      display: "\\sum_{i=1}^n",
+    },
+    {
+      label: "df/dx",
+      title: "Turunan / Diferensial",
+      snippet: "\\frac{df}{dx}",
+      display: "\\frac{df}{dx}",
+    },
+    {
+      label: "[2x2]",
+      title: "Matriks 2x2",
+      snippet: "\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}",
+      display: "\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}",
+    },
+    {
+      label: "det(A)",
+      title: "Determinan",
+      snippet: "\\det(A)",
+      display: "\\det(A)",
+    },
+    { label: "x⃗", title: "Vektor", snippet: "\\vec{v}", display: "\\vec{v}" },
   ];
 
   const simbolSnippets = [
-    { label: '±', snippet: '\\pm' },
-    { label: '≤', snippet: '\\le' },
-    { label: '≥', snippet: '\\ge' },
-    { label: '≠', snippet: '\\neq' },
-    { label: '≈', snippet: '\\approx' },
-    { label: '×', snippet: '\\times' },
-    { label: '÷', snippet: '\\div' },
-    { label: 'π', snippet: '\\pi' },
-    { label: 'θ', snippet: '\\theta' },
-    { label: 'α', snippet: '\\alpha' },
-    { label: 'β', snippet: '\\beta' },
-    { label: 'Δ', snippet: '\\Delta' },
-    { label: '∞', snippet: '\\infty' },
-    { label: '⟹', snippet: '\\implies' },
-    { label: '∈', snippet: '\\in' },
-    { label: '°', snippet: '^\\circ' },
+    { label: "±", snippet: "\\pm" },
+    { label: "≤", snippet: "\\le" },
+    { label: "≥", snippet: "\\ge" },
+    { label: "≠", snippet: "\\neq" },
+    { label: "≈", snippet: "\\approx" },
+    { label: "×", snippet: "\\times" },
+    { label: "÷", snippet: "\\div" },
+    { label: "π", snippet: "\\pi" },
+    { label: "θ", snippet: "\\theta" },
+    { label: "α", snippet: "\\alpha" },
+    { label: "β", snippet: "\\beta" },
+    { label: "Δ", snippet: "\\Delta" },
+    { label: "∞", snippet: "\\infty" },
+    { label: "⟹", snippet: "\\implies" },
+    { label: "∈", snippet: "\\in" },
+    { label: "°", snippet: "^\\circ" },
   ];
 
   return (
@@ -69,7 +136,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
           </span>
           <button
             type="button"
-            onClick={() => setActiveCategory('aljabar')}
+            onClick={() => setActiveCategory("aljabar")}
             className={`px-2.5 py-0.5 border transition rounded-xl min-h-9 min-w-9 ${
               activeCategory === "aljabar"
                 ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
@@ -80,7 +147,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
           </button>
           <button
             type="button"
-            onClick={() => setActiveCategory('kalkulus')}
+            onClick={() => setActiveCategory("kalkulus")}
             className={`px-2.5 py-0.5 border transition rounded-xl min-h-9 min-w-9 ${
               activeCategory === "kalkulus"
                 ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
@@ -91,7 +158,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
           </button>
           <button
             type="button"
-            onClick={() => setActiveCategory('simbol')}
+            onClick={() => setActiveCategory("simbol")}
             className={`px-2.5 py-0.5 border transition rounded-xl min-h-9 min-w-9 ${
               activeCategory === "simbol"
                 ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
@@ -109,7 +176,7 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
 
       {/* Button Row by Category */}
       <div className="flex flex-wrap gap-1.5 items-center font-sans text-xs">
-        {activeCategory === 'aljabar' && (
+        {activeCategory === "aljabar" && (
           <>
             {aljabarSnippets.map((item, idx) => (
               <button
@@ -120,13 +187,15 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
                 className="px-2.5 py-1 bg-[#F6F8FC] hover:bg-[#234573] hover:text-white text-[#263D5F] border border-slate-200 text-xs font-bold transition flex items-center space-x-1 rounded-xl min-h-9 min-w-9"
               >
                 <span>{item.label}</span>
-                <span className="text-xs opacity-70 hidden lg:inline font-sans">({item.title})</span>
+                <span className="text-xs opacity-70 hidden lg:inline font-sans">
+                  ({item.title})
+                </span>
               </button>
             ))}
           </>
         )}
 
-        {activeCategory === 'kalkulus' && (
+        {activeCategory === "kalkulus" && (
           <>
             {kalkulusSnippets.map((item, idx) => (
               <button
@@ -137,13 +206,15 @@ export default function MathToolbar({ onInsert }: MathToolbarProps) {
                 className="px-2.5 py-1 bg-[#F6F8FC] hover:bg-[#234573] hover:text-white text-[#263D5F] border border-slate-200 text-xs font-bold transition flex items-center space-x-1 rounded-xl min-h-9 min-w-9"
               >
                 <span>{item.label}</span>
-                <span className="text-xs opacity-70 hidden lg:inline font-sans">({item.title})</span>
+                <span className="text-xs opacity-70 hidden lg:inline font-sans">
+                  ({item.title})
+                </span>
               </button>
             ))}
           </>
         )}
 
-        {activeCategory === 'simbol' && (
+        {activeCategory === "simbol" && (
           <>
             {simbolSnippets.map((item, idx) => (
               <button

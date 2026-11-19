@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useApp } from '@/context/AppContext';
-import { MOCK_USERS } from '@/data/mockData';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useApp } from "@/context/AppContext";
+import { MOCK_USERS } from "@/data/mockData";
 import {
   ShieldCheck,
   GraduationCap,
@@ -14,23 +14,26 @@ import {
   Sparkles,
   Users,
   FileCheck2,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const { switchRole, switchUser, signInWithGoogle } = useApp();
-  const [customEmail, setCustomEmail] = useState('');
+  const [customEmail, setCustomEmail] = useState("");
 
   const handleGoogleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const emailToUse = customEmail.trim() || 'raihan.pratama@siswa.euclide.edu';
+    const emailToUse = customEmail.trim() || "raihan.pratama@siswa.euclide.edu";
     const success = signInWithGoogle(emailToUse);
     if (success) {
-      router.push('/tryouts');
+      router.push("/tryouts");
     }
   };
 
-  const handleRoleQuickLogin = (role: 'admin' | 'tentor' | 'siswa', targetPath: string) => {
+  const handleRoleQuickLogin = (
+    role: "admin" | "tentor" | "siswa",
+    targetPath: string,
+  ) => {
     switchRole(role);
     router.push(targetPath);
   };
@@ -115,7 +118,7 @@ export default function LoginPage() {
           {/* 2. Demo Role Shortcuts */}
           <div className="space-y-2.5">
             <button
-              onClick={() => handleRoleQuickLogin('siswa', '/tryouts')}
+              onClick={() => handleRoleQuickLogin("siswa", "/tryouts")}
               className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-blue-500 bg-slate-50/70 hover:bg-blue-50/40 transition group text-left shadow-2xs"
             >
               <div className="flex items-center space-x-3">
@@ -123,15 +126,19 @@ export default function LoginPage() {
                   S
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">Masuk sebagai Siswa</div>
-                  <div className="text-[11px] text-slate-500">Raihan Pratama (Akun Aktif)</div>
+                  <div className="text-xs font-bold text-slate-900">
+                    Masuk sebagai Siswa
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    Raihan Pratama (Akun Aktif)
+                  </div>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition" />
             </button>
 
             <button
-              onClick={() => handleRoleQuickLogin('tentor', '/tentor/grading')}
+              onClick={() => handleRoleQuickLogin("tentor", "/tentor/grading")}
               className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-amber-500 bg-slate-50/70 hover:bg-amber-50/40 transition group text-left shadow-2xs"
             >
               <div className="flex items-center space-x-3">
@@ -139,15 +146,19 @@ export default function LoginPage() {
                   T
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">Masuk sebagai Tentor</div>
-                  <div className="text-[11px] text-slate-500">Dr. Hendra Wijaya (Koreksi Esai)</div>
+                  <div className="text-xs font-bold text-slate-900">
+                    Masuk sebagai Tentor
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    Dr. Hendra Wijaya (Koreksi Esai)
+                  </div>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-1 transition" />
             </button>
 
             <button
-              onClick={() => handleRoleQuickLogin('admin', '/admin')}
+              onClick={() => handleRoleQuickLogin("admin", "/admin")}
               className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-slate-800 bg-slate-50/70 hover:bg-slate-100 transition group text-left shadow-2xs"
             >
               <div className="flex items-center space-x-3">
@@ -155,8 +166,12 @@ export default function LoginPage() {
                   A
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">Masuk sebagai Admin / Owner</div>
-                  <div className="text-[11px] text-slate-500">Siti Rahmawati (Buku Kas & Kuota)</div>
+                  <div className="text-xs font-bold text-slate-900">
+                    Masuk sebagai Admin / Owner
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    Siti Rahmawati (Buku Kas & Kuota)
+                  </div>
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-1 transition" />

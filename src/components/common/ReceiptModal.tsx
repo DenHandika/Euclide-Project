@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { PaymentRecord } from '@/types';
-import { Printer, X, ShieldCheck } from 'lucide-react';
+import React from "react";
+import { PaymentRecord } from "@/types";
+import { Printer, X, ShieldCheck } from "lucide-react";
 
 interface ReceiptModalProps {
   payment: PaymentRecord | null;
@@ -13,9 +13,9 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
   if (!payment) return null;
 
   const formatIDR = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
       maximumFractionDigits: 0,
     }).format(val);
   };
@@ -51,38 +51,59 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
         </div>
 
         {/* Printable Physical Receipt Sheet */}
-        <div id="printable-receipt" className="border border-slate-200 p-6 bg-[#FFFFFF] space-y-4 font-sans text-xs rounded-2xl shadow-sm print:rounded-none print:shadow-none">
+        <div
+          id="printable-receipt"
+          className="border border-slate-200 p-6 bg-[#FFFFFF] space-y-4 font-sans text-xs rounded-2xl shadow-sm print:rounded-none print:shadow-none"
+        >
           {/* Header */}
           <div className="border-b-2 border-slate-200 pb-3 flex items-start justify-between">
             <div>
-              <div className="font-sans font-black text-xl text-[#263D5F] tracking-tight">EUCLIDE</div>
-              <p className="text-xs text-slate-500 uppercase font-sans">Bimbel & CBT Management System</p>
-              <p className="text-xs text-slate-500">Jl. Geometri No. 2026, Kampus Klaster 1</p>
+              <div className="font-sans font-black text-xl text-[#263D5F] tracking-tight">
+                EUCLIDE
+              </div>
+              <p className="text-xs text-slate-500 uppercase font-sans">
+                Bimbel & CBT Management System
+              </p>
+              <p className="text-xs text-slate-500">
+                Jl. Geometri No. 2026, Kampus Klaster 1
+              </p>
             </div>
             <div className="text-right font-sans">
               <span className="inline-block px-2 py-0.5 bg-[#EAF7F0] text-[#126340] font-bold border border-[#1B8A5A]/30 rounded-full">
                 LUNAS TERVERIFIKASI
               </span>
-              <div className="text-xs text-slate-500 mt-1">No: {payment.invoiceNumber}</div>
+              <div className="text-xs text-slate-500 mt-1">
+                No: {payment.invoiceNumber}
+              </div>
             </div>
           </div>
 
           {/* Metadata Grid */}
           <div className="grid grid-cols-2 gap-3 p-3 bg-[#F6F8FC] border border-slate-100 font-sans text-xs rounded-xl">
             <div>
-              <span className="text-xs text-slate-500 block uppercase">Nama Siswa / Wajib Bayar</span>
-              <span className="font-bold text-[#263D5F]">{payment.studentName}</span>
+              <span className="text-xs text-slate-500 block uppercase">
+                Nama Siswa / Wajib Bayar
+              </span>
+              <span className="font-bold text-[#263D5F]">
+                {payment.studentName}
+              </span>
             </div>
             <div>
-              <span className="text-xs text-slate-500 block uppercase">Nomor Induk Siswa (NIS)</span>
+              <span className="text-xs text-slate-500 block uppercase">
+                Nomor Induk Siswa (NIS)
+              </span>
               <span className="font-bold text-[#263D5F]">{payment.nis}</span>
             </div>
             <div>
-              <span className="text-xs text-slate-500 block uppercase">Periode Pembayaran</span>
+              <span className="text-xs text-slate-500 block uppercase">
+                Periode Pembayaran
+              </span>
               <span className="text-[#263D5F]">{payment.month}</span>
             </div>
             <div>
-              <span className="text-xs text-slate-500 block uppercase">Metode Pembayaran</span>
+              <span className="text-xs text-slate-500 block uppercase">
+                Metode Pembayaran
+              </span>
               <span className="text-[#263D5F]">{payment.paymentMethod}</span>
             </div>
           </div>
@@ -98,8 +119,12 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
             <tbody className="divide-y divide-slate-100">
               <tr>
                 <td className="py-2">
-                  <div className="font-semibold text-[#263D5F]">Biaya SPP Program Bimbingan SNBT</div>
-                  <div className="text-xs text-slate-500">{payment.notes || 'Pembayaran SPP Reguler'}</div>
+                  <div className="font-semibold text-[#263D5F]">
+                    Biaya SPP Program Bimbingan SNBT
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {payment.notes || "Pembayaran SPP Reguler"}
+                  </div>
                 </td>
                 <td className="py-2 text-right font-sans font-bold text-[#263D5F]">
                   {formatIDR(payment.amount)}
@@ -108,7 +133,9 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-slate-200 font-sans">
-                <td className="py-2 font-bold text-[#263D5F]">TOTAL PEMBAYARAN</td>
+                <td className="py-2 font-bold text-[#263D5F]">
+                  TOTAL PEMBAYARAN
+                </td>
                 <td className="py-2 text-right font-bold text-sm text-[#263D5F]">
                   {formatIDR(payment.amount)}
                 </td>
@@ -119,7 +146,9 @@ export function ReceiptModal({ payment, onClose }: ReceiptModalProps) {
           {/* Signatures */}
           <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-sans text-slate-500">
             <div>
-              <div>Dicatat oleh: <strong>{payment.recordedBy}</strong></div>
+              <div>
+                Dicatat oleh: <strong>{payment.recordedBy}</strong>
+              </div>
               <div>Waktu Bayar: {payment.paidAt}</div>
             </div>
             <div className="text-right">

@@ -1,8 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useApp } from '@/context/AppContext';
-import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
+import React from "react";
+import { useApp } from "@/context/AppContext";
+import {
+  CheckCircle2,
+  AlertCircle,
+  Info,
+  AlertTriangle,
+  X,
+} from "lucide-react";
 
 export function ToastStack() {
   const { toasts, removeToast } = useApp();
@@ -12,17 +18,17 @@ export function ToastStack() {
   return (
     <div className="fixed top-20 right-4 z-50 flex flex-col space-y-2 max-w-sm pointer-events-none font-sans text-xs">
       {toasts.map((toast) => {
-        let bg = 'bg-white text-[#263D5F] border-slate-200';
+        let bg = "bg-white text-[#263D5F] border-slate-200";
         let icon = <Info className="w-4 h-4 text-[#1B3B8C] shrink-0" />;
 
-        if (toast.type === 'success') {
-          bg = 'bg-white text-[#263D5F] border-emerald-200';
+        if (toast.type === "success") {
+          bg = "bg-white text-[#263D5F] border-emerald-200";
           icon = <CheckCircle2 className="w-4 h-4 text-[#1B8A5A] shrink-0" />;
-        } else if (toast.type === 'error') {
-          bg = 'bg-white text-[#263D5F] border-rose-200';
+        } else if (toast.type === "error") {
+          bg = "bg-white text-[#263D5F] border-rose-200";
           icon = <AlertCircle className="w-4 h-4 text-[#D0342C] shrink-0" />;
-        } else if (toast.type === 'warning') {
-          bg = 'bg-white text-[#263D5F] border-amber-200';
+        } else if (toast.type === "warning") {
+          bg = "bg-white text-[#263D5F] border-amber-200";
           icon = <AlertTriangle className="w-4 h-4 text-[#C8831A] shrink-0" />;
         }
 

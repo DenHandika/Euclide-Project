@@ -1,12 +1,12 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useApp } from '@/context/AppContext';
-import { PaymentRecord } from '@/types';
-import ReceiptModal from '@/components/common/ReceiptModal';
+import React, { useState } from "react";
+import Link from "next/link";
+import { useApp } from "@/context/AppContext";
+import { PaymentRecord } from "@/types";
+import ReceiptModal from "@/components/common/ReceiptModal";
 import {
   Users,
   Activity,
@@ -18,21 +18,21 @@ import {
   ArrowRight,
   Sparkles,
   Layers,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function AdminDashboardPage() {
   const { batches, payments, students, getFinancialMetrics } = useApp();
   const metrics = getFinancialMetrics();
-  const classesPagination = usePagination(batches, 3, '', [3, 6, 12, 24]);
+  const classesPagination = usePagination(batches, 3, "", [3, 6, 12, 24]);
 
   const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(
-    null
+    null,
   );
 
   const formatIDR = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
       maximumFractionDigits: 0,
     }).format(val);
   };
@@ -84,7 +84,7 @@ export default function AdminDashboardPage() {
               <Users className="w-4 h-4 text-blue-600" />
             </div>
             <div className="text-3xl font-extrabold text-slate-900">
-              650{' '}
+              650{" "}
               <span className="text-xs font-normal text-slate-400">Siswa</span>
             </div>
             <div className="mt-2 text-xs text-blue-600 font-semibold">
@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
               <Activity className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="text-3xl font-extrabold text-emerald-600">
-              {metrics.activeConcurrent}{' '}
+              {metrics.activeConcurrent}{" "}
               <span className="text-xs font-normal text-slate-400">Online</span>
             </div>
             <div className="mt-2 text-xs text-emerald-600 font-semibold flex items-center space-x-1">
@@ -165,7 +165,7 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               {classesPagination.pageItems.map((batch) => {
                 const percent = Math.round(
-                  (batch.currentStudents / batch.maxCapacity) * 100
+                  (batch.currentStudents / batch.maxCapacity) * 100,
                 );
                 const isFull = percent >= 95;
 
@@ -187,13 +187,13 @@ export default function AdminDashboardPage() {
                       <span
                         className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
                           isFull
-                            ? 'bg-rose-100 text-rose-800'
+                            ? "bg-rose-100 text-rose-800"
                             : percent > 75
-                              ? 'bg-amber-100 text-amber-900'
-                              : 'bg-emerald-100 text-emerald-800'
+                              ? "bg-amber-100 text-amber-900"
+                              : "bg-emerald-100 text-emerald-800"
                         }`}
                       >
-                        {isFull ? 'Penuh (100%)' : `${percent}% Terisi`}
+                        {isFull ? "Penuh (100%)" : `${percent}% Terisi`}
                       </span>
                     </div>
 
@@ -203,10 +203,10 @@ export default function AdminDashboardPage() {
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
                             isFull
-                              ? 'bg-rose-600'
+                              ? "bg-rose-600"
                               : percent > 75
-                                ? 'bg-amber-500'
-                                : 'bg-blue-600'
+                                ? "bg-amber-500"
+                                : "bg-blue-600"
                           }`}
                           style={{ width: `${percent}%` }}
                         />

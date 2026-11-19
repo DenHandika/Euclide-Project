@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 import {
   CheckCircle2,
   Clock3,
@@ -6,43 +6,43 @@ import {
   CircleDashed,
   Info,
   GraduationCap,
-} from 'lucide-react';
-import type { UserStatus } from '@/types';
+} from "lucide-react";
+import type { UserStatus } from "@/types";
 
 export type StatusTone =
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'neutral'
-  | 'info'
-  | 'purple';
+  | "success"
+  | "warning"
+  | "danger"
+  | "neutral"
+  | "info"
+  | "purple";
 const tones = {
   success: {
-    styles: 'bg-emerald-50 text-emerald-800 ring-emerald-600/10',
+    styles: "bg-emerald-50 text-emerald-800 ring-emerald-600/10",
     Icon: CheckCircle2,
   },
   warning: {
-    styles: 'bg-amber-50 text-amber-800 ring-amber-600/10',
+    styles: "bg-amber-50 text-amber-800 ring-amber-600/10",
     Icon: Clock3,
   },
   danger: {
-    styles: 'bg-rose-50 text-rose-800 ring-rose-600/10',
+    styles: "bg-rose-50 text-rose-800 ring-rose-600/10",
     Icon: CircleAlert,
   },
   neutral: {
-    styles: 'bg-slate-100 text-slate-600 ring-slate-500/10',
+    styles: "bg-slate-100 text-slate-600 ring-slate-500/10",
     Icon: CircleDashed,
   },
-  info: { styles: 'bg-blue-50 text-blue-800 ring-blue-600/10', Icon: Info },
+  info: { styles: "bg-blue-50 text-blue-800 ring-blue-600/10", Icon: Info },
   purple: {
-    styles: 'bg-violet-50 text-violet-800 ring-violet-600/10',
+    styles: "bg-violet-50 text-violet-800 ring-violet-600/10",
     Icon: GraduationCap,
   },
 };
 
 export default function StatusBadge({
   children,
-  tone = 'neutral',
+  tone = "neutral",
 }: {
   children: ReactNode;
   tone?: StatusTone;
@@ -65,11 +65,11 @@ export default function StatusBadge({
 
 const accountStatuses: Record<UserStatus, { label: string; tone: StatusTone }> =
   {
-    active: { label: 'Aktif', tone: 'success' },
-    nonactive: { label: 'Nonaktif', tone: 'neutral' },
-    suspended: { label: 'SPP tertunggak', tone: 'danger' },
-    graduated: { label: 'Lulus', tone: 'purple' },
-    leave: { label: 'Cuti', tone: 'warning' },
+    active: { label: "Aktif", tone: "success" },
+    nonactive: { label: "Nonaktif", tone: "neutral" },
+    suspended: { label: "SPP tertunggak", tone: "danger" },
+    graduated: { label: "Lulus", tone: "purple" },
+    leave: { label: "Cuti", tone: "warning" },
   };
 
 export function AccountStatusBadge({ status }: { status: UserStatus }) {

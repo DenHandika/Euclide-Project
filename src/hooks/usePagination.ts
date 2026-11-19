@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { getPageRange } from '@/lib/pagination';
+import { useState } from "react";
+import { getPageRange } from "@/lib/pagination";
 
 export interface PaginationState {
   page: number;
@@ -19,8 +19,8 @@ export interface PaginationState {
 export default function usePagination<T>(
   items: T[],
   initialSize = 5,
-  resetKey = '',
-  pageSizes: readonly number[] = [5, 10, 25, 50]
+  resetKey = "",
+  pageSizes: readonly number[] = [5, 10, 25, 50],
 ) {
   const [pageSize, setSize] = useState(initialSize);
   const [selection, setSelection] = useState({ key: resetKey, page: 1 });
@@ -28,7 +28,7 @@ export default function usePagination<T>(
   const range = getPageRange(
     items.length,
     selection.key === resetKey ? selection.page : 1,
-    pageSize
+    pageSize,
   );
   if (selection.key === resetKey && selection.page !== range.page)
     setSelection({ key: resetKey, page: range.page });

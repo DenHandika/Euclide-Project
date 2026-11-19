@@ -1,41 +1,41 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight, Search, BookOpen } from 'lucide-react';
-import { useApp } from '@/context/AppContext';
-import TryoutCard from '@/components/common/TryoutCard';
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowRight, Search, BookOpen } from "lucide-react";
+import { useApp } from "@/context/AppContext";
+import TryoutCard from "@/components/common/TryoutCard";
 
 export default function TryoutsCatalogPage() {
   const { tryouts, currentUser } = useApp();
-  const [category, setCategory] = useState('all');
-  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState("all");
+  const [search, setSearch] = useState("");
   const categories = [
-    { id: 'all', label: 'Semua tryout' },
-    { id: 'grand', label: 'UTBK lengkap' },
-    { id: 'tps', label: 'TPS & matematika' },
-    { id: 'literasi', label: 'Literasi' },
+    { id: "all", label: "Semua tryout" },
+    { id: "grand", label: "UTBK lengkap" },
+    { id: "tps", label: "TPS & matematika" },
+    { id: "literasi", label: "Literasi" },
   ];
   const filtered = tryouts.filter(
     (t) =>
-      (category === 'all' ||
-        (category === 'grand'
+      (category === "all" ||
+        (category === "grand"
           ? t.subtests.length >= 7
-          : category === 'literasi'
-            ? t.subtests.every((subtest) => subtest.category === 'Literasi')
+          : category === "literasi"
+            ? t.subtests.every((subtest) => subtest.category === "Literasi")
             : t.subtests.length < 7 &&
-              t.subtests.some((subtest) => subtest.category !== 'Literasi'))) &&
-      `${t.title} ${t.description} ${t.subtests.map((s) => s.name).join(' ')}`
+              t.subtests.some((subtest) => subtest.category !== "Literasi"))) &&
+      `${t.title} ${t.description} ${t.subtests.map((s) => s.name).join(" ")}`
         .toLowerCase()
-        .includes(search.toLowerCase().trim())
+        .includes(search.toLowerCase().trim()),
   );
   const tryoutsPagination = usePagination(
     filtered,
     6,
-    search + '|' + category,
-    [3, 6, 12, 24]
+    search + "|" + category,
+    [3, 6, 12, 24],
   );
 
   return (
@@ -44,7 +44,7 @@ export default function TryoutsCatalogPage() {
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
           <p className="eu-eyebrow">RUANG BELAJAR</p>
           <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
-            Siap latihan, {currentUser.name.split(' ')[0]}?
+            Siap latihan, {currentUser.name.split(" ")[0]}?
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500">
             Pilih tryout sesuai kebutuhanmu. Mulai, evaluasi, lalu tingkatkan
@@ -82,7 +82,7 @@ export default function TryoutsCatalogPage() {
                 key={c.id}
                 aria-pressed={category === c.id}
                 onClick={() => setCategory(c.id)}
-                className={`min-h-11 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${category === c.id ? 'border-[#244676] bg-[#244676] text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-[#B4C5DE]'}`}
+                className={`min-h-11 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${category === c.id ? "border-[#244676] bg-[#244676] text-white" : "border-slate-200 bg-white text-slate-600 hover:border-[#B4C5DE]"}`}
               >
                 {c.label}
               </button>
@@ -100,7 +100,7 @@ export default function TryoutsCatalogPage() {
           </label>
         </div>
         <p className="mb-4 text-sm text-slate-500">
-          {filtered.length} paket tersedia{' '}
+          {filtered.length} paket tersedia{" "}
           <span className="text-slate-400">· Data contoh versi demo</span>
         </p>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -119,8 +119,8 @@ export default function TryoutsCatalogPage() {
             </p>
             <button
               onClick={() => {
-                setSearch('');
-                setCategory('all');
+                setSearch("");
+                setCategory("all");
               }}
               className="eu-button-secondary mt-5"
             >

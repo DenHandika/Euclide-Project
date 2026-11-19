@@ -1,11 +1,11 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import React, { useState, useRef } from 'react';
-import * as XLSX from 'xlsx';
-import { useApp } from '@/context/AppContext';
-import { StudentImportRow } from '@/types';
+import React, { useState, useRef } from "react";
+import * as XLSX from "xlsx";
+import { useApp } from "@/context/AppContext";
+import { StudentImportRow } from "@/types";
 import {
   Upload,
   FileSpreadsheet,
@@ -14,7 +14,7 @@ import {
   AlertTriangle,
   X,
   FileDown,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface StudentBulkImportModalProps {
   isOpen: boolean;
@@ -27,12 +27,12 @@ export default function StudentBulkImportModal({
 }: StudentBulkImportModalProps) {
   const { importStudentsBulk, showToast } = useApp();
   const [parsedRows, setParsedRows] = useState<StudentImportRow[]>([]);
-  const [fileName, setFileName] = useState('');
+  const [fileName, setFileName] = useState("");
   const studentImportPagination = usePagination(
     parsedRows,
     10,
     fileName,
-    [10, 25, 50]
+    [10, 25, 50],
   );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,41 +49,41 @@ export default function StudentBulkImportModal({
     reader.onload = (evt) => {
       try {
         const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wb = XLSX.read(bstr, { type: "binary" });
         const wsName = wb.SheetNames[0];
         const ws = wb.Sheets[wsName];
         const data = XLSX.utils.sheet_to_json<any>(ws);
 
         if (data.length === 0) {
-          showToast('File spreadsheet kosong atau tidak terbaca.', 'error');
+          showToast("File spreadsheet kosong atau tidak terbaca.", "error");
           return;
         }
 
         const formatted: StudentImportRow[] = data.map((item: any) => {
           const nis = String(
-            item.NIS || item.nis || item.Nomor_Induk || ''
+            item.NIS || item.nis || item.Nomor_Induk || "",
           ).trim();
-          const nama = String(item.Nama || item.nama || item.Name || '').trim();
-          const email = String(item.Email || item.email || '').trim();
+          const nama = String(item.Nama || item.nama || item.Name || "").trim();
+          const email = String(item.Email || item.email || "").trim();
           const batch = String(
-            item.Batch_Kelas || item.batch || 'batch-super-intensif'
+            item.Batch_Kelas || item.batch || "batch-super-intensif",
           ).trim();
           const ptn = String(
-            item.Target_PTN || item.ptn || 'Universitas Indonesia (UI)'
+            item.Target_PTN || item.ptn || "Universitas Indonesia (UI)",
           ).trim();
           const prodi = String(
-            item.Target_Prodi || item.prodi || 'Pendidikan Dokter'
+            item.Target_Prodi || item.prodi || "Pendidikan Dokter",
           ).trim();
           const phone = String(
-            item.No_Telepon_WA || item.phone || item.telepon || '081234567890'
+            item.No_Telepon_WA || item.phone || item.telepon || "081234567890",
           ).trim();
-          const status = String(item.Status || item.status || 'Aktif').trim();
+          const status = String(item.Status || item.status || "Aktif").trim();
 
           const isValid = nis.length > 0 && nama.length > 0;
 
           return {
-            NIS: nis || 'EUC-2026-XXXX',
-            Nama: nama || 'Tanpa Nama',
+            NIS: nis || "EUC-2026-XXXX",
+            Nama: nama || "Tanpa Nama",
             Email: email || `${nis.toLowerCase()}@siswa.euclide.edu`,
             Batch_Kelas: batch,
             Target_PTN: ptn,
@@ -92,7 +92,7 @@ export default function StudentBulkImportModal({
             Status: status,
             isValid,
             errorMessage: !isValid
-              ? 'NIS atau Nama siswa tidak boleh kosong'
+              ? "NIS atau Nama siswa tidak boleh kosong"
               : undefined,
           };
         });
@@ -100,12 +100,12 @@ export default function StudentBulkImportModal({
         setParsedRows(formatted);
         showToast(
           `Berhasil membaca ${formatted.length} baris data siswa dari file ${file.name}`,
-          'info'
+          "info",
         );
       } catch (err) {
         showToast(
-          'Gagal memproses file Excel. Pastikan format file .xlsx atau .csv valid.',
-          'error'
+          "Gagal memproses file Excel. Pastikan format file .xlsx atau .csv valid.",
+          "error",
         );
       }
     };
@@ -116,49 +116,49 @@ export default function StudentBulkImportModal({
   const handleDownloadTemplate = () => {
     const sampleData = [
       {
-        NIS: 'EUC-2026-0101',
-        Nama: 'Andi Saputra Pratama',
-        Email: 'andi.saputra@siswa.euclide.edu',
-        Batch_Kelas: 'batch-super-intensif',
-        Target_PTN: 'Universitas Indonesia (UI)',
-        Target_Prodi: 'Pendidikan Dokter',
-        No_Telepon_WA: '081234567891',
-        Status: 'Aktif',
+        NIS: "EUC-2026-0101",
+        Nama: "Andi Saputra Pratama",
+        Email: "andi.saputra@siswa.euclide.edu",
+        Batch_Kelas: "batch-super-intensif",
+        Target_PTN: "Universitas Indonesia (UI)",
+        Target_Prodi: "Pendidikan Dokter",
+        No_Telepon_WA: "081234567891",
+        Status: "Aktif",
       },
       {
-        NIS: 'EUC-2026-0102',
-        Nama: 'Siti Nurhaliza',
-        Email: 'siti.nurhaliza@siswa.euclide.edu',
-        Batch_Kelas: 'batch-kedokteran',
-        Target_PTN: 'Universitas Gadjah Mada (UGM)',
-        Target_Prodi: 'Kedokteran',
-        No_Telepon_WA: '081234567892',
-        Status: 'Aktif',
+        NIS: "EUC-2026-0102",
+        Nama: "Siti Nurhaliza",
+        Email: "siti.nurhaliza@siswa.euclide.edu",
+        Batch_Kelas: "batch-kedokteran",
+        Target_PTN: "Universitas Gadjah Mada (UGM)",
+        Target_Prodi: "Kedokteran",
+        No_Telepon_WA: "081234567892",
+        Status: "Aktif",
       },
       {
-        NIS: 'EUC-2026-0103',
-        Nama: 'Budi Santoso',
-        Email: 'budi.santoso@siswa.euclide.edu',
-        Batch_Kelas: 'batch-reguler-weekend',
-        Target_PTN: 'Institut Teknologi Bandung (ITB)',
-        Target_Prodi: 'STEI - Rekayasa',
-        No_Telepon_WA: '081234567893',
-        Status: 'Aktif',
+        NIS: "EUC-2026-0103",
+        Nama: "Budi Santoso",
+        Email: "budi.santoso@siswa.euclide.edu",
+        Batch_Kelas: "batch-reguler-weekend",
+        Target_PTN: "Institut Teknologi Bandung (ITB)",
+        Target_Prodi: "STEI - Rekayasa",
+        No_Telepon_WA: "081234567893",
+        Status: "Aktif",
       },
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(sampleData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data_Siswa_Bimbel');
-    XLSX.writeFile(workbook, 'Template_Bulk_Import_Siswa_Euclide.xlsx');
-    showToast('Template Excel data siswa berhasil diunduh!', 'success');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data_Siswa_Bimbel");
+    XLSX.writeFile(workbook, "Template_Bulk_Import_Siswa_Euclide.xlsx");
+    showToast("Template Excel data siswa berhasil diunduh!", "success");
   };
 
   const handleSaveToDatabase = () => {
     if (parsedRows.length === 0) return;
     importStudentsBulk(parsedRows);
     setParsedRows([]);
-    setFileName('');
+    setFileName("");
     onClose();
   };
 
@@ -273,7 +273,7 @@ export default function StudentBulkImportModal({
                       <tr
                         key={idx}
                         className={
-                          row.isValid ? 'hover:bg-[#F6F8FC]' : 'bg-[#FDECEB]/40'
+                          row.isValid ? "hover:bg-[#F6F8FC]" : "bg-[#FDECEB]/40"
                         }
                       >
                         <td className="py-2 px-2 font-sans font-semibold text-[#263D5F]">
@@ -331,8 +331,8 @@ export default function StudentBulkImportModal({
             onClick={handleSaveToDatabase}
             className={`px-5 py-2 text-white font-bold transition flex items-center space-x-1.5 rounded-xl min-h-11 ${
               parsedRows.length === 0 || validCount === 0
-                ? 'bg-[#CECEC2] cursor-not-allowed text-slate-500'
-                : 'bg-[#1B8A5A] hover:bg-[#126340]'
+                ? "bg-[#CECEC2] cursor-not-allowed text-slate-500"
+                : "bg-[#1B8A5A] hover:bg-[#126340]"
             } `}
           >
             <CheckCircle2 className="w-4 h-4" />

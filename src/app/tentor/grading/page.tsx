@@ -1,13 +1,13 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import StatusBadge from '@/components/common/StatusBadge';
+import StatusBadge from "@/components/common/StatusBadge";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useApp } from '@/context/AppContext';
-import { EssaySubmission } from '@/types';
-import MathRenderer from '@/components/common/MathRenderer';
+import React, { useEffect, useRef, useState } from "react";
+import { useApp } from "@/context/AppContext";
+import { EssaySubmission } from "@/types";
+import MathRenderer from "@/components/common/MathRenderer";
 import {
   ArrowRight,
   BookOpen,
@@ -19,31 +19,31 @@ import {
   MessageCircle,
   Search,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
-type Filter = 'pending' | 'graded' | 'all';
+type Filter = "pending" | "graded" | "all";
 const filters: { id: Filter; label: string }[] = [
-  { id: 'pending', label: 'Perlu dikoreksi' },
-  { id: 'graded', label: 'Sudah dinilai' },
-  { id: 'all', label: 'Semua jawaban' },
+  { id: "pending", label: "Perlu dikoreksi" },
+  { id: "graded", label: "Sudah dinilai" },
+  { id: "all", label: "Semua jawaban" },
 ];
 const initials = (name: string) =>
   name
     .split(/\s+/)
     .slice(0, 2)
     .map((part) => part[0])
-    .join('')
+    .join("")
     .toUpperCase();
 
 export default function TentorGradingPage() {
   const { essaySubmissions, gradeEssay, showToast, currentUser } = useApp();
   const [selectedEssay, setSelectedEssay] = useState<EssaySubmission | null>(
-    null
+    null,
   );
-  const [scoreInput, setScoreInput] = useState('');
-  const [feedbackInput, setFeedbackInput] = useState('');
-  const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<Filter>('pending');
+  const [scoreInput, setScoreInput] = useState("");
+  const [feedbackInput, setFeedbackInput] = useState("");
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<Filter>("pending");
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function TentorGradingPage() {
     const dialog = dialogRef.current;
     dialog?.showModal();
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     return () => {
       dialog?.close();
       document.body.style.overflow = previousOverflow;
@@ -60,8 +60,8 @@ export default function TentorGradingPage() {
 
   const openGrading = (essay: EssaySubmission) => {
     setSelectedEssay(essay);
-    setScoreInput(essay.score === undefined ? '' : String(essay.score));
-    setFeedbackInput(essay.feedback ?? '');
+    setScoreInput(essay.score === undefined ? "" : String(essay.score));
+    setFeedbackInput(essay.feedback ?? "");
   };
   const saveGrade = (event: React.FormEvent) => {
     event.preventDefault();
@@ -73,11 +73,11 @@ export default function TentorGradingPage() {
       score < 0 ||
       score > 100
     ) {
-      showToast('Isi nilai antara 0 dan 100.', 'warning');
+      showToast("Isi nilai antara 0 dan 100.", "warning");
       return;
     }
     if (!feedbackInput.trim()) {
-      showToast('Tambahkan umpan balik untuk siswa.', 'warning');
+      showToast("Tambahkan umpan balik untuk siswa.", "warning");
       return;
     }
     gradeEssay(selectedEssay.id, score, feedbackInput.trim());
@@ -91,14 +91,14 @@ export default function TentorGradingPage() {
     : 0;
   const filtered = essaySubmissions.filter((essay) => {
     const matchesFilter =
-      filter === 'all' ||
-      (filter === 'graded' ? essay.isGraded : !essay.isGraded);
-    const text = `${essay.studentName} ${essay.studentNis} ${essay.tryoutTitle} ${essay.subtestId.replace(/_/g, ' ')}`;
+      filter === "all" ||
+      (filter === "graded" ? essay.isGraded : !essay.isGraded);
+    const text = `${essay.studentName} ${essay.studentNis} ${essay.tryoutTitle} ${essay.subtestId.replace(/_/g, " ")}`;
     return (
       matchesFilter && text.toLowerCase().includes(query.toLowerCase().trim())
     );
   });
-  const essaysPagination = usePagination(filtered, 5, query + '|' + filter);
+  const essaysPagination = usePagination(filtered, 5, query + "|" + filter);
 
   return (
     <div className="min-h-screen bg-[#F6F8FC] pb-12 pt-7 font-sans text-slate-800 sm:pt-10">
@@ -135,12 +135,12 @@ export default function TentorGradingPage() {
               <div className="relative flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium text-[#52719A]">
-                    Halo, {currentUser.name.split(' ')[0]} 👋
+                    Halo, {currentUser.name.split(" ")[0]} 👋
                   </p>
                   <h2 className="mt-2 max-w-md text-xl font-bold leading-snug text-[#244676] sm:text-2xl">
                     {pending.length
-                      ? 'Ada cerita belajar yang menunggu tanggapanmu.'
-                      : 'Semua jawaban sudah mendapat perhatianmu.'}
+                      ? "Ada cerita belajar yang menunggu tanggapanmu."
+                      : "Semua jawaban sudah mendapat perhatianmu."}
                   </h2>
                 </div>
                 <div
@@ -218,15 +218,15 @@ export default function TentorGradingPage() {
                       type="button"
                       aria-pressed={filter === item.id}
                       onClick={() => setFilter(item.id)}
-                      className={`min-h-12 shrink-0 border-b-2 px-3 text-xs font-semibold transition sm:px-4 sm:text-sm ${filter === item.id ? 'border-[#426DA8] text-[#315D97]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                      className={`min-h-12 shrink-0 border-b-2 px-3 text-xs font-semibold transition sm:px-4 sm:text-sm ${filter === item.id ? "border-[#426DA8] text-[#315D97]" : "border-transparent text-slate-500 hover:text-slate-700"}`}
                     >
                       {item.label}
                       <span
-                        className={`ml-2 rounded-md px-1.5 py-0.5 text-[11px] ${filter === item.id ? 'bg-[#EDF2FA]' : 'bg-slate-50'}`}
+                        className={`ml-2 rounded-md px-1.5 py-0.5 text-[11px] ${filter === item.id ? "bg-[#EDF2FA]" : "bg-slate-50"}`}
                       >
-                        {item.id === 'pending'
+                        {item.id === "pending"
                           ? pending.length
-                          : item.id === 'graded'
+                          : item.id === "graded"
                             ? graded.length
                             : essaySubmissions.length}
                       </span>
@@ -244,7 +244,7 @@ export default function TentorGradingPage() {
                     <div className="flex items-start gap-3.5">
                       <div
                         aria-hidden="true"
-                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${index % 2 ? 'bg-[#F3EDFA] text-[#8B6BA5]' : 'bg-[#ECF2FC] text-[#6183B2]'}`}
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${index % 2 ? "bg-[#F3EDFA] text-[#8B6BA5]" : "bg-[#ECF2FC] text-[#6183B2]"}`}
                       >
                         {initials(essay.studentName)}
                       </div>
@@ -259,16 +259,16 @@ export default function TentorGradingPage() {
                             </p>
                           </div>
                           <StatusBadge
-                            tone={essay.isGraded ? 'success' : 'warning'}
+                            tone={essay.isGraded ? "success" : "warning"}
                           >
                             {essay.isGraded
-                              ? 'Sudah dinilai'
-                              : 'Menunggu koreksi'}
+                              ? "Sudah dinilai"
+                              : "Menunggu koreksi"}
                           </StatusBadge>
                         </div>
                         <p className="mt-4 text-xs font-medium capitalize text-[#5A7294]">
-                          {essay.subtestId.replace(/_/g, ' ')}{' '}
-                          <span className="mx-1 text-slate-300">·</span> Soal{' '}
+                          {essay.subtestId.replace(/_/g, " ")}{" "}
+                          <span className="mx-1 text-slate-300">·</span> Soal{" "}
                           {essay.questionNumber}
                         </p>
                         <p className="mt-1 text-xs leading-6 text-slate-500">
@@ -292,12 +292,12 @@ export default function TentorGradingPage() {
                             )}
                             <button
                               onClick={() => openGrading(essay)}
-                              aria-label={`${essay.isGraded ? 'Lihat penilaian' : 'Koreksi jawaban'} ${essay.studentName}`}
-                              className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-xs font-semibold transition ${essay.isGraded ? 'bg-[#F0F4FA] text-[#42668F] hover:bg-[#E5ECF6]' : 'bg-[#2E578F] text-white shadow-sm hover:bg-[#234573]'}`}
+                              aria-label={`${essay.isGraded ? "Lihat penilaian" : "Koreksi jawaban"} ${essay.studentName}`}
+                              className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-xs font-semibold transition ${essay.isGraded ? "bg-[#F0F4FA] text-[#42668F] hover:bg-[#E5ECF6]" : "bg-[#2E578F] text-white shadow-sm hover:bg-[#234573]"}`}
                             >
                               {essay.isGraded
-                                ? 'Lihat penilaian'
-                                : 'Koreksi jawaban'}
+                                ? "Lihat penilaian"
+                                : "Koreksi jawaban"}
                               <ChevronRight size={15} />
                             </button>
                           </div>
@@ -317,7 +317,7 @@ export default function TentorGradingPage() {
               {!filtered.length && (
                 <div className="px-6 py-14 text-center">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#F1F5FA] text-[#6D8EB7]">
-                    {filter === 'pending' && !query ? (
+                    {filter === "pending" && !query ? (
                       <CheckCheck size={26} />
                     ) : (
                       <Search size={24} />
@@ -325,20 +325,20 @@ export default function TentorGradingPage() {
                   </div>
                   <h3 className="mt-4 text-sm font-bold">
                     {query
-                      ? 'Belum ada jawaban yang cocok'
-                      : filter === 'pending'
-                        ? 'Antreanmu sudah selesai'
-                        : 'Belum ada jawaban di sini'}
+                      ? "Belum ada jawaban yang cocok"
+                      : filter === "pending"
+                        ? "Antreanmu sudah selesai"
+                        : "Belum ada jawaban di sini"}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-slate-500">
                     {query
-                      ? 'Coba nama siswa, Kode Siswa, atau judul tryout lain.'
-                      : 'Jawaban siswa akan muncul sesuai status koreksinya.'}
+                      ? "Coba nama siswa, Kode Siswa, atau judul tryout lain."
+                      : "Jawaban siswa akan muncul sesuai status koreksinya."}
                   </p>
                   {query && (
                     <button
                       type="button"
-                      onClick={() => setQuery('')}
+                      onClick={() => setQuery("")}
                       className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"
                     >
                       Hapus pencarian
@@ -381,8 +381,8 @@ export default function TentorGradingPage() {
               </div>
               <p className="mt-4 text-xs leading-6 text-slate-500">
                 {pending.length
-                  ? 'Luangkan waktu untuk membaca sebelum memberi nilai.'
-                  : 'Terima kasih sudah memberi umpan balik untuk siswa.'}
+                  ? "Luangkan waktu untuk membaca sebelum memberi nilai."
+                  : "Terima kasih sudah memberi umpan balik untuk siswa."}
               </p>
             </section>
             <section className="rounded-[24px] bg-[#FDF5E8] p-6">
@@ -469,7 +469,7 @@ export default function TentorGradingPage() {
                 </h3>
                 <p className="mt-3 whitespace-pre-wrap text-xs leading-7 text-[#637E9F]">
                   {selectedEssay.rubricGuide ||
-                    'Gunakan rubrik yang ditetapkan untuk soal ini.'}
+                    "Gunakan rubrik yang ditetapkan untuk soal ini."}
                 </p>
               </section>
               <form onSubmit={saveGrade} className="rounded-2xl bg-white p-5">

@@ -1,10 +1,10 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import React from 'react';
-import { useApp } from '@/context/AppContext';
-import { TrendingUp, BarChart2, Users, Target, Sparkles } from 'lucide-react';
+import React from "react";
+import { useApp } from "@/context/AppContext";
+import { TrendingUp, BarChart2, Users, Target, Sparkles } from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,55 +14,55 @@ import {
   Tooltip,
   Legend,
   CartesianGrid,
-} from 'recharts';
+} from "recharts";
 
 export default function TentorAnalyticsPage() {
   const { students } = useApp();
 
   const cohortPerformanceData = [
-    { subtest: 'Penalaran Umum', rerataEuclide: 742, rerataNasional: 580 },
+    { subtest: "Penalaran Umum", rerataEuclide: 742, rerataNasional: 580 },
     {
-      subtest: 'Pengetahuan Kuantitatif',
+      subtest: "Pengetahuan Kuantitatif",
       rerataEuclide: 765,
       rerataNasional: 545,
     },
-    { subtest: 'PBM', rerataEuclide: 680, rerataNasional: 560 },
-    { subtest: 'PPU', rerataEuclide: 695, rerataNasional: 550 },
-    { subtest: 'Literasi B. Indo', rerataEuclide: 688, rerataNasional: 570 },
-    { subtest: 'Literasi B. Inggris', rerataEuclide: 720, rerataNasional: 530 },
-    { subtest: 'Penalaran MTK', rerataEuclide: 739, rerataNasional: 520 },
+    { subtest: "PBM", rerataEuclide: 680, rerataNasional: 560 },
+    { subtest: "PPU", rerataEuclide: 695, rerataNasional: 550 },
+    { subtest: "Literasi B. Indo", rerataEuclide: 688, rerataNasional: 570 },
+    { subtest: "Literasi B. Inggris", rerataEuclide: 720, rerataNasional: 530 },
+    { subtest: "Penalaran MTK", rerataEuclide: 739, rerataNasional: 520 },
   ];
 
   const ptnPassingGradeBenchmarks = [
     {
-      ptn: 'Universitas Indonesia (UI)',
-      prodi: 'Pendidikan Dokter',
+      ptn: "Universitas Indonesia (UI)",
+      prodi: "Pendidikan Dokter",
       target: 745,
-      euclideEligible: '32 Siswa',
+      euclideEligible: "32 Siswa",
     },
     {
-      ptn: 'Institut Teknologi Bandung (ITB)',
-      prodi: 'STEI - Rekayasa',
+      ptn: "Institut Teknologi Bandung (ITB)",
+      prodi: "STEI - Rekayasa",
       target: 725,
-      euclideEligible: '48 Siswa',
+      euclideEligible: "48 Siswa",
     },
     {
-      ptn: 'Universitas Indonesia (UI)',
-      prodi: 'Teknik Informatika',
+      ptn: "Universitas Indonesia (UI)",
+      prodi: "Teknik Informatika",
       target: 700,
-      euclideEligible: '65 Siswa',
+      euclideEligible: "65 Siswa",
     },
     {
-      ptn: 'Universitas Gadjah Mada (UGM)',
-      prodi: 'Kedokteran',
+      ptn: "Universitas Gadjah Mada (UGM)",
+      prodi: "Kedokteran",
       target: 740,
-      euclideEligible: '30 Siswa',
+      euclideEligible: "30 Siswa",
     },
     {
-      ptn: 'Institut Teknologi Sepuluh Nopember (ITS)',
-      prodi: 'Sistem Informasi',
+      ptn: "Institut Teknologi Sepuluh Nopember (ITS)",
+      prodi: "Sistem Informasi",
       target: 680,
-      euclideEligible: '84 Siswa',
+      euclideEligible: "84 Siswa",
     },
   ];
   const benchmarksPagination = usePagination(ptnPassingGradeBenchmarks, 5);
@@ -95,7 +95,7 @@ export default function TentorAnalyticsPage() {
                 Rerata Skor Tertimbang Angkatan
               </span>
               <div className="text-3xl font-extrabold text-slate-900">
-                718.4{' '}
+                718.4{" "}
                 <span className="text-xs text-slate-400 font-normal">
                   / 1000
                 </span>
@@ -155,21 +155,21 @@ export default function TentorAnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis
                   dataKey="subtest"
-                  tick={{ fill: '#64748B', fontSize: 10 }}
+                  tick={{ fill: "#64748B", fontSize: 10 }}
                 />
                 <YAxis
                   domain={[0, 1000]}
-                  tick={{ fill: '#64748B', fontSize: 10 }}
+                  tick={{ fill: "#64748B", fontSize: 10 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#0F172A',
-                    color: '#FFFFFF',
-                    borderRadius: '8px',
-                    fontSize: '11px',
+                    backgroundColor: "#0F172A",
+                    color: "#FFFFFF",
+                    borderRadius: "8px",
+                    fontSize: "11px",
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: '11px' }} />
+                <Legend wrapperStyle={{ fontSize: "11px" }} />
                 <Bar
                   dataKey="rerataEuclide"
                   name="Rerata Siswa Euclide"

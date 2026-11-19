@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { PaginationState } from '@/hooks/usePagination';
-import { pageNumbers } from '@/lib/pagination';
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { PaginationState } from "@/hooks/usePagination";
+import { pageNumbers } from "@/lib/pagination";
 
 export default function Pagination({
   pagination: p,
@@ -19,10 +19,10 @@ export default function Pagination({
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <p role="status" aria-live="polite">
-          Menampilkan{' '}
+          Menampilkan{" "}
           <strong className="font-semibold text-slate-700">
             {p.from}–{p.to}
-          </strong>{' '}
+          </strong>{" "}
           dari {p.totalItems}
         </p>
         <label className="flex items-center gap-2">
@@ -55,14 +55,14 @@ export default function Pagination({
           {p.page} / {p.totalPages}
         </span>
         {pageNumbers(p.page, p.totalPages).map((number) =>
-          typeof number === 'number' ? (
+          typeof number === "number" ? (
             <button
               type="button"
               key={number}
               aria-label={`Halaman ${number}: ${label}`}
-              aria-current={p.page === number ? 'page' : undefined}
+              aria-current={p.page === number ? "page" : undefined}
               onClick={() => p.setPage(number)}
-              className={`hidden h-11 min-w-11 items-center sm:flex justify-center rounded-xl px-2 text-xs font-semibold transition ${p.page === number ? 'bg-[#EDF2FA] text-[#315D97]' : 'hover:bg-slate-100'}`}
+              className={`hidden h-11 min-w-11 items-center sm:flex justify-center rounded-xl px-2 text-xs font-semibold transition ${p.page === number ? "bg-[#EDF2FA] text-[#315D97]" : "hover:bg-slate-100"}`}
             >
               {number}
             </button>
@@ -74,7 +74,7 @@ export default function Pagination({
             >
               …
             </span>
-          )
+          ),
         )}
         <button
           type="button"

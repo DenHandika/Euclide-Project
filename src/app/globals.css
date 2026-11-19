@@ -1,4 +1,4 @@
-@import 'katex/dist/katex.min.css';
+@import "katex/dist/katex.min.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,20 +20,29 @@
 
 @layer base {
   body {
-    background-color: #F8FAFC;
-    color: #0F172A;
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    color: #0F172A;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    color: #0f172a;
     letter-spacing: -0.025em;
   }
 
-  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
     outline: 2px solid #244676;
     outline-offset: 4px;
   }
@@ -46,22 +55,26 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #94a3b8;
 }
 
 /* Stabilo / Highlight Accent */
 .stabilo {
-  background: linear-gradient(120deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.35) 100%);
-  color: #0F172A;
+  background: linear-gradient(
+    120deg,
+    rgba(245, 158, 11, 0.2) 0%,
+    rgba(245, 158, 11, 0.35) 100%
+  );
+  color: #0f172a;
   padding: 0.1em 0.35em;
   border-radius: 4px;
   box-decoration-break: clone;
@@ -70,7 +83,7 @@
 
 .stabilo-strong {
   background-color: rgba(245, 158, 11, 0.35);
-  color: #0F172A;
+  color: #0f172a;
   font-weight: 600;
   padding: 0.1em 0.4em;
   border-radius: 4px;
@@ -78,7 +91,7 @@
 
 .stabilo-indigo {
   background-color: rgba(37, 99, 235, 0.12);
-  color: #1E3A8A;
+  color: #1e3a8a;
   padding: 0.1em 0.35em;
   border-radius: 4px;
 }
@@ -88,37 +101,37 @@
   width: 2.1rem;
   height: 2.1rem;
   border-radius: 9999px;
-  border: 1.5px solid #CBD5E1;
+  border: 1.5px solid #cbd5e1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.8rem;
   font-weight: 700;
   color: #334155;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
 .omr-bubble:hover {
-  border-color: #2563EB;
-  color: #1E3A8A;
-  background-color: #EFF6FF;
+  border-color: #2563eb;
+  color: #1e3a8a;
+  background-color: #eff6ff;
   transform: scale(1.04);
 }
 
 .omr-bubble-filled {
-  background-color: #1E3A8A !important;
-  border-color: #1E3A8A !important;
-  color: #FFFFFF !important;
+  background-color: #1e3a8a !important;
+  border-color: #1e3a8a !important;
+  color: #ffffff !important;
   box-shadow: 0 2px 6px rgba(30, 58, 138, 0.3);
 }
 
 .omr-bubble-flagged {
-  background-color: #F59E0B !important;
-  border-color: #D97706 !important;
-  color: #0F172A !important;
+  background-color: #f59e0b !important;
+  border-color: #d97706 !important;
+  color: #0f172a !important;
   font-weight: 800 !important;
 }
 
@@ -140,7 +153,7 @@
 
 @media (max-width: 767px) {
   /* Small form text triggers automatic focus zoom in mobile Safari. */
-  :root input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  :root input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
   :root textarea,
   :root select {
     font-size: max(16px, 1rem);
@@ -154,7 +167,7 @@
 /* KaTeX custom sizing tweaks */
 .katex-wrapper .katex {
   font-size: 1.05em;
-  color: #0F172A;
+  color: #0f172a;
 }
 
 .katex-display {
@@ -166,7 +179,8 @@
   body * {
     visibility: hidden;
   }
-  #printable-receipt, #printable-receipt * {
+  #printable-receipt,
+  #printable-receipt * {
     visibility: visible;
   }
   #printable-receipt {

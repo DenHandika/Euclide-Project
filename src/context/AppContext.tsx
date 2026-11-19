@@ -1,7 +1,17 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { StudyProgram, validateChoices, SNBT_RULE_YEAR } from '@/lib/snbtChoices';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import {
+  StudyProgram,
+  validateChoices,
+  SNBT_RULE_YEAR,
+} from "@/lib/snbtChoices";
 import {
   User,
   UserRole,
@@ -17,7 +27,7 @@ import {
   ExamResult,
   UserAnswer,
   SubtestId,
-} from '@/types';
+} from "@/types";
 import {
   MOCK_USERS,
   MOCK_TRYOUTS,
@@ -26,12 +36,12 @@ import {
   MOCK_PAYMENTS,
   MOCK_ESSAY_SUBMISSIONS,
   MOCK_EXAM_RESULT,
-} from '@/data/mockData';
+} from "@/data/mockData";
 
 interface Toast {
   id: string;
   message: string;
-  type: 'success' | 'info' | 'error' | 'warning';
+  type: "success" | "info" | "error" | "warning";
 }
 
 interface AppContextType {
@@ -42,41 +52,59 @@ interface AppContextType {
   switchUser: (user: User) => void;
   signInWithGoogle: (email?: string) => boolean;
   logout: () => void;
-  
+
   // Tryouts & CBT
   tryouts: Tryout[];
   questions: Question[];
   activeSessions: Record<string, ExamSession>;
   startExam: (tryoutId: string, choices?: StudyProgram[]) => ExamSession;
   getExamSession: (tryoutId: string) => ExamSession | null;
-  saveAnswer: (tryoutId: string, questionId: string, type: any, answer: string | string[], isFlagged?: boolean) => void;
+  saveAnswer: (
+    tryoutId: string,
+    questionId: string,
+    type: any,
+    answer: string | string[],
+    isFlagged?: boolean,
+  ) => void;
   toggleFlagQuestion: (tryoutId: string, questionId: string) => void;
-  updateSubtestTimer: (tryoutId: string, subtestId: SubtestId, remainingSeconds: number) => void;
+  updateSubtestTimer: (
+    tryoutId: string,
+    subtestId: SubtestId,
+    remainingSeconds: number,
+  ) => void;
   incrementViolations: (tryoutId: string) => number;
   submitExam: (tryoutId: string) => ExamResult;
-  
+
   // Results
   examResults: Record<string, ExamResult>;
   getExamResult: (tryoutId: string) => ExamResult;
-  
+
   // Bank Soal
-  addQuestion: (question: Omit<Question, 'id'>) => void;
-  addQuestionsBulk: (newQuestions: Omit<Question, 'id'>[]) => void;
+  addQuestion: (question: Omit<Question, "id">) => void;
+  addQuestionsBulk: (newQuestions: Omit<Question, "id">[]) => void;
   deleteQuestion: (id: string) => void;
-  
+
   // Essay Grading
   essaySubmissions: EssaySubmission[];
   gradeEssay: (id: string, score: number, feedback: string) => void;
-  
+
   // Admin & Financials
   batches: ClassBatch[];
   students: User[];
   payments: PaymentRecord[];
   updateBatchCapacity: (batchId: string, maxCapacity: number) => void;
   toggleStudentStatus: (studentId: string, status: UserStatus) => void;
-  importStudentsBulk: (rows: StudentImportRow[]) => { importedCount: number; errorsCount: number };
-  addManualPayment: (payment: Omit<PaymentRecord, 'id' | 'invoiceNumber' | 'paidAt'>) => PaymentRecord;
-  importPaymentsBulk: (rows: PaymentImportRow[]) => { importedCount: number; errorsCount: number };
+  importStudentsBulk: (rows: StudentImportRow[]) => {
+    importedCount: number;
+    errorsCount: number;
+  };
+  addManualPayment: (
+    payment: Omit<PaymentRecord, "id" | "invoiceNumber" | "paidAt">,
+  ) => PaymentRecord;
+  importPaymentsBulk: (rows: PaymentImportRow[]) => {
+    importedCount: number;
+    errorsCount: number;
+  };
   getFinancialMetrics: () => {
     totalStudents: number;
     activeConcurrent: number;
@@ -86,7 +114,10 @@ interface AppContextType {
 
   // Toast notifications
   toasts: Toast[];
-  showToast: (message: string, type?: 'success' | 'info' | 'error' | 'warning') => void;
+  showToast: (
+    message: string,
+    type?: "success" | "info" | "error" | "warning",
+  ) => void;
   removeToast: (id: string) => void;
 }
 
@@ -99,18 +130,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return MOCK_USERS[2]; // Default: Active Siswa (Raihan)
   });
 
-  const [currentRole, setCurrentRole] = useState<UserRole>('siswa');
+  const [currentRole, setCurrentRole] = useState<UserRole>("siswa");
 
   // 2. Data states with LocalStorage persistence
   const [tryouts, setTryouts] = useState<Tryout[]>(() => MOCK_TRYOUTS);
   const [questions, setQuestions] = useState<Question[]>(() => MOCK_QUESTIONS);
-  const [batches, setBatches] = useState<ClassBatch[]>(() => MOCK_CLASS_BATCHES);
-  const [students, setStudents] = useState<User[]>(() => MOCK_USERS.filter((u) => u.role === 'siswa'));
-  const [payments, setPayments] = useState<PaymentRecord[]>(() => MOCK_PAYMENTS);
-  const [essaySubmissions, setEssaySubmissions] = useState<EssaySubmission[]>(() => MOCK_ESSAY_SUBMISSIONS);
-  const [activeSessions, setActiveSessions] = useState<Record<string, ExamSession>>({});
+  const [batches, setBatches] = useState<ClassBatch[]>(
+    () => MOCK_CLASS_BATCHES,
+  );
+  const [students, setStudents] = useState<User[]>(() =>
+    MOCK_USERS.filter((u) => u.role === "siswa"),
+  );
+  const [payments, setPayments] = useState<PaymentRecord[]>(
+    () => MOCK_PAYMENTS,
+  );
+  const [essaySubmissions, setEssaySubmissions] = useState<EssaySubmission[]>(
+    () => MOCK_ESSAY_SUBMISSIONS,
+  );
+  const [activeSessions, setActiveSessions] = useState<
+    Record<string, ExamSession>
+  >({});
   const [examResults, setExamResults] = useState<Record<string, ExamResult>>({
-    'to-utbk-national-01': MOCK_EXAM_RESULT,
+    "to-utbk-national-01": MOCK_EXAM_RESULT,
   });
 
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -118,39 +159,42 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Load from LocalStorage on mount
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem('euclide_user');
+      const storedUser = localStorage.getItem("euclide_user");
       if (storedUser) {
         const parsed = JSON.parse(storedUser);
         setCurrentUser(parsed);
         setCurrentRole(parsed.role);
       }
 
-      const storedPayments = localStorage.getItem('euclide_payments');
+      const storedPayments = localStorage.getItem("euclide_payments");
       if (storedPayments) setPayments(JSON.parse(storedPayments));
 
-      const storedStudents = localStorage.getItem('euclide_students');
+      const storedStudents = localStorage.getItem("euclide_students");
       if (storedStudents) setStudents(JSON.parse(storedStudents));
 
-      const storedBatches = localStorage.getItem('euclide_batches');
+      const storedBatches = localStorage.getItem("euclide_batches");
       if (storedBatches) setBatches(JSON.parse(storedBatches));
 
-      const storedQuestions = localStorage.getItem('euclide_questions');
+      const storedQuestions = localStorage.getItem("euclide_questions");
       if (storedQuestions) {
         const saved: Question[] = JSON.parse(storedQuestions);
-        const savedIds = new Set(saved.map(question => question.id));
+        const savedIds = new Set(saved.map((question) => question.id));
         // Add newly shipped examples without deleting questions edited by the user.
-        setQuestions([...MOCK_QUESTIONS.filter(question => !savedIds.has(question.id)), ...saved]);
+        setQuestions([
+          ...MOCK_QUESTIONS.filter((question) => !savedIds.has(question.id)),
+          ...saved,
+        ]);
       }
 
-      const storedEssays = localStorage.getItem('euclide_essays');
+      const storedEssays = localStorage.getItem("euclide_essays");
       if (storedEssays) setEssaySubmissions(JSON.parse(storedEssays));
 
-      const storedResults = localStorage.getItem('euclide_results');
+      const storedResults = localStorage.getItem("euclide_results");
       if (storedResults) setExamResults(JSON.parse(storedResults));
-      const storedSessions = localStorage.getItem('euclide_sessions');
+      const storedSessions = localStorage.getItem("euclide_sessions");
       if (storedSessions) setActiveSessions(JSON.parse(storedSessions));
     } catch (e) {
-      console.warn('LocalStorage error or SSR', e);
+      console.warn("LocalStorage error or SSR", e);
     } finally {
       setIsHydrated(true);
     }
@@ -165,8 +209,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const showToast = (message: string, type: 'success' | 'info' | 'error' | 'warning' = 'info') => {
-    const id = Date.now().toString() + Math.random().toString(36).substring(2, 5);
+  const showToast = (
+    message: string,
+    type: "success" | "info" | "error" | "warning" = "info",
+  ) => {
+    const id =
+      Date.now().toString() + Math.random().toString(36).substring(2, 5);
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       removeToast(id);
@@ -184,52 +232,71 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     setCurrentRole(role);
     setCurrentUser(targetUser);
-    saveState('euclide_user', targetUser);
-    showToast(`Beralih ke mode ${role.toUpperCase()}: ${targetUser.name}`, 'info');
+    saveState("euclide_user", targetUser);
+    showToast(
+      `Beralih ke mode ${role.toUpperCase()}: ${targetUser.name}`,
+      "info",
+    );
   };
 
   const switchUser = (user: User) => {
     setCurrentUser(user);
     setCurrentRole(user.role);
-    saveState('euclide_user', user);
-    showToast(`Masuk sebagai ${user.name} (${user.role.toUpperCase()})`, 'info');
+    saveState("euclide_user", user);
+    showToast(
+      `Masuk sebagai ${user.name} (${user.role.toUpperCase()})`,
+      "info",
+    );
   };
 
-  const signInWithGoogle = (email: string = 'raihan.pratama@siswa.euclide.edu'): boolean => {
+  const signInWithGoogle = (
+    email: string = "raihan.pratama@siswa.euclide.edu",
+  ): boolean => {
     // Check whitelist in students or mock database
     const allUsers = [...MOCK_USERS, ...students];
-    const matchedUser = allUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
-    
+    const matchedUser = allUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase(),
+    );
+
     if (matchedUser) {
-      if (matchedUser.role === 'siswa' && matchedUser.status !== 'active') {
-        showToast(`Login ditolak: Akun berstatus ${matchedUser.status.toUpperCase()} (Kewajiban SPP / Nonaktif). Hubungi Admin Bimbel.`, 'error');
+      if (matchedUser.role === "siswa" && matchedUser.status !== "active") {
+        showToast(
+          `Login ditolak: Akun berstatus ${matchedUser.status.toUpperCase()} (Kewajiban SPP / Nonaktif). Hubungi Admin Bimbel.`,
+          "error",
+        );
         return false;
       }
 
       setCurrentUser(matchedUser);
       setCurrentRole(matchedUser.role);
-      saveState('euclide_user', matchedUser);
-      showToast(`Login Google Berhasil! Selamat datang, ${matchedUser.name}`, 'success');
+      saveState("euclide_user", matchedUser);
+      showToast(
+        `Login Google Berhasil! Selamat datang, ${matchedUser.name}`,
+        "success",
+      );
       return true;
     } else {
       // Create new active student session
       const newUser: User = {
         id: `user-${Date.now()}`,
-        name: email.split('@')[0].replace('.', ' ').toUpperCase(),
+        name: email.split("@")[0].replace(".", " ").toUpperCase(),
         email,
-        role: 'siswa',
+        role: "siswa",
         nis: `EUC-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-        status: 'active',
-        joinedDate: new Date().toISOString().split('T')[0],
-        sppStatus: 'paid',
-        targetPTN1: 'Universitas Indonesia (UI)',
-        targetProdi1: 'Teknik Komputer',
+        status: "active",
+        joinedDate: new Date().toISOString().split("T")[0],
+        sppStatus: "paid",
+        targetPTN1: "Universitas Indonesia (UI)",
+        targetProdi1: "Teknik Komputer",
       };
       setCurrentUser(newUser);
-      setCurrentRole('siswa');
+      setCurrentRole("siswa");
       setStudents((prev) => [newUser, ...prev]);
-      saveState('euclide_user', newUser);
-      showToast(`Akun Terdaftar & Terverifikasi Aktif! Selamat datang, ${newUser.name}`, 'success');
+      saveState("euclide_user", newUser);
+      showToast(
+        `Akun Terdaftar & Terverifikasi Aktif! Selamat datang, ${newUser.name}`,
+        "success",
+      );
       return true;
     }
   };
@@ -237,15 +304,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     const defaultUser = MOCK_USERS[2];
     setCurrentUser(defaultUser);
-    setCurrentRole('siswa');
-    saveState('euclide_user', defaultUser);
-    showToast('Sesi ditutup.', 'info');
+    setCurrentRole("siswa");
+    saveState("euclide_user", defaultUser);
+    showToast("Sesi ditutup.", "info");
   };
 
   // Exam engine methods
-  const startExam = (tryoutId: string, choices: StudyProgram[] = []): ExamSession => {
+  const startExam = (
+    tryoutId: string,
+    choices: StudyProgram[] = [],
+  ): ExamSession => {
     const existing = activeSessions[tryoutId];
-    if (existing && existing.userId === currentUser.id && !existing.isCompleted && existing.targetChoices?.length) {
+    if (
+      existing &&
+      existing.userId === currentUser.id &&
+      !existing.isCompleted &&
+      existing.targetChoices?.length
+    ) {
       return existing;
     }
 
@@ -259,7 +334,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
 
     const newSession: ExamSession = {
-      targetChoices: choices.map(choice => ({ ...choice })),
+      targetChoices: choices.map((choice) => ({ ...choice })),
       choiceRuleYear: SNBT_RULE_YEAR,
       tryoutId,
       userId: currentUser.id,
@@ -275,7 +350,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const updatedSessions = { ...activeSessions, [tryoutId]: newSession };
     setActiveSessions(updatedSessions);
-    saveState('euclide_sessions', updatedSessions);
+    saveState("euclide_sessions", updatedSessions);
     return newSession;
   };
 
@@ -289,7 +364,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     questionId: string,
     type: any,
     answer: string | string[],
-    isFlagged: boolean = false
+    isFlagged: boolean = false,
   ) => {
     setActiveSessions((prev) => {
       const session = prev[tryoutId] || startExam(tryoutId);
@@ -299,7 +374,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           questionId,
           type,
           answer,
-          isFlagged: isFlagged !== undefined ? isFlagged : session.answers[questionId]?.isFlagged || false,
+          isFlagged:
+            isFlagged !== undefined
+              ? isFlagged
+              : session.answers[questionId]?.isFlagged || false,
           answeredAt: new Date().toISOString(),
         },
       };
@@ -310,7 +388,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       };
 
       const next = { ...prev, [tryoutId]: updatedSession };
-      saveState('euclide_sessions', next);
+      saveState("euclide_sessions", next);
       return next;
     });
   };
@@ -326,8 +404,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ...session.answers,
         [questionId]: {
           questionId,
-          type: current?.type || 'single_choice',
-          answer: current?.answer || '',
+          type: current?.type || "single_choice",
+          answer: current?.answer || "",
           isFlagged,
           answeredAt: current?.answeredAt || new Date().toISOString(),
         },
@@ -335,16 +413,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       const updatedSession = { ...session, answers: updatedAnswers };
       const next = { ...prev, [tryoutId]: updatedSession };
-      saveState('euclide_sessions', next);
+      saveState("euclide_sessions", next);
       return next;
     });
   };
 
-  const updateSubtestTimer = (tryoutId: string, subtestId: SubtestId, remainingSeconds: number) => {
+  const updateSubtestTimer = (
+    tryoutId: string,
+    subtestId: SubtestId,
+    remainingSeconds: number,
+  ) => {
     setActiveSessions((prev) => {
       const session = prev[tryoutId];
       if (!session) return prev;
-      const updatedTimers = { ...session.subtestRemainingSeconds, [subtestId]: remainingSeconds };
+      const updatedTimers = {
+        ...session.subtestRemainingSeconds,
+        [subtestId]: remainingSeconds,
+      };
       return {
         ...prev,
         [tryoutId]: {
@@ -365,7 +450,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         violationsCount: currentCount,
       };
       const next = { ...prev, [tryoutId]: updatedSession };
-      saveState('euclide_sessions', next);
+      saveState("euclide_sessions", next);
       return next;
     });
     return currentCount;
@@ -383,13 +468,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       tryoutTitle: tryout.title,
       userId: currentUser.id,
       userName: currentUser.name,
-      date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
-      targetChoices: session?.targetChoices?.map(choice => ({ ...choice })),
+      date: new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+      targetChoices: session?.targetChoices?.map((choice) => ({ ...choice })),
       choiceRuleYear: session?.choiceRuleYear,
     };
 
     // If student answered essay, add to essay grading queue
-    const essayQuestion = tryout.questions.find((q) => q.type === 'essay');
+    const essayQuestion = tryout.questions.find((q) => q.type === "essay");
     if (essayQuestion && session?.answers[essayQuestion.id]) {
       const essayAns = session.answers[essayQuestion.id].answer as string;
       if (essayAns && essayAns.trim().length > 0) {
@@ -401,19 +490,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
           questionNumber: essayQuestion.number,
           subtestId: essayQuestion.subtestId,
           questionText: essayQuestion.question,
-          rubricGuide: essayQuestion.rubricGuide || '',
+          rubricGuide: essayQuestion.rubricGuide || "",
           studentId: currentUser.id,
           studentName: currentUser.name,
-          studentNis: currentUser.nis || 'EUC-2026-XXXX',
+          studentNis: currentUser.nis || "EUC-2026-XXXX",
           studentAnswer: essayAns,
-          submittedAt: new Date().toLocaleString('id-ID') + ' WIB',
+          submittedAt: new Date().toLocaleString("id-ID") + " WIB",
           wordCount: essayAns.trim().split(/\s+/).length,
           isGraded: false,
         };
 
         setEssaySubmissions((prev) => {
           const updated = [newEssaySub, ...prev];
-          saveState('euclide_essays', updated);
+          saveState("euclide_essays", updated);
           return updated;
         });
       }
@@ -429,33 +518,43 @@ export function AppProvider({ children }: { children: ReactNode }) {
           submittedAt: new Date().toISOString(),
         },
       };
-      saveState('euclide_sessions', next);
+      saveState("euclide_sessions", next);
       return next;
     });
 
     const updatedResults = { ...examResults, [tryoutId]: result };
     setExamResults(updatedResults);
-    saveState('euclide_results', updatedResults);
+    saveState("euclide_results", updatedResults);
 
-    showToast('Ujian Berhasil Dikirim! Hasil Rasionalisasi telah siap.', 'success');
+    showToast(
+      "Ujian Berhasil Dikirim! Hasil Rasionalisasi telah siap.",
+      "success",
+    );
     return result;
   };
 
   const getExamResult = (tryoutId: string): ExamResult => {
     const result = examResults[tryoutId];
-    return result?.userId === currentUser.id ? result : { ...MOCK_EXAM_RESULT, tryoutId, userId: currentUser.id, userName: currentUser.name };
+    return result?.userId === currentUser.id
+      ? result
+      : {
+          ...MOCK_EXAM_RESULT,
+          tryoutId,
+          userId: currentUser.id,
+          userName: currentUser.name,
+        };
   };
 
-  const addQuestion = (newQ: Omit<Question, 'id'>) => {
+  const addQuestion = (newQ: Omit<Question, "id">) => {
     const id = `q-custom-${Date.now()}`;
     const questionObj: Question = { ...newQ, id };
     const updated = [questionObj, ...questions];
     setQuestions(updated);
-    saveState('euclide_questions', updated);
-    showToast('Soal berhasil ditambahkan ke Bank Soal!', 'success');
+    saveState("euclide_questions", updated);
+    showToast("Soal berhasil ditambahkan ke Bank Soal!", "success");
   };
 
-  const addQuestionsBulk = (newQuestions: Omit<Question, 'id'>[]) => {
+  const addQuestionsBulk = (newQuestions: Omit<Question, "id">[]) => {
     const formatted: Question[] = newQuestions.map((q, idx) => ({
       ...q,
       id: `q-bulk-${Date.now()}-${idx}`,
@@ -463,15 +562,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }));
     const updated = [...formatted, ...questions];
     setQuestions(updated);
-    saveState('euclide_questions', updated);
-    showToast(`${formatted.length} butir soal berhasil di-import massal ke Bank Soal!`, 'success');
+    saveState("euclide_questions", updated);
+    showToast(
+      `${formatted.length} butir soal berhasil di-import massal ke Bank Soal!`,
+      "success",
+    );
   };
 
   const deleteQuestion = (id: string) => {
     const updated = questions.filter((q) => q.id !== id);
     setQuestions(updated);
-    saveState('euclide_questions', updated);
-    showToast('Soal berhasil dihapus dari Bank Soal.', 'info');
+    saveState("euclide_questions", updated);
+    showToast("Soal berhasil dihapus dari Bank Soal.", "info");
   };
 
   const gradeEssay = (id: string, score: number, feedback: string) => {
@@ -484,23 +586,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
               feedback,
               isGraded: true,
               gradedBy: currentUser.name,
-              gradedAt: new Date().toLocaleString('id-ID') + ' WIB',
+              gradedAt: new Date().toLocaleString("id-ID") + " WIB",
             }
-          : item
+          : item,
       );
-      saveState('euclide_essays', updated);
+      saveState("euclide_essays", updated);
       return updated;
     });
-    showToast(`Nilai esai (${score}/100) berhasil disimpan & dikirim ke siswa.`, 'success');
+    showToast(
+      `Nilai esai (${score}/100) berhasil disimpan & dikirim ke siswa.`,
+      "success",
+    );
   };
 
   const toggleStudentStatus = (studentId: string, status: UserStatus) => {
     setStudents((prev) => {
-      const updated = prev.map((s) => (s.id === studentId ? { ...s, status } : s));
-      saveState('euclide_students', updated);
+      const updated = prev.map((s) =>
+        s.id === studentId ? { ...s, status } : s,
+      );
+      saveState("euclide_students", updated);
       return updated;
     });
-    showToast(`Status siswa diperbarui menjadi: ${status.toUpperCase()}`, 'info');
+    showToast(
+      `Status siswa diperbarui menjadi: ${status.toUpperCase()}`,
+      "info",
+    );
   };
 
   const importStudentsBulk = (rows: StudentImportRow[]) => {
@@ -515,14 +625,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
           nis: row.NIS,
           name: row.Nama,
           email: row.Email || `${row.NIS.toLowerCase()}@siswa.euclide.edu`,
-          role: 'siswa',
-          phone: row.No_Telepon_WA || '081234567890',
-          batchId: row.Batch_Kelas || 'batch-super-intensif',
-          targetPTN1: row.Target_PTN || 'Universitas Indonesia (UI)',
-          targetProdi1: row.Target_Prodi || 'Pendidikan Dokter',
-          status: (row.Status?.toLowerCase() === 'graduated' ? 'graduated' : row.Status?.toLowerCase() === 'leave' ? 'leave' : row.Status?.toLowerCase() === 'nonactive' ? 'nonactive' : 'active') as UserStatus,
-          joinedDate: new Date().toISOString().split('T')[0],
-          sppStatus: 'paid',
+          role: "siswa",
+          phone: row.No_Telepon_WA || "081234567890",
+          batchId: row.Batch_Kelas || "batch-super-intensif",
+          targetPTN1: row.Target_PTN || "Universitas Indonesia (UI)",
+          targetProdi1: row.Target_Prodi || "Pendidikan Dokter",
+          status: (row.Status?.toLowerCase() === "graduated"
+            ? "graduated"
+            : row.Status?.toLowerCase() === "leave"
+              ? "leave"
+              : row.Status?.toLowerCase() === "nonactive"
+                ? "nonactive"
+                : "active") as UserStatus,
+          joinedDate: new Date().toISOString().split("T")[0],
+          sppStatus: "paid",
         });
         imported++;
       } else {
@@ -533,26 +649,37 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (newStudents.length > 0) {
       const updated = [...students, ...newStudents];
       setStudents(updated);
-      saveState('euclide_students', updated);
-      showToast(`Berhasil mengimpor ${imported} data siswa! (${errors} baris dilewati)`, 'success');
+      saveState("euclide_students", updated);
+      showToast(
+        `Berhasil mengimpor ${imported} data siswa! (${errors} baris dilewati)`,
+        "success",
+      );
     } else {
-      showToast(`Gagal mengimpor siswa. Format kolom tidak valid (${errors} baris).`, 'error');
+      showToast(
+        `Gagal mengimpor siswa. Format kolom tidak valid (${errors} baris).`,
+        "error",
+      );
     }
 
     return { importedCount: imported, errorsCount: errors };
   };
 
-  const addManualPayment = (paymentData: Omit<PaymentRecord, 'id' | 'invoiceNumber' | 'paidAt'>): PaymentRecord => {
+  const addManualPayment = (
+    paymentData: Omit<PaymentRecord, "id" | "invoiceNumber" | "paidAt">,
+  ): PaymentRecord => {
     const newRecord: PaymentRecord = {
       ...paymentData,
       id: `pay-${Date.now()}`,
-      invoiceNumber: `INV-EUC-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${Math.floor(100 + Math.random() * 900)}`,
-      paidAt: new Date().toLocaleString('id-ID') + ' WIB',
+      invoiceNumber: `INV-EUC-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, "0")}-${Math.floor(100 + Math.random() * 900)}`,
+      paidAt: new Date().toLocaleString("id-ID") + " WIB",
     };
     const updated = [newRecord, ...payments];
     setPayments(updated);
-    saveState('euclide_payments', updated);
-    showToast(`Pembayaran ${newRecord.invoiceNumber} berhasil dicatat!`, 'success');
+    saveState("euclide_payments", updated);
+    showToast(
+      `Pembayaran ${newRecord.invoiceNumber} berhasil dicatat!`,
+      "success",
+    );
     return newRecord;
   };
 
@@ -566,15 +693,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
         newRecords.push({
           id: `pay-import-${Date.now()}-${idx}`,
           invoiceNumber: `INV-IMP-${Date.now().toString().slice(-4)}-${idx + 1}`,
-          nis: row.Nomor_Induk || 'EUC-2026-XXXX',
+          nis: row.Nomor_Induk || "EUC-2026-XXXX",
           studentName: row.Nama,
-          month: row.Bulan || 'Februari 2026',
+          month: row.Bulan || "Februari 2026",
           amount: Number(row.Nominal),
-          paymentMethod: 'Transfer Bank',
-          status: (row.Status === 'Lunas' ? 'Lunas' : 'Menunggu') as any,
-          paidAt: row.Status === 'Lunas' ? new Date().toLocaleString('id-ID') + ' WIB' : '-',
+          paymentMethod: "Transfer Bank",
+          status: (row.Status === "Lunas" ? "Lunas" : "Menunggu") as any,
+          paidAt:
+            row.Status === "Lunas"
+              ? new Date().toLocaleString("id-ID") + " WIB"
+              : "-",
           recordedBy: `Import Excel (${currentUser.name})`,
-          notes: 'Bulk Excel Import',
+          notes: "Bulk Excel Import",
         });
         imported++;
       } else {
@@ -585,10 +715,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (newRecords.length > 0) {
       const updated = [...newRecords, ...payments];
       setPayments(updated);
-      saveState('euclide_payments', updated);
-      showToast(`Berhasil mengimpor ${imported} data pembayaran! (${errors} baris dilewati)`, 'success');
+      saveState("euclide_payments", updated);
+      showToast(
+        `Berhasil mengimpor ${imported} data pembayaran! (${errors} baris dilewati)`,
+        "success",
+      );
     } else {
-      showToast(`Gagal mengimpor. Semua baris tidak valid (${errors} baris).`, 'error');
+      showToast(
+        `Gagal mengimpor. Semua baris tidak valid (${errors} baris).`,
+        "error",
+      );
     }
 
     return { importedCount: imported, errorsCount: errors };
@@ -598,10 +734,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const totalStudents = students.length;
     const activeConcurrent = 320; // Simulated concurrent active test-takers
     const monthlyRevenue = payments
-      .filter((p) => p.status === 'Lunas')
+      .filter((p) => p.status === "Lunas")
       .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
     const overdueAmount = payments
-      .filter((p) => p.status === 'Jatuh Tempo')
+      .filter((p) => p.status === "Jatuh Tempo")
       .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 
     return {
@@ -614,11 +750,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateBatchCapacity = (batchId: string, maxCapacity: number) => {
     setBatches((prev) => {
-      const updated = prev.map((b) => (b.id === batchId ? { ...b, maxCapacity } : b));
-      saveState('euclide_batches', updated);
+      const updated = prev.map((b) =>
+        b.id === batchId ? { ...b, maxCapacity } : b,
+      );
+      saveState("euclide_batches", updated);
       return updated;
     });
-    showToast('Kapasitas kuota batch berhasil diperbarui!', 'success');
+    showToast("Kapasitas kuota batch berhasil diperbarui!", "success");
   };
 
   return (
@@ -670,7 +808,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 export function useApp() {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error('useApp must be used within an AppProvider');
+    throw new Error("useApp must be used within an AppProvider");
   }
   return context;
 }

@@ -1,14 +1,14 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import StatusBadge from '@/components/common/StatusBadge';
+import StatusBadge from "@/components/common/StatusBadge";
 
-import React, { useState, useRef } from 'react';
-import * as XLSX from 'xlsx';
-import { useApp } from '@/context/AppContext';
-import { PaymentRecord, PaymentImportRow } from '@/types';
-import ReceiptModal from '@/components/common/ReceiptModal';
+import React, { useState, useRef } from "react";
+import * as XLSX from "xlsx";
+import { useApp } from "@/context/AppContext";
+import { PaymentRecord, PaymentImportRow } from "@/types";
+import ReceiptModal from "@/components/common/ReceiptModal";
 import {
   FileSpreadsheet,
   UploadCloud,
@@ -18,7 +18,7 @@ import {
   PlusCircle,
   Printer,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function AdminPaymentsPage() {
   const { payments, addManualPayment, importPaymentsBulk, showToast } =
@@ -26,36 +26,36 @@ export default function AdminPaymentsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [parsedRows, setParsedRows] = useState<PaymentImportRow[]>([]);
-  const [fileName, setFileName] = useState<string>('');
+  const [fileName, setFileName] = useState<string>("");
   const paymentsPagination = usePagination(payments, 5);
   const paymentImportPagination = usePagination(
     parsedRows,
     10,
     fileName,
-    [10, 25, 50]
+    [10, 25, 50],
   );
 
   const [isDragging, setIsDragging] = useState(false);
   const [manualModalOpen, setManualModalOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(
-    null
+    null,
   );
 
   const [manualForm, setManualForm] = useState({
-    nis: 'EUC-2026-0042',
-    studentName: 'Muhammad Raihan Pratama',
-    month: 'Februari 2026',
+    nis: "EUC-2026-0042",
+    studentName: "Muhammad Raihan Pratama",
+    month: "Februari 2026",
     amount: 1750000,
-    paymentMethod: 'Tunai / Kasir' as const,
-    status: 'Lunas' as const,
-    recordedBy: 'Kasir Front Desk',
-    notes: 'Pembayaran SPP Reguler Tunai',
+    paymentMethod: "Tunai / Kasir" as const,
+    status: "Lunas" as const,
+    recordedBy: "Kasir Front Desk",
+    notes: "Pembayaran SPP Reguler Tunai",
   });
 
   const formatIDR = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
       maximumFractionDigits: 0,
     }).format(val);
   };
@@ -67,31 +67,31 @@ export default function AdminPaymentsPage() {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
+        const workbook = XLSX.read(data, { type: "array" });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const rawJson: any[] = XLSX.utils.sheet_to_json(worksheet);
 
         const validatedRows: PaymentImportRow[] = rawJson.map((row) => {
           const nis = String(
-            row.Nomor_Induk || row.NIS || row.nis || ''
+            row.Nomor_Induk || row.NIS || row.nis || "",
           ).trim();
           const nama = String(
-            row.Nama || row.Nama_Siswa || row.nama || ''
+            row.Nama || row.Nama_Siswa || row.nama || "",
           ).trim();
           const bulan = String(
-            row.Bulan || row.Periode || 'Februari 2026'
+            row.Bulan || row.Periode || "Februari 2026",
           ).trim();
           const nominal = Number(row.Nominal || row.Jumlah || row.amount || 0);
-          const status = String(row.Status || row.status || 'Lunas').trim();
+          const status = String(row.Status || row.status || "Lunas").trim();
 
           const isValid = !!(nis && nama && nominal > 0);
           const errorMessage = !nis
-            ? 'Nomor Induk kosong'
+            ? "Nomor Induk kosong"
             : !nama
-              ? 'Nama Siswa kosong'
+              ? "Nama Siswa kosong"
               : nominal <= 0
-                ? 'Nominal tidak valid'
+                ? "Nominal tidak valid"
                 : undefined;
 
           return {
@@ -108,12 +108,12 @@ export default function AdminPaymentsPage() {
         setParsedRows(validatedRows);
         showToast(
           `Berhasil membaca ${validatedRows.length} baris dari ${file.name}`,
-          'info'
+          "info",
         );
       } catch (err) {
         showToast(
-          'Gagal memproses file spreadsheet. Pastikan format valid.',
-          'error'
+          "Gagal memproses file spreadsheet. Pastikan format valid.",
+          "error",
         );
       }
     };
@@ -132,40 +132,40 @@ export default function AdminPaymentsPage() {
   const handleDownloadTemplate = () => {
     const sampleData = [
       {
-        Nomor_Induk: 'EUC-2026-0042',
-        Nama: 'Muhammad Raihan Pratama',
-        Bulan: 'Maret 2026',
+        Nomor_Induk: "EUC-2026-0042",
+        Nama: "Muhammad Raihan Pratama",
+        Bulan: "Maret 2026",
         Nominal: 1750000,
-        Status: 'Lunas',
+        Status: "Lunas",
       },
       {
-        Nomor_Induk: 'EUC-2026-0043',
-        Nama: 'Amanda Putri Maharani',
-        Bulan: 'Maret 2026',
+        Nomor_Induk: "EUC-2026-0043",
+        Nama: "Amanda Putri Maharani",
+        Bulan: "Maret 2026",
         Nominal: 2200000,
-        Status: 'Lunas',
+        Status: "Lunas",
       },
       {
-        Nomor_Induk: 'EUC-2026-0089',
-        Nama: 'Dimas Anggara',
-        Bulan: 'Maret 2026',
+        Nomor_Induk: "EUC-2026-0089",
+        Nama: "Dimas Anggara",
+        Bulan: "Maret 2026",
         Nominal: 1250000,
-        Status: 'Menunggu',
+        Status: "Menunggu",
       },
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(sampleData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data_Pembayaran_SPP');
-    XLSX.writeFile(workbook, 'Template_Bulk_Import_SPP_Euclide.xlsx');
-    showToast('Template Excel berhasil diunduh!', 'success');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data_Pembayaran_SPP");
+    XLSX.writeFile(workbook, "Template_Bulk_Import_SPP_Euclide.xlsx");
+    showToast("Template Excel berhasil diunduh!", "success");
   };
 
   const handleSaveToDatabase = () => {
     if (parsedRows.length === 0) return;
     importPaymentsBulk(parsedRows);
     setParsedRows([]);
-    setFileName('');
+    setFileName("");
   };
 
   const handleManualSubmit = (e: React.FormEvent) => {
@@ -225,8 +225,8 @@ export default function AdminPaymentsPage() {
           onClick={() => fileInputRef.current?.click()}
           className={`border border-dashed p-8 text-center cursor-pointer transition-all rounded-2xl shadow-sm ${
             isDragging
-              ? 'border-[#1B8A5A] bg-[#EAF7F0]'
-              : 'border-slate-200 bg-[#FFFFFF] hover:border-slate-200'
+              ? "border-[#1B8A5A] bg-[#EAF7F0]"
+              : "border-slate-200 bg-[#FFFFFF] hover:border-slate-200"
           } `}
         >
           <input
@@ -250,7 +250,7 @@ export default function AdminPaymentsPage() {
               <h3 className="font-sans font-bold text-base text-[#263D5F]">
                 {fileName
                   ? `File Terpilih: ${fileName}`
-                  : 'Tarik & Letakkan File Spreadsheet (.xlsx / .csv)'}
+                  : "Tarik & Letakkan File Spreadsheet (.xlsx / .csv)"}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 atau klik untuk memilih file dari komputer (SheetJS Parser
@@ -259,8 +259,8 @@ export default function AdminPaymentsPage() {
             </div>
 
             <div className="font-sans text-xs text-slate-500 pt-1">
-              Format Kolom: <strong>Nomor_Induk</strong>, <strong>Nama</strong>,{' '}
-              <strong>Bulan</strong>, <strong>Nominal</strong>,{' '}
+              Format Kolom: <strong>Nomor_Induk</strong>, <strong>Nama</strong>,{" "}
+              <strong>Bulan</strong>, <strong>Nominal</strong>,{" "}
               <strong>Status</strong>
             </div>
           </div>
@@ -275,9 +275,9 @@ export default function AdminPaymentsPage() {
                   Pratinjau Data Impor ({parsedRows.length} Baris)
                 </h3>
                 <p className="font-sans text-xs text-slate-500">
-                  Valid:{' '}
+                  Valid:{" "}
                   <strong className="text-[#1B8A5A]">{validCount}</strong> baris
-                  • Tidak Valid:{' '}
+                  • Tidak Valid:{" "}
                   <strong className="text-[#D0342C]">{errorCount}</strong> baris
                 </p>
               </div>
@@ -316,7 +316,7 @@ export default function AdminPaymentsPage() {
                   {paymentImportPagination.pageItems.map((row, idx) => (
                     <tr
                       key={idx}
-                      className={`hover:bg-[#F6F8FC] ${!row.isValid ? 'bg-[#FDECEB]/50' : ''}`}
+                      className={`hover:bg-[#F6F8FC] ${!row.isValid ? "bg-[#FDECEB]/50" : ""}`}
                     >
                       <td className="py-2 px-2 font-sans text-xs">
                         {row.isValid ? (
@@ -408,18 +408,18 @@ export default function AdminPaymentsPage() {
                     <td className="py-2.5 px-2 font-sans text-xs">
                       <StatusBadge
                         tone={
-                          pay.status === 'Lunas'
-                            ? 'success'
-                            : pay.status === 'Menunggu'
-                              ? 'warning'
-                              : 'danger'
+                          pay.status === "Lunas"
+                            ? "success"
+                            : pay.status === "Menunggu"
+                              ? "warning"
+                              : "danger"
                         }
                       >
                         {pay.status}
                       </StatusBadge>
                     </td>
                     <td className="py-2.5 px-2 text-right">
-                      {pay.status === 'Lunas' && (
+                      {pay.status === "Lunas" && (
                         <button
                           onClick={() => setSelectedReceipt(pay)}
                           className="inline-flex items-center space-x-1 font-sans text-xs text-[#1B3B8C] hover:underline bg-[#F6F8FC] px-2 py-1 border border-slate-200 rounded-xl min-h-11"

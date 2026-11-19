@@ -1,12 +1,12 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import React, { useState } from 'react';
-import { useApp } from '@/context/AppContext';
-import { UserStatus } from '@/types';
-import StudentBulkImportModal from '@/components/admin/StudentBulkImportModal';
-import { AccountStatusBadge } from '@/components/common/StatusBadge';
+import React, { useState } from "react";
+import { useApp } from "@/context/AppContext";
+import { UserStatus } from "@/types";
+import StudentBulkImportModal from "@/components/admin/StudentBulkImportModal";
+import { AccountStatusBadge } from "@/components/common/StatusBadge";
 import {
   Search,
   Upload,
@@ -14,52 +14,52 @@ import {
   UserCheck,
   GraduationCap,
   ChevronDown,
-} from 'lucide-react';
+} from "lucide-react";
 
 const statusFilters = [
-  { id: 'all', label: 'Semua' },
-  { id: 'active', label: 'Aktif' },
-  { id: 'nonactive', label: 'Nonaktif' },
-  { id: 'suspended', label: 'SPP tertunggak' },
-  { id: 'graduated', label: 'Lulus' },
-  { id: 'leave', label: 'Cuti' },
+  { id: "all", label: "Semua" },
+  { id: "active", label: "Aktif" },
+  { id: "nonactive", label: "Nonaktif" },
+  { id: "suspended", label: "SPP tertunggak" },
+  { id: "graduated", label: "Lulus" },
+  { id: "leave", label: "Cuti" },
 ];
 const statusOptions: { value: UserStatus; label: string }[] = [
-  { value: 'active', label: 'Aktif' },
-  { value: 'nonactive', label: 'Nonaktif' },
-  { value: 'suspended', label: 'SPP tertunggak' },
-  { value: 'graduated', label: 'Lulus' },
-  { value: 'leave', label: 'Cuti' },
+  { value: "active", label: "Aktif" },
+  { value: "nonactive", label: "Nonaktif" },
+  { value: "suspended", label: "SPP tertunggak" },
+  { value: "graduated", label: "Lulus" },
+  { value: "leave", label: "Cuti" },
 ];
 
 export default function AdminStudentsPage() {
   const { students, toggleStudentStatus, batches } = useApp();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const filteredStudents = students.filter((student) => {
     const matches =
-      `${student.name} ${student.nis ?? ''} ${student.email} ${student.targetPTN1 ?? ''}`
+      `${student.name} ${student.nis ?? ""} ${student.email} ${student.targetPTN1 ?? ""}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase().trim());
     return (
-      matches && (statusFilter === 'all' || student.status === statusFilter)
+      matches && (statusFilter === "all" || student.status === statusFilter)
     );
   });
   const studentsPagination = usePagination(
     filteredStudents,
     5,
-    searchTerm + '|' + statusFilter
+    searchTerm + "|" + statusFilter,
   );
 
   const batchName = (id?: string) =>
-    batches.find((batch) => batch.id === id)?.name ?? 'Belum ditempatkan';
+    batches.find((batch) => batch.id === id)?.name ?? "Belum ditempatkan";
   const initial = (name: string) =>
     name
       .split(/\s+/)
       .slice(0, 2)
       .map((part) => part[0])
-      .join('')
+      .join("")
       .toUpperCase();
   const statusSelect = (id: string, name: string, status: UserStatus) => (
     <div className="relative inline-block">
@@ -111,25 +111,25 @@ export default function AdminStudentsPage() {
         <dl className="flex flex-wrap gap-x-8 gap-y-4 rounded-2xl bg-white px-5 py-5 sm:gap-x-14 sm:px-6">
           {[
             {
-              label: 'Total siswa',
+              label: "Total siswa",
               value: students.length,
               Icon: Users,
-              color: 'bg-blue-50 text-blue-600',
+              color: "bg-blue-50 text-blue-600",
             },
             {
-              label: 'Siswa aktif',
-              value: students.filter((student) => student.status === 'active')
+              label: "Siswa aktif",
+              value: students.filter((student) => student.status === "active")
                 .length,
               Icon: UserCheck,
-              color: 'bg-emerald-50 text-emerald-700',
+              color: "bg-emerald-50 text-emerald-700",
             },
             {
-              label: 'Alumni',
+              label: "Alumni",
               value: students.filter(
-                (student) => student.status === 'graduated'
+                (student) => student.status === "graduated",
               ).length,
               Icon: GraduationCap,
-              color: 'bg-violet-50 text-violet-600',
+              color: "bg-violet-50 text-violet-600",
             },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-3">
@@ -160,7 +160,7 @@ export default function AdminStudentsPage() {
             >
               {statusFilters.map((filter) => {
                 const count =
-                  filter.id === 'all'
+                  filter.id === "all"
                     ? students.length
                     : students.filter((student) => student.status === filter.id)
                         .length;
@@ -169,11 +169,11 @@ export default function AdminStudentsPage() {
                     key={filter.id}
                     aria-pressed={statusFilter === filter.id}
                     onClick={() => setStatusFilter(filter.id)}
-                    className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-3.5 text-xs font-semibold transition ${statusFilter === filter.id ? 'bg-[#EDF2FA] text-[#315D97]' : 'text-slate-500 hover:bg-slate-50'}`}
+                    className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-3.5 text-xs font-semibold transition ${statusFilter === filter.id ? "bg-[#EDF2FA] text-[#315D97]" : "text-slate-500 hover:bg-slate-50"}`}
                   >
                     {filter.label}
                     <span
-                      className={`rounded-md px-1.5 py-0.5 text-[11px] ${statusFilter === filter.id ? 'bg-white text-[#315D97]' : 'bg-slate-100 text-slate-500'}`}
+                      className={`rounded-md px-1.5 py-0.5 text-[11px] ${statusFilter === filter.id ? "bg-white text-[#315D97]" : "bg-slate-100 text-slate-500"}`}
                     >
                       {count}
                     </span>
@@ -245,7 +245,7 @@ export default function AdminStudentsPage() {
                       {studentsPagination.offset + index + 1}
                     </td>
                     <td className="whitespace-nowrap px-4 py-5 text-xs font-medium tabular-nums text-slate-500">
-                      {student.nis || 'Belum tersedia'}
+                      {student.nis || "Belum tersedia"}
                     </td>
                     <td className="min-w-[280px] px-6 py-5">
                       <div className="flex items-center gap-3">
@@ -270,14 +270,14 @@ export default function AdminStudentsPage() {
                     </td>
                     <td className="min-w-[220px] max-w-[300px] px-4 py-5">
                       <p className="text-xs font-semibold leading-6 text-[#405C80]">
-                        {student.targetPTN1 || 'Belum dipilih'}
+                        {student.targetPTN1 || "Belum dipilih"}
                       </p>
                       <p className="mt-0.5 text-xs leading-6 text-slate-500">
-                        {student.targetProdi1 || 'Belum dipilih'}
+                        {student.targetProdi1 || "Belum dipilih"}
                       </p>
                     </td>
                     <td className="whitespace-nowrap px-4 py-5 text-xs tabular-nums text-slate-500">
-                      {student.phone || 'Belum tersedia'}
+                      {student.phone || "Belum tersedia"}
                     </td>
                     <td className="whitespace-nowrap px-4 py-5">
                       <AccountStatusBadge status={student.status} />
@@ -297,8 +297,8 @@ export default function AdminStudentsPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="mb-2 text-xs font-medium tabular-nums text-slate-500">
-                      No. {studentsPagination.offset + index + 1} ·{' '}
-                      {student.nis || 'Kode belum tersedia'}
+                      No. {studentsPagination.offset + index + 1} ·{" "}
+                      {student.nis || "Kode belum tersedia"}
                     </p>
                     <h3 className="text-sm font-bold text-[#263D5F]">
                       {student.name}
@@ -310,7 +310,7 @@ export default function AdminStudentsPage() {
                   {batchName(student.batchId)}
                 </p>
                 <p className="mt-1 text-xs leading-6 text-[#526B8C]">
-                  {student.targetPTN1 || 'Target belum dipilih'}
+                  {student.targetPTN1 || "Target belum dipilih"}
                 </p>
                 <p className="mt-1 text-xs leading-6 text-slate-500">
                   {student.targetProdi1}
@@ -320,7 +320,7 @@ export default function AdminStudentsPage() {
                 </p>
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-slate-500">
-                    {student.phone || 'Nomor belum tersedia'}
+                    {student.phone || "Nomor belum tersedia"}
                   </p>
                   {statusSelect(student.id, student.name, student.status)}
                 </div>
@@ -342,8 +342,8 @@ export default function AdminStudentsPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setSearchTerm('');
-                  setStatusFilter('all');
+                  setSearchTerm("");
+                  setStatusFilter("all");
                 }}
                 className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"
               >

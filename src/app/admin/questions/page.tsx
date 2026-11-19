@@ -1,14 +1,14 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import React, { useState, useRef } from 'react';
-import { useApp } from '@/context/AppContext';
-import { SUBTEST_CONFIGS } from '@/data/mockData';
-import { Question, SubtestId } from '@/types';
-import MathRenderer from '@/components/common/MathRenderer';
-import MathToolbar from '@/components/admin/MathToolbar';
-import BulkImportModal from '@/components/admin/BulkImportModal';
+import React, { useState, useRef } from "react";
+import { useApp } from "@/context/AppContext";
+import { SUBTEST_CONFIGS } from "@/data/mockData";
+import { Question, SubtestId } from "@/types";
+import MathRenderer from "@/components/common/MathRenderer";
+import MathToolbar from "@/components/admin/MathToolbar";
+import BulkImportModal from "@/components/admin/BulkImportModal";
 import {
   PlusCircle,
   FileSpreadsheet,
@@ -21,7 +21,7 @@ import {
   BookOpen,
   ArrowRight,
   Upload,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function AdminQuestionsPage() {
   const {
@@ -33,39 +33,39 @@ export default function AdminQuestionsPage() {
   } = useApp();
   const [modalOpen, setModalOpen] = useState(false);
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
-  const [filterSubtest, setFilterSubtest] = useState<string>('all');
+  const [filterSubtest, setFilterSubtest] = useState<string>("all");
 
   // Question form state
   const [formData, setFormData] = useState({
-    subtestId: 'penalaran_matematika' as SubtestId,
-    type: 'single_choice' as const,
-    stimulus: '',
-    stimulusImage: '' as string,
+    subtestId: "penalaran_matematika" as SubtestId,
+    type: "single_choice" as const,
+    stimulus: "",
+    stimulusImage: "" as string,
     question:
-      'Diberikan matriks $A = \\begin{pmatrix} 2 & x \\\\ 3 & 5 \\end{pmatrix}$. Jika $\\det(A) = 4$, maka nilai $x$ adalah...',
+      "Diberikan matriks $A = \\begin{pmatrix} 2 & x \\\\ 3 & 5 \\end{pmatrix}$. Jika $\\det(A) = 4$, maka nilai $x$ adalah...",
     options: [
-      { id: 'A', text: '$x = 1$' },
-      { id: 'B', text: '$x = 2$' },
-      { id: 'C', text: '$x = 3$' },
-      { id: 'D', text: '$x = 4$' },
-      { id: 'E', text: '$x = 5$' },
+      { id: "A", text: "$x = 1$" },
+      { id: "B", text: "$x = 2$" },
+      { id: "C", text: "$x = 3$" },
+      { id: "D", text: "$x = 4$" },
+      { id: "E", text: "$x = 5$" },
     ],
-    correctAnswer: 'B',
+    correctAnswer: "B",
     explanation:
-      'Perhitungan determinan: $$\\det(A) = (2)(5) - (3)(x) = 10 - 3x$$ Diketahui $\\det(A) = 4$, maka: $$10 - 3x = 4 \\implies 3x = 6 \\implies x = 2$$',
-    difficulty: 'Sedang' as const,
+      "Perhitungan determinan: $$\\det(A) = (2)(5) - (3)(x) = 10 - 3x$$ Diketahui $\\det(A) = 4$, maka: $$10 - 3x = 4 \\implies 3x = 6 \\implies x = 2$$",
+    difficulty: "Sedang" as const,
     maxScore: 100,
   });
 
   const [activeTargetField, setActiveTargetField] = useState<
-    | 'question'
-    | 'explanation'
-    | 'option-0'
-    | 'option-1'
-    | 'option-2'
-    | 'option-3'
-    | 'option-4'
-  >('question');
+    | "question"
+    | "explanation"
+    | "option-0"
+    | "option-1"
+    | "option-2"
+    | "option-3"
+    | "option-4"
+  >("question");
 
   const handleOptionTextChange = (index: number, text: string) => {
     const newOptions = [...formData.options];
@@ -75,18 +75,18 @@ export default function AdminQuestionsPage() {
 
   // Insert snippet from MathToolbar into active target field
   const handleInsertMathSnippet = (snippet: string) => {
-    if (activeTargetField === 'question') {
+    if (activeTargetField === "question") {
       setFormData((prev) => ({
         ...prev,
         question: `${prev.question} ${snippet}`,
       }));
-    } else if (activeTargetField === 'explanation') {
+    } else if (activeTargetField === "explanation") {
       setFormData((prev) => ({
         ...prev,
         explanation: `${prev.explanation} ${snippet}`,
       }));
-    } else if (activeTargetField.startsWith('option-')) {
-      const optIdx = parseInt(activeTargetField.split('-')[1]);
+    } else if (activeTargetField.startsWith("option-")) {
+      const optIdx = parseInt(activeTargetField.split("-")[1]);
       const newOptions = [...formData.options];
       newOptions[optIdx].text = `${newOptions[optIdx].text} ${snippet}`;
       setFormData((prev) => ({ ...prev, options: newOptions }));
@@ -97,7 +97,7 @@ export default function AdminQuestionsPage() {
   const handlePasteImage = (e: React.ClipboardEvent) => {
     const items = e.clipboardData.items;
     for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
+      if (items[i].type.indexOf("image") !== -1) {
         const file = items[i].getAsFile();
         if (file) {
           const reader = new FileReader();
@@ -105,8 +105,8 @@ export default function AdminQuestionsPage() {
             const dataUrl = event.target?.result as string;
             setFormData((prev) => ({ ...prev, stimulusImage: dataUrl }));
             showToast(
-              'Gambar soal berhasil di-paste (Ctrl+V) sebagai stimulus!',
-              'success'
+              "Gambar soal berhasil di-paste (Ctrl+V) sebagai stimulus!",
+              "success",
             );
           };
           reader.readAsDataURL(file);
@@ -123,7 +123,7 @@ export default function AdminQuestionsPage() {
       reader.onload = (event) => {
         const dataUrl = event.target?.result as string;
         setFormData((prev) => ({ ...prev, stimulusImage: dataUrl }));
-        showToast('Gambar stimulus berhasil diunggah!', 'success');
+        showToast("Gambar stimulus berhasil diunggah!", "success");
       };
       reader.readAsDataURL(file);
     }
@@ -131,7 +131,7 @@ export default function AdminQuestionsPage() {
 
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newQ: Omit<Question, 'id'> = {
+    const newQ: Omit<Question, "id"> = {
       subtestId: formData.subtestId,
       number: questions.length + 1,
       type: formData.type,
@@ -151,20 +151,20 @@ export default function AdminQuestionsPage() {
   };
 
   const handleBulkImportConfirm = (
-    importedQuestions: Omit<Question, 'id'>[]
+    importedQuestions: Omit<Question, "id">[],
   ) => {
     addQuestionsBulk(importedQuestions);
   };
 
   const filteredQuestions = questions.filter((q) => {
-    if (filterSubtest === 'all') return true;
+    if (filterSubtest === "all") return true;
     return q.subtestId === filterSubtest;
   });
   const questionsPagination = usePagination(
     filteredQuestions,
     6,
     filterSubtest,
-    [3, 6, 12, 24]
+    [3, 6, 12, 24],
   );
 
   return (
@@ -207,11 +207,11 @@ export default function AdminQuestionsPage() {
         {/* Subtest Filter Tabs */}
         <div className="flex items-center space-x-1.5 overflow-x-auto font-sans text-xs pb-1">
           <button
-            onClick={() => setFilterSubtest('all')}
+            onClick={() => setFilterSubtest("all")}
             className={`px-3 py-1 border whitespace-nowrap transition rounded-xl min-h-11 ${
-              filterSubtest === 'all'
-                ? 'bg-[#2E578F] text-white border-slate-200 font-semibold'
-                : 'bg-[#FFFFFF] text-slate-500 border-slate-100 hover:border-slate-200'
+              filterSubtest === "all"
+                ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
+                : "bg-[#FFFFFF] text-slate-500 border-slate-100 hover:border-slate-200"
             } `}
           >
             Semua Subtest ({questions.length})
@@ -222,8 +222,8 @@ export default function AdminQuestionsPage() {
               onClick={() => setFilterSubtest(st.id)}
               className={`px-3 py-1 border whitespace-nowrap transition rounded-xl min-h-11 ${
                 filterSubtest === st.id
-                  ? 'bg-[#2E578F] text-white border-slate-200 font-semibold'
-                  : 'bg-[#FFFFFF] text-slate-500 border-slate-100 hover:border-slate-200'
+                  ? "bg-[#2E578F] text-white border-slate-200 font-semibold"
+                  : "bg-[#FFFFFF] text-slate-500 border-slate-100 hover:border-slate-200"
               } `}
             >
               {st.name} ({questions.filter((q) => q.subtestId === st.id).length}
@@ -247,7 +247,7 @@ export default function AdminQuestionsPage() {
                       #{q.number}
                     </span>
                     <span className="text-[#1B3B8C] font-semibold uppercase">
-                      {q.subtestId.replace(/_/g, ' ')}
+                      {q.subtestId.replace(/_/g, " ")}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -265,10 +265,10 @@ export default function AdminQuestionsPage() {
                 </div>
 
                 {/* Stimulus Image Preview if present */}
-                {q.stimulus && q.stimulus.startsWith('[IMAGE_STIMULUS]') && (
+                {q.stimulus && q.stimulus.startsWith("[IMAGE_STIMULUS]") && (
                   <div className="p-2 bg-[#F6F8FC] border border-slate-100 max-h-36 overflow-hidden flex items-center justify-center rounded-xl">
                     <img
-                      src={q.stimulus.replace('[IMAGE_STIMULUS]', '')}
+                      src={q.stimulus.replace("[IMAGE_STIMULUS]", "")}
                       alt="Stimulus Soal"
                       className="max-h-32 object-contain"
                     />
@@ -287,8 +287,8 @@ export default function AdminQuestionsPage() {
                       key={opt.id}
                       className={`flex items-start space-x-2.5 p-2 border rounded-xl ${
                         opt.id === q.correctAnswer
-                          ? 'bg-[#EAF7F0] border-[#1B8A5A]/50 text-[#126340] font-semibold'
-                          : 'bg-[#F6F8FC] border-slate-100 text-[#263D5F]'
+                          ? "bg-[#EAF7F0] border-[#1B8A5A]/50 text-[#126340] font-semibold"
+                          : "bg-[#F6F8FC] border-slate-100 text-[#263D5F]"
                       } `}
                     >
                       <span className="omr-bubble shrink-0 text-xs w-5 h-5">
@@ -446,7 +446,7 @@ export default function AdminQuestionsPage() {
                       <button
                         type="button"
                         onClick={() =>
-                          setFormData({ ...formData, stimulusImage: '' })
+                          setFormData({ ...formData, stimulusImage: "" })
                         }
                         className="text-[#D0342C] text-xs font-sans hover:underline mt-1 rounded-xl min-h-11"
                       >
@@ -482,11 +482,11 @@ export default function AdminQuestionsPage() {
                     </label>
                     <button
                       type="button"
-                      onClick={() => setActiveTargetField('question')}
+                      onClick={() => setActiveTargetField("question")}
                       className={`text-xs font-sans px-1.5 py-1 border rounded-xl min-h-11 ${
-                        activeTargetField === 'question'
-                          ? 'bg-[#2E578F] text-white'
-                          : 'bg-[#F6F8FC] text-slate-500'
+                        activeTargetField === "question"
+                          ? "bg-[#2E578F] text-white"
+                          : "bg-[#F6F8FC] text-slate-500"
                       } `}
                     >
                       Target Toolbar
@@ -496,7 +496,7 @@ export default function AdminQuestionsPage() {
                     rows={4}
                     required
                     value={formData.question}
-                    onFocus={() => setActiveTargetField('question')}
+                    onFocus={() => setActiveTargetField("question")}
                     onChange={(e) =>
                       setFormData({ ...formData, question: e.target.value })
                     }
@@ -557,11 +557,11 @@ export default function AdminQuestionsPage() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => setActiveTargetField('explanation')}
+                    onClick={() => setActiveTargetField("explanation")}
                     className={`text-xs font-sans px-1.5 py-1 border rounded-xl min-h-11 ${
-                      activeTargetField === 'explanation'
-                        ? 'bg-[#2E578F] text-white'
-                        : 'bg-[#F6F8FC] text-slate-500'
+                      activeTargetField === "explanation"
+                        ? "bg-[#2E578F] text-white"
+                        : "bg-[#F6F8FC] text-slate-500"
                     } `}
                   >
                     Target Toolbar
@@ -571,7 +571,7 @@ export default function AdminQuestionsPage() {
                   rows={3}
                   required
                   value={formData.explanation}
-                  onFocus={() => setActiveTargetField('explanation')}
+                  onFocus={() => setActiveTargetField("explanation")}
                   onChange={(e) =>
                     setFormData({ ...formData, explanation: e.target.value })
                   }

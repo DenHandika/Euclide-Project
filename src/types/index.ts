@@ -1,8 +1,13 @@
-import type { StudyProgram } from '@/lib/snbtChoices';
+import type { StudyProgram } from "@/lib/snbtChoices";
 
-export type UserRole = 'admin' | 'tentor' | 'siswa';
+export type UserRole = "admin" | "tentor" | "siswa";
 
-export type UserStatus = 'active' | 'nonactive' | 'suspended' | 'graduated' | 'leave';
+export type UserStatus =
+  | "active"
+  | "nonactive"
+  | "suspended"
+  | "graduated"
+  | "leave";
 
 export interface StudentImportRow {
   NIS: string;
@@ -32,24 +37,28 @@ export interface User {
   batchId?: string;
   status: UserStatus;
   joinedDate: string;
-  sppStatus?: 'paid' | 'unpaid' | 'overdue';
+  sppStatus?: "paid" | "unpaid" | "overdue";
 }
 
-export type QuestionType = 'single_choice' | 'multi_select' | 'short_answer' | 'essay';
+export type QuestionType =
+  | "single_choice"
+  | "multi_select"
+  | "short_answer"
+  | "essay";
 
 export type SubtestId =
-  | 'penalaran_umum'
-  | 'pengetahuan_kuantitatif'
-  | 'pemahaman_bacaan_menulis'
-  | 'pengetahuan_pemahaman_umum'
-  | 'literasi_indonesia'
-  | 'literasi_inggris'
-  | 'penalaran_matematika';
+  | "penalaran_umum"
+  | "pengetahuan_kuantitatif"
+  | "pemahaman_bacaan_menulis"
+  | "pengetahuan_pemahaman_umum"
+  | "literasi_indonesia"
+  | "literasi_inggris"
+  | "penalaran_matematika";
 
 export interface SubtestConfig {
   id: SubtestId;
   name: string;
-  category: 'TPS' | 'Literasi' | 'Penalaran Matematika';
+  category: "TPS" | "Literasi" | "Penalaran Matematika";
   durationMinutes: number;
   questionCount: number;
   description: string;
@@ -73,7 +82,7 @@ export interface Question {
   explanation: string; // KaTeX explanation / Pembahasan
   rubricGuide?: string; // For essay grading
   maxScore: number;
-  difficulty: 'Mudah' | 'Sedang' | 'Sukar';
+  difficulty: "Mudah" | "Sedang" | "Sukar";
 }
 
 export interface Tryout {
@@ -133,7 +142,7 @@ export interface PTNTargetAnalysis {
   targetScore: number;
   userScore: number;
   difference: number;
-  status: 'aman' | 'kompetitif' | 'kritis'; // 🟢 Aman (>= target), 🟡 Kompetitif (target - 30 to target), 🔴 Kritis (< target - 30)
+  status: "aman" | "kompetitif" | "kritis"; // 🟢 Aman (>= target), 🟡 Kompetitif (target - 30 to target), 🔴 Kritis (< target - 30)
   chancePercentage: number;
   acceptanceQuota: number;
   applicantsLastYear: number;
@@ -168,13 +177,17 @@ export interface ExamResult {
 export interface ClassBatch {
   id: string;
   name: string;
-  program: 'SNBT Super Intensif' | 'Kedokteran Priority' | 'Reguler Weekend' | 'Drilling UTBK 2026';
+  program:
+    | "SNBT Super Intensif"
+    | "Kedokteran Priority"
+    | "Reguler Weekend"
+    | "Drilling UTBK 2026";
   room: string;
   tutorName: string;
   currentStudents: number;
   maxCapacity: number;
   schedule: string;
-  status: 'active' | 'upcoming' | 'completed';
+  status: "active" | "upcoming" | "completed";
 }
 
 export interface PaymentRecord {
@@ -184,8 +197,8 @@ export interface PaymentRecord {
   studentName: string;
   month: string;
   amount: number;
-  paymentMethod: 'Transfer Bank' | 'Tunai / Kasir' | 'Virtual Account' | 'QRIS';
-  status: 'Lunas' | 'Menunggu' | 'Jatuh Tempo';
+  paymentMethod: "Transfer Bank" | "Tunai / Kasir" | "Virtual Account" | "QRIS";
+  status: "Lunas" | "Menunggu" | "Jatuh Tempo";
   paidAt: string;
   recordedBy: string;
   notes?: string;

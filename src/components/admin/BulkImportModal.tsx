@@ -1,10 +1,10 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import React, { useState } from 'react';
-import { Question, SubtestId } from '@/types';
-import MathRenderer from '@/components/common/MathRenderer';
+import React, { useState } from "react";
+import { Question, SubtestId } from "@/types";
+import MathRenderer from "@/components/common/MathRenderer";
 import {
   FileText,
   Upload,
@@ -18,46 +18,46 @@ import {
   X,
   ArrowRight,
   BookOpen,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface BulkImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (questions: Omit<Question, 'id'>[]) => void;
+  onImport: (questions: Omit<Question, "id">[]) => void;
 }
 
 // Smart Auto-Formatter: converts common plain math notations to KaTeX
 function autoFormatMathText(text: string): string {
-  if (!text) return '';
+  if (!text) return "";
 
   let formatted = text;
 
   // If already contains $, preserve it
-  if (formatted.includes('$')) {
+  if (formatted.includes("$")) {
     return formatted;
   }
 
   // 1. Simple square roots: sqrt(...) or akar(...) -> \sqrt{...}
-  formatted = formatted.replace(/(?:sqrt|akar)\(([^)]+)\)/gi, '$\\sqrt{$1}$');
+  formatted = formatted.replace(/(?:sqrt|akar)\(([^)]+)\)/gi, "$\\sqrt{$1}$");
 
   // 2. Simple exponents: e.g., 3t^2, x^3, 2^n -> $3t^2$
   formatted = formatted.replace(
     /\b([a-zA-Z0-9]+)\^([a-zA-Z0-9]+)\b/g,
-    '$$$1^{$2}$$'
+    "$$$1^{$2}$$",
   );
 
   // 3. Simple inequality symbols: <= -> \le, >= -> \ge, != -> \neq, +- -> \pm
-  formatted = formatted.replace(/<=/g, '$\\le$');
-  formatted = formatted.replace(/>=/g, '$\\ge$');
-  formatted = formatted.replace(/\+-/g, '$\\pm$');
+  formatted = formatted.replace(/<=/g, "$\\le$");
+  formatted = formatted.replace(/>=/g, "$\\ge$");
+  formatted = formatted.replace(/\+-/g, "$\\pm$");
 
   // 4. Equations with standard functions: e.g., V(t) = ... or f(x) = ...
   formatted = formatted.replace(
     /\b([fghvV]\([a-zA-Z]\)\s*=\s*[^,\n\r]+)/g,
     (match) => {
-      if (match.includes('$')) return match;
+      if (match.includes("$")) return match;
       return `$${match}$`;
-    }
+    },
   );
 
   return formatted;
@@ -92,9 +92,9 @@ export default function BulkImportModal({
   onClose,
   onImport,
 }: BulkImportModalProps) {
-  const [rawText, setRawText] = useState<string>('');
+  const [rawText, setRawText] = useState<string>("");
   const [parsedQuestions, setParsedQuestions] = useState<
-    Omit<Question, 'id'>[]
+    Omit<Question, "id">[]
   >([]);
   const [copied, setCopied] = useState<boolean>(false);
   const [autoMathEnabled, setAutoMathEnabled] = useState<boolean>(true);
@@ -102,7 +102,7 @@ export default function BulkImportModal({
 
   if (!isOpen) return null;
 
-  const parseRawTextToQuestions = (text: string): Omit<Question, 'id'>[] => {
+  const parseRawTextToQuestions = (text: string): Omit<Question, "id">[] => {
     if (!text.trim()) return [];
 
     // Split by [SOAL ... or [NOMOR ...
@@ -110,75 +110,75 @@ export default function BulkImportModal({
       .split(/\[(?:SOAL|NOMOR)[^\]]*\]/i)
       .filter((b) => b.trim().length > 0);
 
-    const results: Omit<Question, 'id'>[] = [];
+    const results: Omit<Question, "id">[] = [];
 
     blocks.forEach((block, idx) => {
       // Extract subtest
       const subtestMatch = block.match(/\[SUBTEST\]\s*([a-zA-Z0-9_-]+)/i);
       const subtestId: SubtestId =
-        (subtestMatch?.[1] as SubtestId) || 'penalaran_matematika';
+        (subtestMatch?.[1] as SubtestId) || "penalaran_matematika";
 
       // Extract difficulty (Mudah | Sedang | Sukar/Sulit)
       const diffMatch = block.match(
-        /\[KESULITAN\]\s*(Mudah|Sedang|Sulit|Sukar)/i
+        /\[KESULITAN\]\s*(Mudah|Sedang|Sulit|Sukar)/i,
       );
-      let difficulty: 'Mudah' | 'Sedang' | 'Sukar' = 'Sedang';
+      let difficulty: "Mudah" | "Sedang" | "Sukar" = "Sedang";
       if (diffMatch) {
         const d = diffMatch[1].toLowerCase();
-        if (d === 'mudah') difficulty = 'Mudah';
-        else if (d === 'sulit' || d === 'sukar') difficulty = 'Sukar';
-        else difficulty = 'Sedang';
+        if (d === "mudah") difficulty = "Mudah";
+        else if (d === "sulit" || d === "sukar") difficulty = "Sukar";
+        else difficulty = "Sedang";
       }
 
       // Extract Stimulus (optional)
       const stimMatch = block.match(
-        /\[STIMULUS\]([\s\S]*?)(?=\[(?:SOAL|A|B|C|D|E|KUNCI|PEMBAHASAN)\]|$)/i
+        /\[STIMULUS\]([\s\S]*?)(?=\[(?:SOAL|A|B|C|D|E|KUNCI|PEMBAHASAN)\]|$)/i,
       );
       const stimulus = stimMatch ? stimMatch[1].trim() : undefined;
 
       // Extract Question prompt: text between subtest/kesulitan and first option [A]
-      let questionPrompt = '';
+      let questionPrompt = "";
       const promptRegex =
         /(?:\[KESULITAN\][^\n]*\n|\[SUBTEST\][^\n]*\n|^)([\s\S]*?)(?=\[A\])/i;
       const promptMatch = block.match(promptRegex);
       if (promptMatch) {
         questionPrompt = promptMatch[1]
-          .replace(/\[SUBTEST\][^\n]*\n?/gi, '')
-          .replace(/\[KESULITAN\][^\n]*\n?/gi, '')
-          .replace(/\[STIMULUS\][\s\S]*?\[\/STIMULUS\]/gi, '')
+          .replace(/\[SUBTEST\][^\n]*\n?/gi, "")
+          .replace(/\[KESULITAN\][^\n]*\n?/gi, "")
+          .replace(/\[STIMULUS\][\s\S]*?\[\/STIMULUS\]/gi, "")
           .trim();
       }
 
       // Extract Options [A] to [E]
-      const optA = block.match(/\[A\]\s*([^\n\r]+)/i)?.[1]?.trim() || '';
-      const optB = block.match(/\[B\]\s*([^\n\r]+)/i)?.[1]?.trim() || '';
-      const optC = block.match(/\[C\]\s*([^\n\r]+)/i)?.[1]?.trim() || '';
-      const optD = block.match(/\[D\]\s*([^\n\r]+)/i)?.[1]?.trim() || '';
-      const optE = block.match(/\[E\]\s*([^\n\r]+)/i)?.[1]?.trim() || '';
+      const optA = block.match(/\[A\]\s*([^\n\r]+)/i)?.[1]?.trim() || "";
+      const optB = block.match(/\[B\]\s*([^\n\r]+)/i)?.[1]?.trim() || "";
+      const optC = block.match(/\[C\]\s*([^\n\r]+)/i)?.[1]?.trim() || "";
+      const optD = block.match(/\[D\]\s*([^\n\r]+)/i)?.[1]?.trim() || "";
+      const optE = block.match(/\[E\]\s*([^\n\r]+)/i)?.[1]?.trim() || "";
 
       // Extract Key
       const keyMatch = block.match(/\[KUNCI\]\s*([A-Ea-e])/i);
-      const correctAnswer = keyMatch ? keyMatch[1].toUpperCase() : 'A';
+      const correctAnswer = keyMatch ? keyMatch[1].toUpperCase() : "A";
 
       // Extract Explanation
       const expMatch = block.match(
-        /\[PEMBAHASAN\]\s*([\s\S]*?)(?=\[(?:SOAL|NOMOR)\]|$)/i
+        /\[PEMBAHASAN\]\s*([\s\S]*?)(?=\[(?:SOAL|NOMOR)\]|$)/i,
       );
       const explanation = expMatch
         ? expMatch[1].trim()
-        : 'Pembahasan resmi belum ditambahkan.';
+        : "Pembahasan resmi belum ditambahkan.";
 
       if (questionPrompt && optA && optB) {
         const finalQuestion = autoMathEnabled
           ? autoFormatMathText(questionPrompt)
           : questionPrompt;
         const options = [
-          { id: 'A', text: autoMathEnabled ? autoFormatMathText(optA) : optA },
-          { id: 'B', text: autoMathEnabled ? autoFormatMathText(optB) : optB },
+          { id: "A", text: autoMathEnabled ? autoFormatMathText(optA) : optA },
+          { id: "B", text: autoMathEnabled ? autoFormatMathText(optB) : optB },
           ...(optC
             ? [
                 {
-                  id: 'C',
+                  id: "C",
                   text: autoMathEnabled ? autoFormatMathText(optC) : optC,
                 },
               ]
@@ -186,7 +186,7 @@ export default function BulkImportModal({
           ...(optD
             ? [
                 {
-                  id: 'D',
+                  id: "D",
                   text: autoMathEnabled ? autoFormatMathText(optD) : optD,
                 },
               ]
@@ -194,7 +194,7 @@ export default function BulkImportModal({
           ...(optE
             ? [
                 {
-                  id: 'E',
+                  id: "E",
                   text: autoMathEnabled ? autoFormatMathText(optE) : optE,
                 },
               ]
@@ -204,7 +204,7 @@ export default function BulkImportModal({
         results.push({
           number: idx + 1,
           subtestId,
-          type: 'single_choice',
+          type: "single_choice",
           stimulus,
           question: finalQuestion,
           options,
@@ -259,12 +259,12 @@ NASKAH SOAL:
 ` + TEMPLATE_EXAMPLE;
 
     const blob = new Blob([fileHeader], {
-      type: 'application/msword;charset=utf-8',
+      type: "application/msword;charset=utf-8",
     });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'TEMPLATE_IMPORT_SOAL_EUCLIDE.doc';
+    link.download = "TEMPLATE_IMPORT_SOAL_EUCLIDE.doc";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -345,7 +345,7 @@ NASKAH SOAL:
               ) : (
                 <Copy className="w-3 h-3" />
               )}
-              <span>{copied ? 'Tersalin!' : 'Salin Teks'}</span>
+              <span>{copied ? "Tersalin!" : "Salin Teks"}</span>
             </button>
           </div>
 
@@ -415,7 +415,7 @@ NASKAH SOAL:
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-2">
                   <BookOpen className="w-8 h-8 opacity-40" />
                   <p className="text-xs font-sans">
-                    Ketik atau paste teks soal ber-tag di panel kiri, atau klik{' '}
+                    Ketik atau paste teks soal ber-tag di panel kiri, atau klik{" "}
                     <strong>"Muat Contoh Template"</strong>.
                   </p>
                 </div>
@@ -430,7 +430,7 @@ NASKAH SOAL:
                         Nomor #{questionImportPagination.offset + i + 1}
                       </span>
                       <span className="text-[#C8831A] font-medium capitalize">
-                        {q.subtestId.replace(/_/g, ' ')} • {q.difficulty}
+                        {q.subtestId.replace(/_/g, " ")} • {q.difficulty}
                       </span>
                     </div>
 
@@ -446,8 +446,8 @@ NASKAH SOAL:
                           key={opt.id}
                           className={`flex items-center space-x-2 px-2 py-1 border rounded-xl ${
                             opt.id === q.correctAnswer
-                              ? 'bg-[#EAF7F0] border-[#1B8A5A]/40 text-[#126340] font-bold'
-                              : 'bg-[#FFFFFF] border-slate-100 text-[#263D5F]'
+                              ? "bg-[#EAF7F0] border-[#1B8A5A]/40 text-[#126340] font-bold"
+                              : "bg-[#FFFFFF] border-slate-100 text-[#263D5F]"
                           } `}
                         >
                           <span className="w-4 h-4 rounded-full bg-[#2E578F] text-white flex items-center justify-center text-xs">
@@ -478,7 +478,7 @@ NASKAH SOAL:
         {/* Footer Actions */}
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between font-sans text-xs shrink-0">
           <span className="text-slate-500">
-            Total siap di-import:{' '}
+            Total siap di-import:{" "}
             <strong>{parsedQuestions.length} butir soal</strong>
           </span>
 
@@ -496,8 +496,8 @@ NASKAH SOAL:
               onClick={handleConfirmImport}
               className={`px-5 py-1.5 flex items-center space-x-1.5 font-bold transition rounded-xl min-h-11 ${
                 parsedQuestions.length > 0
-                  ? 'bg-[#2E578F] hover:bg-[#234573] text-white cursor-pointer'
-                  : 'bg-[#CECEC2] text-slate-500 cursor-not-allowed'
+                  ? "bg-[#2E578F] hover:bg-[#234573] text-white cursor-pointer"
+                  : "bg-[#CECEC2] text-slate-500 cursor-not-allowed"
               } `}
             >
               <span>Simpan ke Bank Soal</span>

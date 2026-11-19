@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useApp } from '@/context/AppContext';
-import MathRenderer from '@/components/common/MathRenderer';
-import TargetEvaluation from '@/components/student/TargetEvaluation';
-import { evaluateTarget } from '@/lib/snbtChoices';
+import React, { useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useApp } from "@/context/AppContext";
+import MathRenderer from "@/components/common/MathRenderer";
+import TargetEvaluation from "@/components/student/TargetEvaluation";
+import { evaluateTarget } from "@/lib/snbtChoices";
 import {
   Radar,
   RadarChart,
@@ -20,7 +20,7 @@ import {
   YAxis,
   Tooltip,
   Legend,
-} from 'recharts';
+} from "recharts";
 import {
   Award,
   BookOpen,
@@ -36,35 +36,53 @@ import {
   FileCheck2,
   Layers,
   Percent,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function ExamResultPage() {
   const params = useParams();
-  const tryoutId = (params?.id as string) || 'to-utbk-national-01';
+  const tryoutId = (params?.id as string) || "to-utbk-national-01";
   const { getExamResult, tryouts } = useApp();
-  const [filterReview, setFilterReview] = useState<'all' | 'math' | 'wrong'>('all');
+  const [filterReview, setFilterReview] = useState<"all" | "math" | "wrong">(
+    "all",
+  );
 
   const result = getExamResult(tryoutId);
   const tryout = tryouts.find((t) => t.id === tryoutId) || tryouts[0];
   const firstChoice = result.targetChoices?.[0];
-  const firstTarget = evaluateTarget(result.totalScore, firstChoice?.targetScore ?? null);
+  const firstTarget = evaluateTarget(
+    result.totalScore,
+    firstChoice?.targetScore ?? null,
+  );
 
   const radarData = result.subtestResults.map((st) => ({
-    subject: st.subtestName.replace('Penalaran', 'Pen.').replace('Pengetahuan', 'Peng.'),
+    subject: st.subtestName
+      .replace("Penalaran", "Pen.")
+      .replace("Pengetahuan", "Peng."),
     skorSiswa: st.score,
     rataAngkatan: st.nationalAverage,
     fullMark: 1000,
   }));
 
   const reviewQuestions = tryout.questions.filter((q) => {
-    if (filterReview === 'math') return q.subtestId === 'penalaran_matematika' || q.subtestId === 'pengetahuan_kuantitatif';
+    if (filterReview === "math")
+      return (
+        q.subtestId === "penalaran_matematika" ||
+        q.subtestId === "pengetahuan_kuantitatif"
+      );
     return true;
   });
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-10 font-sans text-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">Prototipe untuk demo: skor, statistik, dan evaluasi materi masih menggunakan data contoh. Pilihan prodi berasal dari preferensi saat sesi dimulai.</p>
+        <p
+          role="status"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900"
+        >
+          Prototipe untuk demo: skor, statistik, dan evaluasi materi masih
+          menggunakan data contoh. Pilihan prodi berasal dari preferensi saat
+          sesi dimulai.
+        </p>
         {/* 1. Official Evaluation Header Card */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-card space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
@@ -77,7 +95,10 @@ export default function ExamResultPage() {
                 {result.tryoutTitle}
               </h1>
               <p className="text-xs text-slate-500 font-sans">
-                Peserta: <strong className="text-slate-800">{result.userName}</strong> • Tanggal Uji: {result.date} • Metodologi: Skor Tertimbang Subtest UTBK
+                Peserta:{" "}
+                <strong className="text-slate-800">{result.userName}</strong> •
+                Tanggal Uji: {result.date} • Metodologi: Skor Tertimbang Subtest
+                UTBK
               </p>
             </div>
 
@@ -124,7 +145,9 @@ export default function ExamResultPage() {
                 <span className="text-3xl font-extrabold text-amber-600">
                   {result.percentileRank}%
                 </span>
-                <span className="text-xs text-slate-400 font-sans">Top Tier</span>
+                <span className="text-xs text-slate-400 font-sans">
+                  Top Tier
+                </span>
               </div>
               <p className="mt-1 text-xs text-slate-600">
                 Top 5% dari 650 siswa angkatan
@@ -139,7 +162,13 @@ export default function ExamResultPage() {
                 <span className="text-3xl font-extrabold text-blue-600">
                   {result.totalCorrect}
                 </span>
-                <span className="text-xs text-slate-400 font-sans">/ {result.totalCorrect + result.totalIncorrect + result.totalUnanswered} Butir contoh</span>
+                <span className="text-xs text-slate-400 font-sans">
+                  /{" "}
+                  {result.totalCorrect +
+                    result.totalIncorrect +
+                    result.totalUnanswered}{" "}
+                  Butir contoh
+                </span>
               </div>
               <p className="mt-1 text-xs text-slate-600">
                 {result.totalIncorrect} Salah • {result.totalUnanswered} Kosong
@@ -152,31 +181,55 @@ export default function ExamResultPage() {
               </span>
               <div className="flex items-baseline space-x-1.5">
                 <span className="text-xl font-extrabold text-slate-900">
-                  {firstChoice ? firstTarget.label : 'Belum ada pilihan'}
+                  {firstChoice ? firstTarget.label : "Belum ada pilihan"}
                 </span>
               </div>
               <p className="mt-1 text-xs text-slate-600">
-                {firstChoice ? `${firstChoice.name} · ${firstChoice.degree}` : 'Pilih prodi sebelum memulai tryout.'}
+                {firstChoice
+                  ? `${firstChoice.name} · ${firstChoice.degree}`
+                  : "Pilih prodi sebelum memulai tryout."}
               </p>
             </div>
           </div>
         </div>
 
-        <TargetEvaluation choices={result.targetChoices ?? []} score={result.totalScore} />
+        <TargetEvaluation
+          choices={result.targetChoices ?? []}
+          score={result.totalScore}
+        />
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
           <h2 className="text-lg font-bold">Fokus belajar berikutnya</h2>
-          <p className="mt-2 text-sm leading-7 text-slate-500">Mulai dari subtes dengan skor terendah pada contoh hasil ini.</p>
+          <p className="mt-2 text-sm leading-7 text-slate-500">
+            Mulai dari subtes dengan skor terendah pada contoh hasil ini.
+          </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[...result.subtestResults].sort((a, b) => a.score - b.score).slice(0, 3).map((subtest, index) => (
-              <div key={subtest.subtestId} className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-semibold text-[#244676]">Prioritas latihan {index + 1}</p>
-                <h3 className="mt-2 text-sm font-bold leading-6">{subtest.subtestName}</h3>
-                <p className="mt-1 text-xs text-slate-500">Skor contoh: {subtest.score}/1000</p>
-              </div>
-            ))}
+            {[...result.subtestResults]
+              .sort((a, b) => a.score - b.score)
+              .slice(0, 3)
+              .map((subtest, index) => (
+                <div
+                  key={subtest.subtestId}
+                  className="rounded-xl bg-slate-50 p-4"
+                >
+                  <p className="text-xs font-semibold text-[#244676]">
+                    Prioritas latihan {index + 1}
+                  </p>
+                  <h3 className="mt-2 text-sm font-bold leading-6">
+                    {subtest.subtestName}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Skor contoh: {subtest.score}/1000
+                  </p>
+                </div>
+              ))}
           </div>
-          <Link href="/drilling" className="eu-button-secondary mt-5 rounded-xl">Buka latihan soal <ArrowRight size={16} /></Link>
+          <Link
+            href="/drilling"
+            className="eu-button-secondary mt-5 rounded-xl"
+          >
+            Buka latihan soal <ArrowRight size={16} />
+          </Link>
         </section>
 
         {/* 4. Visualizations: Radar Chart & Subtest Distribution */}
@@ -188,7 +241,9 @@ export default function ExamResultPage() {
                 <h3 className="text-base font-bold text-slate-900">
                   Radar Kompetensi 7 Subtest UTBK
                 </h3>
-                <p className="text-xs text-slate-500">Skor Siswa vs Rata-rata Angkatan Euclide</p>
+                <p className="text-xs text-slate-500">
+                  Skor Siswa vs Rata-rata Angkatan Euclide
+                </p>
               </div>
               <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">
                 7 SUBTEST
@@ -199,8 +254,15 @@ export default function ExamResultPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="70%">
                   <PolarGrid stroke="#E2E8F0" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#334155', fontSize: 10 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 1000]} stroke="#CBD5E1" />
+                  <PolarAngleAxis
+                    dataKey="subject"
+                    tick={{ fill: "#334155", fontSize: 10 }}
+                  />
+                  <PolarRadiusAxis
+                    angle={30}
+                    domain={[0, 1000]}
+                    stroke="#CBD5E1"
+                  />
                   <Radar
                     name="Skor Anda"
                     dataKey="skorSiswa"
@@ -215,13 +277,15 @@ export default function ExamResultPage() {
                     fill="#F59E0B"
                     fillOpacity={0.2}
                   />
-                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                  <Legend
+                    wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0F172A',
-                      color: '#FFFFFF',
-                      borderRadius: '8px',
-                      fontSize: '11px',
+                      backgroundColor: "#0F172A",
+                      color: "#FFFFFF",
+                      borderRadius: "8px",
+                      fontSize: "11px",
                     }}
                   />
                 </RadarChart>
@@ -236,7 +300,9 @@ export default function ExamResultPage() {
                 <h3 className="text-base font-bold text-slate-900">
                   Distribusi Nilai Per Subtest
                 </h3>
-                <p className="text-xs text-slate-500">Rincian pencapaian skor per bidang studi</p>
+                <p className="text-xs text-slate-500">
+                  Rincian pencapaian skor per bidang studi
+                </p>
               </div>
               <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
                 SKOR CAPAIAN
@@ -245,25 +311,43 @@ export default function ExamResultPage() {
 
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={radarData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                <BarChart
+                  data={radarData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
+                >
                   <XAxis
                     dataKey="subject"
-                    tick={{ fill: '#64748B', fontSize: 9 }}
+                    tick={{ fill: "#64748B", fontSize: 9 }}
                     angle={-25}
                     textAnchor="end"
                   />
-                  <YAxis domain={[0, 1000]} tick={{ fill: '#64748B', fontSize: 10 }} />
+                  <YAxis
+                    domain={[0, 1000]}
+                    tick={{ fill: "#64748B", fontSize: 10 }}
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0F172A',
-                      color: '#FFFFFF',
-                      borderRadius: '8px',
-                      fontSize: '11px',
+                      backgroundColor: "#0F172A",
+                      color: "#FFFFFF",
+                      borderRadius: "8px",
+                      fontSize: "11px",
                     }}
                   />
-                  <Bar dataKey="skorSiswa" name="Skor Anda" fill="#2563EB" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="rataAngkatan" name="Rata-rata Angkatan" fill="#CBD5E1" radius={[4, 4, 0, 0]} />
-                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                  <Bar
+                    dataKey="skorSiswa"
+                    name="Skor Anda"
+                    fill="#2563EB"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="rataAngkatan"
+                    name="Rata-rata Angkatan"
+                    fill="#CBD5E1"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Legend
+                    wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -281,7 +365,11 @@ export default function ExamResultPage() {
                 Catatan Evaluasi & Rencana Aksi Tentor
               </h3>
               <p className="text-xs text-slate-500">
-                Evaluator: <strong className="text-slate-800">{result.tentorFeedback.evaluator}</strong> • Pembimbing Spesialis UTBK
+                Evaluator:{" "}
+                <strong className="text-slate-800">
+                  {result.tentorFeedback.evaluator}
+                </strong>{" "}
+                • Pembimbing Spesialis UTBK
               </p>
             </div>
           </div>
@@ -325,13 +413,15 @@ export default function ExamResultPage() {
               <h3 className="text-lg font-bold text-slate-900">
                 Pembahasan Lengkap & Kunci Jawaban
               </h3>
-              <p className="text-xs text-slate-500">Telaah langkah pengerjaan dan pembahasan KaTeX per butir soal</p>
+              <p className="text-xs text-slate-500">
+                Telaah langkah pengerjaan dan pembahasan KaTeX per butir soal
+              </p>
             </div>
 
             <div className="flex items-center space-x-2 text-xs">
               {[
-                { id: 'all', label: `Semua (${reviewQuestions.length})` },
-                { id: 'math', label: 'Matematika & Kuantitatif' },
+                { id: "all", label: `Semua (${reviewQuestions.length})` },
+                { id: "math", label: "Matematika & Kuantitatif" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -360,12 +450,16 @@ export default function ExamResultPage() {
                       {idx + 1}
                     </span>
                     <span className="text-xs font-bold text-slate-800">
-                      Soal #{idx + 1} • {q.subtestId.replace(/_/g, ' ').toUpperCase()}
+                      Soal #{idx + 1} •{" "}
+                      {q.subtestId.replace(/_/g, " ").toUpperCase()}
                     </span>
                   </div>
 
                   <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">
-                    Kunci: {Array.isArray(q.correctAnswer) ? q.correctAnswer.join(', ') : q.correctAnswer}
+                    Kunci:{" "}
+                    {Array.isArray(q.correctAnswer)
+                      ? q.correctAnswer.join(", ")
+                      : q.correctAnswer}
                   </span>
                 </div>
 

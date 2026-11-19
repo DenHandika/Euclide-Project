@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { useApp } from '@/context/AppContext';
-import { UserRole } from '@/types';
-import { MOCK_USERS } from '@/data/mockData';
+import React, { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useApp } from "@/context/AppContext";
+import { UserRole } from "@/types";
+import { MOCK_USERS } from "@/data/mockData";
 import {
   ShieldCheck,
   GraduationCap,
@@ -13,17 +13,18 @@ import {
   ChevronUp,
   ExternalLink,
   Check,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 export function RoleSwitcher() {
   const pathname = usePathname();
-  const isExamScreen = pathname?.startsWith('/exam/') && !pathname?.includes('/result');
+  const isExamScreen =
+    pathname?.startsWith("/exam/") && !pathname?.includes("/result");
 
   const { currentRole, currentUser, switchRole, switchUser } = useApp();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (isExamScreen || pathname !== '/login') {
+  if (isExamScreen || pathname !== "/login") {
     return null;
   }
 
@@ -35,43 +36,44 @@ export function RoleSwitcher() {
     quickLinks: { label: string; href: string }[];
   }[] = [
     {
-      role: 'admin',
-      title: 'Super-Admin / Owner',
+      role: "admin",
+      title: "Super-Admin / Owner",
       icon: <ShieldCheck className="w-3.5 h-3.5" />,
-      description: 'Buku Kas, Import Excel SPP, Kuota Batch & Bank Soal',
+      description: "Buku Kas, Import Excel SPP, Kuota Batch & Bank Soal",
       quickLinks: [
-        { label: 'Buku Kas', href: '/admin' },
-        { label: 'Import Excel', href: '/admin/payments' },
-        { label: 'Roster Siswa', href: '/admin/students' },
-        { label: 'Bank Soal', href: '/admin/questions' },
+        { label: "Buku Kas", href: "/admin" },
+        { label: "Import Excel", href: "/admin/payments" },
+        { label: "Roster Siswa", href: "/admin/students" },
+        { label: "Bank Soal", href: "/admin/questions" },
       ],
     },
     {
-      role: 'tentor',
-      title: 'Tentor / Pengajar',
+      role: "tentor",
+      title: "Tentor / Pengajar",
       icon: <GraduationCap className="w-3.5 h-3.5" />,
-      description: 'Koreksi Esai Manual (0-100), Bank Soal KaTeX, Analitik Subtest',
+      description:
+        "Koreksi Esai Manual (0-100), Bank Soal KaTeX, Analitik Subtest",
       quickLinks: [
-        { label: 'Koreksi Esai', href: '/tentor/grading' },
-        { label: 'Bank Soal KaTeX', href: '/admin/questions' },
-        { label: 'Analitik Subtest', href: '/tentor/analytics' },
+        { label: "Koreksi Esai", href: "/tentor/grading" },
+        { label: "Bank Soal KaTeX", href: "/admin/questions" },
+        { label: "Analitik Subtest", href: "/tentor/analytics" },
       ],
     },
     {
-      role: 'siswa',
-      title: 'Siswa / Peserta CBT',
+      role: "siswa",
+      title: "Siswa / Peserta CBT",
       icon: <BookOpen className="w-3.5 h-3.5" />,
-      description: 'Player CBT Mobile-First, Timer Subtest, Rasionalisasi SNBT',
+      description: "Player CBT Mobile-First, Timer Subtest, Rasionalisasi SNBT",
       quickLinks: [
-        { label: 'Katalog Tryout', href: '/tryouts' },
-        { label: 'Simulasi CBT', href: '/exam/to-utbk-national-01' },
-        { label: 'Rasionalisasi', href: '/exam/to-utbk-national-01/result' },
-        { label: 'Modul Latihan', href: '/drilling' },
+        { label: "Katalog Tryout", href: "/tryouts" },
+        { label: "Simulasi CBT", href: "/exam/to-utbk-national-01" },
+        { label: "Rasionalisasi", href: "/exam/to-utbk-national-01/result" },
+        { label: "Modul Latihan", href: "/drilling" },
       ],
     },
   ];
 
-  const studentAccounts = MOCK_USERS.filter((u) => u.role === 'siswa');
+  const studentAccounts = MOCK_USERS.filter((u) => u.role === "siswa");
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm sm:max-w-md font-sans">
@@ -118,18 +120,22 @@ export function RoleSwitcher() {
                             : "border-slate-200 bg-[#FFFFFF] text-slate-500"
                         }`}
                       >
-                        {isCurrent ? <Check className="w-3 h-3" /> : ''}
+                        {isCurrent ? <Check className="w-3 h-3" /> : ""}
                       </span>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-sans font-bold text-sm text-[#263D5F]">{item.title}</span>
+                          <span className="font-sans font-bold text-sm text-[#263D5F]">
+                            {item.title}
+                          </span>
                           {isCurrent && (
                             <span className="text-xs font-sans bg-[#EFA93B]/25 text-[#263D5F] font-semibold px-1.5 py-1 rounded-full">
                               Aktif
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-500 leading-tight mt-0.5">{item.description}</p>
+                        <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                          {item.description}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -164,14 +170,14 @@ export function RoleSwitcher() {
             <div className="grid grid-cols-3 gap-1.5 font-sans text-xs">
               {studentAccounts.slice(0, 3).map((stu) => {
                 const isSelected = currentUser.id === stu.id;
-                let statusLabel = 'Aktif';
-                let borderCol = 'border-[#E4E4DC] text-[#13224E]';
-                if (stu.status === 'suspended') {
-                  statusLabel = 'SPP Overdue';
-                  borderCol = 'border-[#D0342C]/40 text-[#D0342C] bg-[#FDECEB]';
-                } else if (stu.status === 'graduated') {
-                  statusLabel = 'Alumni';
-                  borderCol = 'border-[#637096]/40 text-[#637096] bg-[#F3F3ED]';
+                let statusLabel = "Aktif";
+                let borderCol = "border-[#E4E4DC] text-[#13224E]";
+                if (stu.status === "suspended") {
+                  statusLabel = "SPP Overdue";
+                  borderCol = "border-[#D0342C]/40 text-[#D0342C] bg-[#FDECEB]";
+                } else if (stu.status === "graduated") {
+                  statusLabel = "Alumni";
+                  borderCol = "border-[#637096]/40 text-[#637096] bg-[#F3F3ED]";
                 }
 
                 return (
@@ -179,10 +185,14 @@ export function RoleSwitcher() {
                     key={stu.id}
                     onClick={() => switchUser(stu)}
                     className={`p-1.5 text-left border transition rounded-xl min-h-11 ${
-                      isSelected ? "border-slate-200 bg-[#F6F8FC] font-bold" : borderCol
+                      isSelected
+                        ? "border-slate-200 bg-[#F6F8FC] font-bold"
+                        : borderCol
                     } `}
                   >
-                    <div className="truncate font-sans font-medium">{stu.name.split(' ')[0]}</div>
+                    <div className="truncate font-sans font-medium">
+                      {stu.name.split(" ")[0]}
+                    </div>
                     <div className="text-xs opacity-75">{statusLabel}</div>
                   </button>
                 );
@@ -198,8 +208,15 @@ export function RoleSwitcher() {
         className="flex items-center space-x-2 bg-[#2E578F] hover:bg-[#234573] text-white px-3.5 py-2 border border-slate-200 transition text-xs font-sans rounded-xl min-h-11"
       >
         <span className="w-2 h-2 rounded-full bg-[#EFA93B]" />
-        <span>Peran: <strong className="text-[#EFA93B] uppercase">{currentRole}</strong></span>
-        {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+        <span>
+          Peran:{" "}
+          <strong className="text-[#EFA93B] uppercase">{currentRole}</strong>
+        </span>
+        {isOpen ? (
+          <ChevronDown className="w-3.5 h-3.5" />
+        ) : (
+          <ChevronUp className="w-3.5 h-3.5" />
+        )}
       </button>
     </div>
   );

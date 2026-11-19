@@ -1,12 +1,12 @@
-'use client';
-import Pagination from '@/components/common/Pagination';
-import usePagination from '@/hooks/usePagination';
+"use client";
+import Pagination from "@/components/common/Pagination";
+import usePagination from "@/hooks/usePagination";
 
-import StatusBadge from '@/components/common/StatusBadge';
+import StatusBadge from "@/components/common/StatusBadge";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useApp } from '@/context/AppContext';
-import { ClassBatch } from '@/types';
+import React, { useEffect, useRef, useState } from "react";
+import { useApp } from "@/context/AppContext";
+import { ClassBatch } from "@/types";
 import {
   ArrowUpRight,
   BookOpen,
@@ -18,23 +18,23 @@ import {
   Search,
   Users,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
-type Availability = 'all' | 'available' | 'full';
+type Availability = "all" | "available" | "full";
 const accents = [
-  { surface: 'bg-[#ECF2FC]', text: 'text-[#597EAF]', bar: 'bg-[#83A6D3]' },
-  { surface: 'bg-[#F3EEFA]', text: 'text-[#8B70A4]', bar: 'bg-[#AD98C8]' },
-  { surface: 'bg-[#FFF3E4]', text: 'text-[#A47A3F]', bar: 'bg-[#D5AF72]' },
-  { surface: 'bg-[#EBF6F1]', text: 'text-[#4D8B75]', bar: 'bg-[#84B7A5]' },
+  { surface: "bg-[#ECF2FC]", text: "text-[#597EAF]", bar: "bg-[#83A6D3]" },
+  { surface: "bg-[#F3EEFA]", text: "text-[#8B70A4]", bar: "bg-[#AD98C8]" },
+  { surface: "bg-[#FFF3E4]", text: "text-[#A47A3F]", bar: "bg-[#D5AF72]" },
+  { surface: "bg-[#EBF6F1]", text: "text-[#4D8B75]", bar: "bg-[#84B7A5]" },
 ];
 
 export default function AdminClassesPage() {
   const { batches, updateBatchCapacity } = useApp();
   const [editingBatch, setEditingBatch] = useState<ClassBatch | null>(null);
-  const [capacity, setCapacity] = useState('');
-  const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
-  const [availability, setAvailability] = useState<Availability>('all');
+  const [capacity, setCapacity] = useState("");
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [availability, setAvailability] = useState<Availability>("all");
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function AdminClassesPage() {
     const dialog = dialogRef.current;
     dialog?.showModal();
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     return () => {
       dialog?.close();
       document.body.style.overflow = previousOverflow;
@@ -51,12 +51,12 @@ export default function AdminClassesPage() {
 
   const studentCount = batches.reduce(
     (sum, batch) => sum + batch.currentStudents,
-    0
+    0,
   );
   const availableSeats = batches.reduce(
     (sum, batch) =>
       sum + Math.max(0, batch.maxCapacity - batch.currentStudents),
-    0
+    0,
   );
   const filtered = batches.filter((batch) => {
     const matches =
@@ -65,8 +65,8 @@ export default function AdminClassesPage() {
         .includes(search.toLowerCase().trim());
     return (
       matches &&
-      (availability === 'all' ||
-        (availability === 'full'
+      (availability === "all" ||
+        (availability === "full"
           ? batch.currentStudents >= batch.maxCapacity
           : batch.currentStudents < batch.maxCapacity))
     );
@@ -74,14 +74,14 @@ export default function AdminClassesPage() {
   const classesPagination = usePagination(
     filtered,
     6,
-    search + '|' + availability,
-    [3, 6, 12, 24]
+    search + "|" + availability,
+    [3, 6, 12, 24],
   );
 
   const editCapacity = (batch: ClassBatch) => {
     setEditingBatch(batch);
     setCapacity(String(batch.maxCapacity));
-    setError('');
+    setError("");
   };
   const saveCapacity = (event: React.FormEvent) => {
     event.preventDefault();
@@ -96,7 +96,7 @@ export default function AdminClassesPage() {
       value > 10000
     ) {
       setError(
-        `Isi kapasitas bulat antara ${Math.max(1, current?.currentStudents ?? 1)} dan 10.000 kursi.`
+        `Isi kapasitas bulat antara ${Math.max(1, current?.currentStudents ?? 1)} dan 10.000 kursi.`,
       );
       return;
     }
@@ -222,17 +222,17 @@ export default function AdminClassesPage() {
                 accents[
                   Math.max(
                     0,
-                    batches.findIndex((item) => item.id === batch.id)
+                    batches.findIndex((item) => item.id === batch.id),
                   ) % accents.length
                 ];
               const remaining = Math.max(
                 0,
-                batch.maxCapacity - batch.currentStudents
+                batch.maxCapacity - batch.currentStudents,
               );
               const percentage =
                 batch.maxCapacity > 0
                   ? Math.round(
-                      (batch.currentStudents / batch.maxCapacity) * 100
+                      (batch.currentStudents / batch.maxCapacity) * 100,
                     )
                   : 100;
               const full = remaining === 0;
@@ -255,8 +255,8 @@ export default function AdminClassesPage() {
                         {batch.program}
                       </span>
                     </div>
-                    <StatusBadge tone={full ? 'danger' : 'success'}>
-                      {full ? 'Kelas penuh' : `${remaining} kursi tersedia`}
+                    <StatusBadge tone={full ? "danger" : "success"}>
+                      {full ? "Kelas penuh" : `${remaining} kursi tersedia`}
                     </StatusBadge>
                   </div>
                   <h3 className="mt-5 text-lg font-bold leading-7 text-[#263D5F]">
@@ -291,7 +291,7 @@ export default function AdminClassesPage() {
                       <span className="font-semibold text-[#486284]">
                         {batch.currentStudents}
                         <span className="font-normal text-slate-500">
-                          {' '}
+                          {" "}
                           / {batch.maxCapacity} siswa
                         </span>
                       </span>
@@ -305,7 +305,7 @@ export default function AdminClassesPage() {
                       className="h-2 overflow-hidden rounded-full bg-[#F0F3F8]"
                     >
                       <div
-                        className={`h-full rounded-full transition-all ${full ? 'bg-[#D99A92]' : theme.bar}`}
+                        className={`h-full rounded-full transition-all ${full ? "bg-[#D99A92]" : theme.bar}`}
                         style={{
                           width: `${Math.min(100, Math.max(0, percentage))}%`,
                         }}
@@ -313,12 +313,12 @@ export default function AdminClassesPage() {
                     </div>
                     <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
                       <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-                        {batch.status === 'upcoming' ? (
+                        {batch.status === "upcoming" ? (
                           <>
                             <CalendarDays size={14} />
                             Segera dimulai
                           </>
-                        ) : batch.status === 'completed' ? (
+                        ) : batch.status === "completed" ? (
                           <>
                             <Check size={14} />
                             Kelas selesai
@@ -360,8 +360,8 @@ export default function AdminClassesPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setSearch('');
-                  setAvailability('all');
+                  setSearch("");
+                  setAvailability("all");
                 }}
                 className="mt-4 min-h-11 px-3 text-sm font-semibold text-[#426DA8]"
               >
@@ -424,7 +424,7 @@ export default function AdminClassesPage() {
                 value={capacity}
                 onChange={(event) => {
                   setCapacity(event.target.value);
-                  setError('');
+                  setError("");
                 }}
                 aria-describedby="capacity-help capacity-error"
                 aria-invalid={!!error}
