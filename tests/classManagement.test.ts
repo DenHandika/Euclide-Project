@@ -27,6 +27,14 @@ test("legacy weekly schedules remain editable without changing the source", () =
     [1, 3, 5],
   );
   assert.equal(readMeetings(MOCK_CLASS_BATCHES[3]).length, 7);
+  assert.equal(
+    readMeetings(MOCK_CLASS_BATCHES[0])[0].room,
+    MOCK_CLASS_BATCHES[0].room,
+  );
+  assert.equal(
+    readMeetings(MOCK_CLASS_BATCHES[0])[0].tutorName,
+    MOCK_CLASS_BATCHES[0].tutorName,
+  );
   assert.equal(readMeetings({ schedule: "Akan diumumkan" }).length, 0);
   const meetings = [
     { day: 5, start: "16:00", end: "17:00" },
@@ -37,6 +45,109 @@ test("legacy weekly schedules remain editable without changing the source", () =
     "Senin 10:00–11:00 WIB; Jumat 16:00–17:00 WIB",
   );
   assert.equal(meetings[0].day, 5);
+});
+
+test("multiple sessions on one day retain their own rooms and tutors", () => {
+  const draft = {
+    ...input(),
+    room: "",
+    tutorName: "",
+    meetings: [
+      {
+        day: 1,
+        start: "16:00",
+        end: "17:00",
+        room: "Ruang 1",
+        tutorName: "Tentor A",
+      },
+      {
+        day: 1,
+        start: "17:00",
+        end: "18:00",
+        room: "Ruang 2",
+        tutorName: "Tentor B",
+      },
+      {
+        day: 3,
+        start: "16:00",
+        end: "17:00",
+        room: "Ruang 3",
+        tutorName: "Tentor C",
+      },
+    ],
+  };
+  assert.equal(validateClass(draft, []), null);
+  assert.equal(readMeetings(draft)[1].room, "Ruang 2");
+  assert.equal(readMeetings(draft)[1].tutorName, "Tentor B");
+  const other = {
+    ...input(),
+    id: "other",
+    name: "Kelas lain",
+    currentStudents: 0,
+    room: "Ruang 1; Ruang 2",
+    tutorName: "Tentor A; Tentor B",
+    meetings: draft.meetings,
+  };
+  assert.equal(
+    validateClass(
+      {
+        ...input(),
+        meetings: [
+          {
+            day: 1,
+            start: "16:00",
+            end: "17:00",
+            room: "Ruang 2",
+            tutorName: "Tentor B",
+          },
+        ],
+      },
+      [other],
+    ),
+    null,
+  );
+  assert.match(
+    validateClass(
+      {
+        ...input(),
+        meetings: [
+          {
+            day: 1,
+            start: "17:00",
+            end: "18:00",
+            room: "Ruang lain",
+            tutorName: "Tentor B",
+          },
+        ],
+      },
+      [other],
+    )!,
+    /tentor/,
+  );
+  assert.match(
+    validateClass(
+      {
+        ...input(),
+        meetings: [
+          {
+            day: 1,
+            start: "17:00",
+            end: "18:00",
+            room: " ruang 2 ",
+            tutorName: "Tentor lain",
+          },
+        ],
+      },
+      [other],
+    )!,
+    /ruang/,
+  );
+  assert.ok(
+    validateClass(
+      { ...draft, meetings: [{ ...draft.meetings[0], tutorName: "" }] },
+      [],
+    ),
+  );
 });
 
 test("class validation rejects incomplete fields, invalid times and overlapping sessions", () => {

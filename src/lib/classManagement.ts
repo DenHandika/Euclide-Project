@@ -20,9 +20,15 @@ const normalize = (value: string) =>
   value.trim().replace(/\s+/g, " ").toLowerCase();
 
 export function readMeetings(
-  batch: Pick<ClassBatch, "schedule" | "meetings">,
+  batch: Pick<ClassBatch, "schedule" | "meetings"> &
+    Partial<Pick<ClassBatch, "room" | "tutorName">>,
 ): ClassMeeting[] {
-  if (batch.meetings) return batch.meetings.map((meeting) => ({ ...meeting }));
+  if (batch.meetings)
+    return batch.meetings.map((meeting) => ({
+      ...meeting,
+      room: meeting.room ?? batch.room ?? "",
+      tutorName: meeting.tutorName ?? batch.tutorName ?? "",
+    }));
   const times = [...batch.schedule.matchAll(/\b(\d{2})[.:](\d{2})\b/g)];
   if (times.length !== 2) return [];
   const days = /setiap hari/i.test(batch.schedule)
@@ -34,6 +40,8 @@ export function readMeetings(
     day,
     start: `${times[0][1]}:${times[0][2]}`,
     end: `${times[1][1]}:${times[1][2]}`,
+    room: batch.room ?? "",
+    tutorName: batch.tutorName ?? "",
   }));
 }
 
@@ -58,12 +66,8 @@ export function validateClass(
   const current = id ? batches.find((batch) => batch.id === id) : undefined;
   if (id && !current)
     return "Kelas tidak ditemukan. Tutup formulir lalu buka kembali.";
-  if (
-    [input.name, input.room, input.tutorName].some(
-      (value) => !value.trim() || value.trim().length > 160,
-    )
-  )
-    return "Isi nama kelas, ruang, dan tentor (maksimal 160 karakter).";
+  if ([input.name].some((value) => !value.trim() || value.trim().length > 160))
+    return "Isi nama kelas (maksimal 160 karakter).";
   if (
     !CLASS_PROGRAMS.includes(input.program) ||
     !["active", "upcoming", "completed"].includes(input.status)
@@ -82,11 +86,17 @@ export function validateClass(
     )
   )
     return "Nama kelas sudah digunakan. Gunakan nama yang berbeda.";
-  const meetings = input.meetings ?? [];
+  const meetings = readMeetings(input);
   if (!meetings.length || meetings.length > 21)
     return "Tambahkan 1–21 sesi jadwal mingguan.";
   const time = /^([01]\d|2[0-3]):[0-5]\d$/;
   for (const meeting of meetings) {
+    if (
+      [meeting.room, meeting.tutorName].some(
+        (value) => !value?.trim() || value.trim().length > 160,
+      )
+    )
+      return "Isi ruang dan tentor pada setiap sesi (maksimal 160 karakter).";
     if (
       !Number.isInteger(meeting.day) ||
       meeting.day < 0 ||
@@ -108,14 +118,17 @@ export function validateClass(
   if (input.status !== "completed") {
     for (const batch of batches) {
       if (batch.id === id || batch.status === "completed") continue;
-      const roomConflict = normalize(batch.room) === normalize(input.room);
-      const tutorConflict =
-        normalize(batch.tutorName) === normalize(input.tutorName);
-      if (
-        (roomConflict || tutorConflict) &&
-        meetings.some((a) => readMeetings(batch).some((b) => overlaps(a, b)))
-      )
-        return `Jadwal bentrok dengan ${batch.name}: ${roomConflict ? "ruang" : "tentor"} dipakai pada waktu yang sama.`;
+      for (const a of meetings) {
+        for (const b of readMeetings(batch)) {
+          if (!overlaps(a, b)) continue;
+          const roomConflict =
+            normalize(a.room ?? "") === normalize(b.room ?? "");
+          const tutorConflict =
+            normalize(a.tutorName ?? "") === normalize(b.tutorName ?? "");
+          if (roomConflict || tutorConflict)
+            return `Jadwal bentrok dengan ${batch.name}: ${roomConflict ? "ruang" : "tentor"} dipakai pada ${CLASS_DAYS[a.day]} ${b.start}–${b.end}.`;
+        }
+      }
     }
   }
   return null;

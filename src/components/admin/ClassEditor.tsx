@@ -13,7 +13,13 @@ import {
 
 const field =
   "min-h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-3 py-2 text-base text-slate-900";
-const emptyMeeting = (): ClassMeeting => ({ day: 1, start: "", end: "" });
+const emptyMeeting = (): ClassMeeting => ({
+  day: 1,
+  start: "",
+  end: "",
+  room: "",
+  tutorName: "",
+});
 
 export default function ClassEditor({
   batch,
@@ -59,7 +65,10 @@ export default function ClassEditor({
     <dialog
       ref={dialog}
       aria-labelledby={`${prefix}-title`}
-      onClose={onClose}
+      onClose={(event) => {
+        // Strict Mode can queue a cleanup close event before reopening the dialog.
+        if (!event.currentTarget.open) onClose();
+      }}
       className="class-editor m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-2xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 text-slate-900 shadow-xl sm:p-7"
     >
       <div className="flex items-start justify-between gap-4">
@@ -68,7 +77,8 @@ export default function ClassEditor({
             {batch ? "Ubah kelas & jadwal" : "Tambah kelas"}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Atur ruang, tentor, dan sesi belajar mingguan. Jam menggunakan WIB.
+            Susun sesi belajar dengan ruang dan tentor masing-masing. Jam
+            menggunakan WIB.
           </p>
         </div>
         <button
@@ -151,58 +161,6 @@ export default function ClassEditor({
               <option value="completed">Selesai</option>
             </select>
           </div>
-          <div>
-            <label
-              htmlFor={`${prefix}-room`}
-              className="mb-2 block text-sm font-semibold"
-            >
-              Ruang / lokasi belajar
-            </label>
-            <input
-              id={`${prefix}-room`}
-              required
-              maxLength={160}
-              list={`${prefix}-rooms`}
-              value={draft.room}
-              onChange={(event) => change("room", event.target.value)}
-              className={field}
-            />
-            <datalist id={`${prefix}-rooms`}>
-              {[...new Set(batches.map((item) => item.room))].map((room) => (
-                <option key={room} value={room} />
-              ))}
-            </datalist>
-            <p className="mt-2 text-xs text-slate-600">
-              Pilih ruang yang ada atau ketik nama ruang baru.
-            </p>
-          </div>
-          <div>
-            <label
-              htmlFor={`${prefix}-tutor`}
-              className="mb-2 block text-sm font-semibold"
-            >
-              Tentor pengampu
-            </label>
-            <input
-              id={`${prefix}-tutor`}
-              required
-              maxLength={160}
-              list={`${prefix}-tutors`}
-              value={draft.tutorName}
-              onChange={(event) => change("tutorName", event.target.value)}
-              className={field}
-            />
-            <datalist id={`${prefix}-tutors`}>
-              {[...new Set(batches.map((item) => item.tutorName))].map(
-                (tutor) => (
-                  <option key={tutor} value={tutor} />
-                ),
-              )}
-            </datalist>
-            <p className="mt-2 text-xs text-slate-600">
-              Nama pengampu untuk kelas ini; tidak membuat akun login.
-            </p>
-          </div>
         </div>
         <div>
           <label
@@ -234,8 +192,12 @@ export default function ClassEditor({
         <fieldset className="min-w-0 border-t border-slate-200 pt-4">
           <legend className="pr-3 text-base font-bold">Jadwal mingguan</legend>
           <p className="mb-4 text-sm leading-relaxed text-slate-600">
-            Tambahkan satu sesi untuk setiap hari atau waktu belajar. Ruang dan
-            tentor mengikuti pengaturan kelas di atas.
+            Hari yang sama boleh memiliki beberapa sesi. Tentukan jam, ruang,
+            dan tentor untuk setiap sesi.
+          </p>
+          <p className="mb-4 text-xs leading-relaxed text-slate-600">
+            Pilih saran ruang/tentor atau ketik nama baru. Nama tentor di jadwal
+            belum membuat akun login.
           </p>
           {!draft.meetings?.length && batch?.schedule && (
             <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
@@ -329,9 +291,75 @@ export default function ClassEditor({
                     <Trash2 size={18} aria-hidden="true" />
                   </button>
                 </div>
+                <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor={`${prefix}-room-${index}`}
+                      className="mb-1.5 block text-sm"
+                    >
+                      Ruang / lokasi
+                    </label>
+                    <input
+                      id={`${prefix}-room-${index}`}
+                      required
+                      maxLength={160}
+                      list={`${prefix}-rooms`}
+                      value={meeting.room ?? ""}
+                      onChange={(event) =>
+                        updateMeeting(index, { room: event.target.value })
+                      }
+                      className={field}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor={`${prefix}-tutor-${index}`}
+                      className="mb-1.5 block text-sm"
+                    >
+                      Tentor pengampu
+                    </label>
+                    <input
+                      id={`${prefix}-tutor-${index}`}
+                      required
+                      maxLength={160}
+                      list={`${prefix}-tutors`}
+                      value={meeting.tutorName ?? ""}
+                      onChange={(event) =>
+                        updateMeeting(index, { tutorName: event.target.value })
+                      }
+                      className={field}
+                    />
+                  </div>
+                </div>
               </fieldset>
             ))}
           </div>
+          <datalist id={`${prefix}-rooms`}>
+            {[
+              ...new Set(
+                batches
+                  .flatMap((item) =>
+                    readMeetings(item).map((meeting) => meeting.room),
+                  )
+                  .filter(Boolean),
+              ),
+            ].map((room) => (
+              <option key={room} value={room} />
+            ))}
+          </datalist>
+          <datalist id={`${prefix}-tutors`}>
+            {[
+              ...new Set(
+                batches
+                  .flatMap((item) =>
+                    readMeetings(item).map((meeting) => meeting.tutorName),
+                  )
+                  .filter(Boolean),
+              ),
+            ].map((tutor) => (
+              <option key={tutor} value={tutor} />
+            ))}
+          </datalist>
           <button
             type="button"
             disabled={(draft.meetings?.length ?? 0) >= 21}

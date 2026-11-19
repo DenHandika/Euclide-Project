@@ -6,6 +6,7 @@ import usePagination from "@/hooks/usePagination";
 
 import StatusBadge from "@/components/common/StatusBadge";
 import ClassEditor from "@/components/admin/ClassEditor";
+import { CLASS_DAYS, readMeetings } from "@/lib/classManagement";
 
 import React, { useMemo, useEffect, useRef, useState } from "react";
 import { useApp } from "@/context/AppContext";
@@ -281,29 +282,49 @@ export default function AdminClassesPage() {
                   <h3 className="mt-5 text-lg font-bold leading-7 text-[#263D5F]">
                     {batch.name}
                   </h3>
-                  <div className="mt-4 space-y-2.5 text-xs leading-6 text-slate-500">
-                    <p className="flex items-start gap-2.5">
-                      <MapPin
-                        size={16}
-                        className="mt-1 shrink-0 text-[#88A0BF]"
-                      />
-                      <span>{batch.room}</span>
+                  {readMeetings(batch).length ? (
+                    <details className="mt-4 border-y border-slate-100 text-sm">
+                      <summary className="min-h-11 cursor-pointer py-3 font-semibold text-[#244676]">
+                        Jadwal mingguan ({readMeetings(batch).length} sesi)
+                      </summary>
+                      <ol className="divide-y divide-slate-100">
+                        {readMeetings(batch)
+                          .sort(
+                            (a, b) =>
+                              ((a.day + 6) % 7) - ((b.day + 6) % 7) ||
+                              a.start.localeCompare(b.start),
+                          )
+                          .map((meeting, index) => (
+                            <li key={index} className="space-y-1.5 py-3">
+                              <p className="font-semibold text-slate-900">
+                                {CLASS_DAYS[meeting.day]} · {meeting.start}–
+                                {meeting.end} WIB
+                              </p>
+                              <p className="flex items-start gap-2 text-slate-600">
+                                <Users
+                                  size={16}
+                                  aria-hidden="true"
+                                  className="mt-0.5 shrink-0"
+                                />
+                                <span>{meeting.tutorName}</span>
+                              </p>
+                              <p className="flex items-start gap-2 text-slate-600">
+                                <MapPin
+                                  size={16}
+                                  aria-hidden="true"
+                                  className="mt-0.5 shrink-0"
+                                />
+                                <span>{meeting.room}</span>
+                              </p>
+                            </li>
+                          ))}
+                      </ol>
+                    </details>
+                  ) : (
+                    <p className="mt-4 text-sm leading-relaxed text-slate-600">
+                      {batch.schedule || "Jadwal belum diatur"}
                     </p>
-                    <p className="flex items-start gap-2.5">
-                      <Users
-                        size={16}
-                        className="mt-1 shrink-0 text-[#88A0BF]"
-                      />
-                      <span>{batch.tutorName}</span>
-                    </p>
-                    <p className="flex items-start gap-2.5">
-                      <CalendarDays
-                        size={16}
-                        className="mt-1 shrink-0 text-[#88A0BF]"
-                      />
-                      <span>{batch.schedule}</span>
-                    </p>
-                  </div>
+                  )}
                   <div className="mt-auto pt-6">
                     <div className="mb-2.5 flex items-center justify-between gap-2 text-xs">
                       <span className="text-slate-500">Keterisian kelas</span>

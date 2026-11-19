@@ -3,6 +3,7 @@ import { normalizeDifficulty } from "@/lib/questionDifficulty";
 import {
   ClassInput,
   formatMeetings,
+  readMeetings,
   validateClass,
 } from "@/lib/classManagement";
 import { readStudentResult, storeStudentResult } from "@/lib/resultStorage";
@@ -765,14 +766,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const error = validateClass(input, batches, id);
     if (error) return error;
     const existing = batches.find((batch) => batch.id === id);
+    const meetings = readMeetings(input).map((meeting) => ({
+      ...meeting,
+      room: meeting.room!.trim(),
+      tutorName: meeting.tutorName!.trim(),
+    }));
     const saved: ClassBatch = {
       ...input,
       id: existing?.id ?? crypto.randomUUID(),
       name: input.name.trim(),
-      room: input.room.trim(),
-      tutorName: input.tutorName.trim(),
+      room: [...new Set(meetings.map((meeting) => meeting.room))].join("; "),
+      tutorName: [
+        ...new Set(meetings.map((meeting) => meeting.tutorName)),
+      ].join("; "),
+      meetings,
       currentStudents: existing?.currentStudents ?? 0,
-      schedule: formatMeetings(input.meetings ?? []),
+      schedule: formatMeetings(meetings),
     };
     const updated = existing
       ? batches.map((batch) => (batch.id === existing.id ? saved : batch))

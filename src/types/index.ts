@@ -179,6 +179,8 @@ export interface ClassMeeting {
   day: number;
   start: string;
   end: string;
+  room?: string;
+  tutorName?: string;
 }
 
 export interface ClassBatch {
