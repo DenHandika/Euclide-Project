@@ -23,6 +23,14 @@ LocalStorage `euclide_batches`, bukan PostgreSQL.
 6. Uji di HP dan desktop: input 16px, kontrol dapat digulir saat keyboard terbuka,
    tambah/hapus sesi, Tab/Shift+Tab, Escape, tombol Batal dan Tutup. Tidak ada
    navigasi di balik modal yang bisa diaktifkan selama formulir terbuka.
+7. Buka pilihan ruang/tentor: daftar putih mengikuti desain aplikasi, opsi aktif
+   memiliki tanda centang, dan teks ketikan memfilter saran. Coba nama baru,
+   klik pilihan, panah atas/bawah lalu Enter, Tab, serta Escape saat daftar terbuka.
+   Enter saat komposisi IME tidak memilih atau menyimpan. Daftar melayang lewat
+   Popover API dan CSS anchor positioning, tanpa mendorong formulir. Posisi dapat
+   dibalik ketika ruang layar tidak cukup. Browser tanpa anchor positioning
+   memakai panel melayang di bawah layar; tanpa Popover API panel CSS tetap
+   berada di dalam dialog. Uji juga buka/tutup, scroll, batas layar dan keyboard HP.
 
 Skenario di atas belum diklaim telah dijalankan melalui browser. Uji unit mencakup
 parsing jadwal lama, validasi jam/kuota, duplikasi nama, dan konflik mingguan.

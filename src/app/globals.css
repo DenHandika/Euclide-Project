@@ -265,6 +265,38 @@ html {
   overscroll-behavior: contain;
 }
 
+.combobox-anchor {
+  anchor-name: var(--combobox-anchor);
+}
+
+/* Without anchor positioning, the floating list remains usable as a small sheet. */
+.combobox-popup {
+  position: fixed;
+  inset: auto 1rem max(1rem, env(safe-area-inset-bottom, 0px));
+  z-index: 100;
+  inline-size: auto;
+  max-inline-size: 32rem;
+  max-block-size: min(22rem, 65dvh);
+  margin: 0 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@supports (position-area: block-end) and (inline-size: anchor-size(inline)) {
+  .combobox-popup {
+    position-anchor: var(--combobox-anchor);
+    position-area: block-end span-inline-end;
+    position-try-fallbacks:
+      flip-block,
+      flip-inline,
+      flip-block flip-inline;
+    inset: auto;
+    inline-size: anchor-size(inline);
+    max-inline-size: calc(100vw - 2rem);
+    margin: 0.5rem 0;
+  }
+}
+
 @media print {
   @page {
     margin: 12mm;

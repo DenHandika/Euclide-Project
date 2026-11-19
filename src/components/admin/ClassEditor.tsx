@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import EditableCombobox from "@/components/common/EditableCombobox";
 import type { ClassBatch, ClassMeeting } from "@/types";
 import {
   CLASS_DAYS,
@@ -44,6 +45,12 @@ export default function ClassEditor({
     meetings: batch ? readMeetings(batch) : [emptyMeeting()],
   }));
   const [error, setError] = useState("");
+  const knownRooms = batches.flatMap((item) =>
+    readMeetings(item).map((meeting) => meeting.room ?? ""),
+  );
+  const knownTutors = batches.flatMap((item) =>
+    readMeetings(item).map((meeting) => meeting.tutorName ?? ""),
+  );
   useEffect(() => {
     const element = dialog.current;
     if (element && !element.open) element.showModal();
@@ -292,74 +299,26 @@ export default function ClassEditor({
                   </button>
                 </div>
                 <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor={`${prefix}-room-${index}`}
-                      className="mb-1.5 block text-sm"
-                    >
-                      Ruang / lokasi
-                    </label>
-                    <input
-                      id={`${prefix}-room-${index}`}
-                      required
-                      maxLength={160}
-                      list={`${prefix}-rooms`}
-                      value={meeting.room ?? ""}
-                      onChange={(event) =>
-                        updateMeeting(index, { room: event.target.value })
-                      }
-                      className={field}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor={`${prefix}-tutor-${index}`}
-                      className="mb-1.5 block text-sm"
-                    >
-                      Tentor pengampu
-                    </label>
-                    <input
-                      id={`${prefix}-tutor-${index}`}
-                      required
-                      maxLength={160}
-                      list={`${prefix}-tutors`}
-                      value={meeting.tutorName ?? ""}
-                      onChange={(event) =>
-                        updateMeeting(index, { tutorName: event.target.value })
-                      }
-                      className={field}
-                    />
-                  </div>
+                  <EditableCombobox
+                    id={`${prefix}-room-${index}`}
+                    label="Ruang / lokasi"
+                    value={meeting.room ?? ""}
+                    options={knownRooms}
+                    onChange={(room) => updateMeeting(index, { room })}
+                  />
+                  <EditableCombobox
+                    id={`${prefix}-tutor-${index}`}
+                    label="Tentor pengampu"
+                    value={meeting.tutorName ?? ""}
+                    options={knownTutors}
+                    onChange={(tutorName) =>
+                      updateMeeting(index, { tutorName })
+                    }
+                  />
                 </div>
               </fieldset>
             ))}
           </div>
-          <datalist id={`${prefix}-rooms`}>
-            {[
-              ...new Set(
-                batches
-                  .flatMap((item) =>
-                    readMeetings(item).map((meeting) => meeting.room),
-                  )
-                  .filter(Boolean),
-              ),
-            ].map((room) => (
-              <option key={room} value={room} />
-            ))}
-          </datalist>
-          <datalist id={`${prefix}-tutors`}>
-            {[
-              ...new Set(
-                batches
-                  .flatMap((item) =>
-                    readMeetings(item).map((meeting) => meeting.tutorName),
-                  )
-                  .filter(Boolean),
-              ),
-            ].map((tutor) => (
-              <option key={tutor} value={tutor} />
-            ))}
-          </datalist>
           <button
             type="button"
             disabled={(draft.meetings?.length ?? 0) >= 21}
