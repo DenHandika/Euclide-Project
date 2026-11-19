@@ -133,7 +133,7 @@ export default function LoginPage() {
                     Masuk sebagai Siswa
                   </div>
                   <div className="text-[11px] text-slate-500">
-                    Raihan Pratama (Akun Aktif)
+                    Sakhi (Akun Aktif)
                   </div>
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default function LoginPage() {
                     Masuk sebagai Tentor
                   </div>
                   <div className="text-[11px] text-slate-500">
-                    Dr. Hendra Wijaya (Koreksi Esai)
+                    Epri (Koreksi Esai)
                   </div>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function LoginPage() {
                     Masuk sebagai Admin / Owner
                   </div>
                   <div className="text-[11px] text-slate-500">
-                    Siti Rahmawati (Buku Kas & Kuota)
+                    Panjie Wicaksono (Buku Kas & Kuota)
                   </div>
                 </div>
               </div>
