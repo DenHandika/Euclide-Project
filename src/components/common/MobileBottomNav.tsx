@@ -52,7 +52,7 @@ export default function MobileBottomNav() {
       : studentNav;
 
   return (
-    <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 py-1.5 px-3 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+    <div className="answer-bottom-nav md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 py-1.5 px-3 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
       <div className="flex items-center justify-around">
         {activeNav.map((item) => {
           const isActive = pathname === item.href;

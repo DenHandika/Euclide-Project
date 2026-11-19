@@ -130,6 +130,27 @@
   -ms-user-select: none;
 }
 
+/* Answer fields must remain editable inside the protected exam surface. */
+.written-answer {
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: manipulation;
+  scroll-margin-block: 10rem;
+}
+
+@media (max-width: 767px) {
+  /* Small form text triggers automatic focus zoom in mobile Safari. */
+  :root input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  :root textarea,
+  :root select {
+    font-size: max(16px, 1rem);
+  }
+
+  body:has(input:focus, textarea:focus) .answer-bottom-nav {
+    display: none;
+  }
+}
+
 /* KaTeX custom sizing tweaks */
 .katex-wrapper .katex {
   font-size: 1.05em;

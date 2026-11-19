@@ -94,7 +94,7 @@ untuk mencoba kondisi kosong; jangan menghapus data browser.
 | FE-17 | Isi essay Literasi Indonesia dengan dua paragraf; pindah nomor dan kembali. | Teks dan pemisahan paragraf tidak hilang; indikator jumlah kata mengikuti teks; tidak dianggap otomatis benar/salah. | Belum diuji |
 | FE-18 | Tandai soal kosong ragu; isi jawaban; lepaskan tanda ragu. Bandingkan palet dan ringkasan. | Status kosong, terjawab, dan ragu konsisten. Terjawab+ragu tidak dihitung dua kali sebagai dua jawaban. | Belum diuji |
 | FE-19 | Klik nomor 5, Soal Sebelumnya/Prev, dan Soal Berikutnya/Next. Coba tombol pada batas subtes. | Soal yang ditampilkan sesuai nomor; tidak ada soal kosong/tidak terdefinisi; perpindahan subtes jelas. | Belum diuji |
-| FE-20 | Buka soal rumus integral/matriks dan ubah ukuran teks A/A+/A++. Pada HP coba tab Wacana dan Soal. | Rumus terbaca; teks tidak saling menimpa; bacaan dan opsi bisa dijangkau tanpa kehilangan jawaban. | Belum diuji |
+| FE-20 | Buka soal rumus integral/matriks dan ubah ukuran teks A/A+/A++. Pada HP gulir dari wacana ke soal dan kembali tanpa tab. | Rumus terbaca; teks tidak saling menimpa; bacaan dan opsi bisa dijangkau tanpa kehilangan jawaban. | Belum diuji |
 | FE-21 | Jawab PU nomor 1, pindah PK nomor 3 dan isi jawaban; refresh halaman. | Target: semua jawaban serta posisi subtes/nomor terakhir pulih. Periksa jawaban dan posisi secara terpisah; lihat K-02 untuk celah yang sudah teridentifikasi. | Belum diuji |
 | FE-22 | Pada sesi khusus, biarkan timer satu subtes habis tanpa klik. | Target: pindah ke subtes berikutnya sekali; jawaban tetap tersimpan; tidak mendapat tambahan waktu pada subtes yang selesai. Timer demo masih memiliki batas K-03. | Belum diuji |
 | FE-23 | Pada sesi khusus anti-curang, pindah tab sekali lalu kembali. | Peringatan tampil. Catat jumlah pelanggaran aktual; satu perpindahan tidak semestinya menggandakan hitungan. Uji ini terpisah dari alur utama. | Belum diuji |
@@ -149,7 +149,7 @@ Ini temuan review, bukan hasil pelaksanaan UAT di perangkat penguji.
 | K-03 | Timer frontend memakai interval dan sisa waktu browser, bukan deadline server. Menghentikan browser/koneksi atau berpindah subtes belum membuktikan waktu ujian ketat. | FE-22 menguji tampilan dan transisi saja. Jaminan timer server dan ketahanan manipulasi **Ditunda**. Catat jika subtes mendapat waktu kembali. |
 | K-04 | Bank soal yang dibuat di UI tersimpan lokal; paket tryout dibentuk dari bank contoh statis saat kode dimuat. | FE-33 hanya menguji bank lokal. Penyusunan/penerbitan paket dari soal buatan user belum tersedia. |
 | K-05 | Skor hasil masih salinan data contoh; simpan nilai essay belum menghitung ulang hasil tryout. | FE-25 menguji tampilan/snapshot. Akurasi skor, ranking, dan finalisasi setelah koreksi **Ditunda**. |
-| K-06 | Blur dan visibilitychange dapat sama-sama terpanggil saat berpindah aplikasi; penghitung pelanggaran perlu verifikasi. | FE-23 perlu dicatat, termasuk bila hitungan ganda atau auto-submit terlalu cepat. Deteksi bukan bukti bisa mencegah semua kecurangan. |
+| K-06 | Deteksi hanya memakai visibilitychange; blur dihapus agar keyboard/fokus tidak dihitung sebagai perpindahan aplikasi. Perilaku perangkat tetap perlu verifikasi. | FE-23 perlu dicatat, termasuk bila hitungan ganda atau auto-submit terlalu cepat. Deteksi bukan bukti bisa mencegah semua kecurangan. |
 
 Pembayaran, pendaftaran bisnis, portal orang tua, payment gateway, integrasi
 PostgreSQL/OAuth, dan uji 350 pengguna tidak masuk UAT frontend ini.
@@ -184,7 +184,7 @@ Masalah tampilan yang menutup tombol utama juga bisa menjadi P0/P1 sesuai dampak
 
 | Ukuran | Hasil |
 |---|---|
-| Skenario disiapkan | 40 |
+| Skenario disiapkan | 46 |
 | Skenario dijalankan | … |
 | Lulus | … |
 | Gagal | … |
@@ -199,3 +199,17 @@ Penerimaan FE memerlukan alur siswa memilih prodi → mengerjakan empat tipe soa
 diselesaikan pada desktop dan HP tanpa masalah penghalang. Batas K-01–K-06
 tetap dicatat dan tidak berubah menjadi kelulusan produk. **UAT FE bukan
 persetujuan penggunaan untuk ujian sungguhan atau data siswa nyata.**
+
+
+## 11. Regresi input dan bacaan di HP
+
+Jalankan pada Chrome Android dan Safari iPhone, dengan keyboard asli. Perubahan ini belum diuji pada perangkat asli.
+
+| ID | Langkah | Hasil yang diharapkan | Status |
+|---|---|---|---|
+| FE-41 | Latihan Penalaran Matematika: cari isian singkat, ketuk label/kolom, ketik 120, periksa, lalu lanjut | Kolom terlihat, keyboard terbuka, jawaban terbaca dan dapat diperiksa; soal berikutnya kosong | Belum diuji |
+| FE-42 | Buka esai latihan; ketik beberapa paragraf, periksa pembahasan | Textarea dapat diketik, tidak ada klaim skor otomatis benar/salah untuk esai | Belum diuji |
+| FE-43 | Buka pilihan jamak latihan, pilih dua opsi lalu batalkan salah satunya | Semua opsi tampil; pilihan dapat ditambah/dibatalkan dan diperiksa bersama | Belum diuji |
+| FE-44 | Di CBT berbaca panjang, baca, isi jawaban, gulir kembali ke bacaan lalu ke jawaban | Bacaan dan jawaban selalu ada tanpa tab; jawaban tetap tersimpan saat menggulir | Belum diuji |
+| FE-45 | Fokus isian/esai di latihan dan CBT; ubah posisi kursor, sembunyikan keyboard; uji portrait/landscape | Tidak terjadi zoom otomatis; input tetap terjangkau dengan gulir; navigasi bawah tidak menutup field saat fokus; zoom manual tetap bisa | Belum diuji |
+| FE-46 | Di CBT, buka/tutup keyboard beberapa kali lalu benar-benar pindah tab/aplikasi | Membuka keyboard tidak menambah pelanggaran; tab/aplikasi tersembunyi tetap tercatat sekali per kejadian visibilitychange | Belum diuji |

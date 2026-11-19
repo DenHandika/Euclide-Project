@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { Question, UserAnswer, ExamSession } from '@/types';
 import MathRenderer from '@/components/common/MathRenderer';
+import WrittenAnswer from '@/components/common/WrittenAnswer';
 import {
   Clock,
   Maximize,
@@ -18,15 +19,12 @@ import {
   ShieldCheck,
   CheckCircle2,
   X,
-  FileText,
   AlertTriangle,
   User,
   ZoomIn,
   ZoomOut,
   Type,
   HelpCircle,
-  Sparkles,
-  BookOpen,
 } from 'lucide-react';
 
 export default function CBTExamPlayerPage() {
@@ -41,8 +39,18 @@ export default function CBTExamPlayerPage() {
     if (!ready) router.replace(`/tryouts/${tryoutId}/prepare`);
     else if (session?.isCompleted) router.replace(`/exam/${tryoutId}/result`);
   }, [isHydrated, ready, session?.isCompleted, tryoutId, router]);
-  if (!isHydrated || !ready || session?.isCompleted) return <div className="p-8 text-center text-sm text-slate-500">Menyiapkan sesi tryout...</div>;
-  return <CBTExamPlayer key={`${tryoutId}-${session.startedAt}`} initialSession={session} />;
+  if (!isHydrated || !ready || session?.isCompleted)
+    return (
+      <div className="p-8 text-center text-sm text-slate-500">
+        Menyiapkan sesi tryout...
+      </div>
+    );
+  return (
+    <CBTExamPlayer
+      key={`${tryoutId}-${session.startedAt}`}
+      initialSession={session}
+    />
+  );
 }
 
 function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
@@ -69,10 +77,17 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [fontSizeLevel, setFontSizeLevel] = useState<'normal' | 'large' | 'xlarge'>('normal');
-  const [visitedQuestions, setVisitedQuestions] = useState<Set<string>>(new Set());
-  const [mobileTab, setMobileTab] = useState<'question' | 'stimulus'>('question');
-  const [antiCheatModal, setAntiCheatModal] = useState<{ isOpen: boolean; count: number }>({
+  const [fontSizeLevel, setFontSizeLevel] = useState<
+    'normal' | 'large' | 'xlarge'
+  >('normal');
+  const [visitedQuestions, setVisitedQuestions] = useState<Set<string>>(
+    new Set()
+  );
+
+  const [antiCheatModal, setAntiCheatModal] = useState<{
+    isOpen: boolean;
+    count: number;
+  }>({
     isOpen: false,
     count: 0,
   });
@@ -82,27 +97,36 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
   const [session, setSession] = useState(initialSession);
 
   // Current Subtest & Question
-  const currentSubtest = tryout.subtests[currentSubtestIndex] || tryout.subtests[0];
-  const subtestQuestions = tryout.questions.filter((q) => q.subtestId === currentSubtest.id);
+  const currentSubtest =
+    tryout.subtests[currentSubtestIndex] || tryout.subtests[0];
+  const subtestQuestions = tryout.questions.filter(
+    (q) => q.subtestId === currentSubtest.id
+  );
   const currentQuestion: Question =
-    subtestQuestions[currentQuestionIndex] || tryout.questions[0] || ({} as Question);
+    subtestQuestions[currentQuestionIndex] ||
+    tryout.questions[0] ||
+    ({} as Question);
 
   // Mark current question as visited
   useEffect(() => {
     if (currentQuestion?.id) {
-      setVisitedQuestions((prev) => new Set([...Array.from(prev), currentQuestion.id]));
+      setVisitedQuestions(
+        (prev) => new Set([...Array.from(prev), currentQuestion.id])
+      );
     }
-    // When switching questions, default back to question tab on mobile
-    setMobileTab('question');
   }, [currentQuestion?.id]);
 
   // Timer per subtest
   const [timerSeconds, setTimerSeconds] = useState<number>(() => {
-    return session.subtestRemainingSeconds[currentSubtest.id] || currentSubtest.durationMinutes * 60;
+    return (
+      session.subtestRemainingSeconds[currentSubtest.id] ||
+      currentSubtest.durationMinutes * 60
+    );
   });
 
   // Current answer state for current question
-  const currentAnswerObj: UserAnswer | undefined = session?.answers[currentQuestion?.id];
+  const currentAnswerObj: UserAnswer | undefined =
+    session?.answers[currentQuestion?.id];
   const currentAnswerVal = currentAnswerObj?.answer ?? '';
   const isCurrentFlagged = currentAnswerObj?.isFlagged || false;
 
@@ -128,7 +152,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
   }, [currentSubtestIndex, currentSubtest.id]);
 
   useEffect(() => {
-    const rem = session.subtestRemainingSeconds[currentSubtest.id] || currentSubtest.durationMinutes * 60;
+    const rem =
+      session.subtestRemainingSeconds[currentSubtest.id] ||
+      currentSubtest.durationMinutes * 60;
     setTimerSeconds(rem);
     setCurrentQuestionIndex(0);
   }, [currentSubtestIndex]);
@@ -140,22 +166,14 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
         const count = incrementViolations(tryoutId);
         setAntiCheatModal({ isOpen: true, count });
         if (count >= 3) {
-          showToast('Batas toleransi keluar layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
+          showToast(
+            'Batas toleransi keluar layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.',
+            'error'
+          );
           setTimeout(() => {
             handleFinalSubmit();
           }, 1500);
         }
-      }
-    };
-
-    const handleWindowBlur = () => {
-      const count = incrementViolations(tryoutId);
-      setAntiCheatModal({ isOpen: true, count });
-      if (count >= 3) {
-        showToast('Batas toleransi keluar layar (3x) terlampaui. Ujian otomatis dikumpulkan demi integritas.', 'error');
-        setTimeout(() => {
-          handleFinalSubmit();
-        }, 1500);
       }
     };
 
@@ -164,12 +182,12 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('blur', handleWindowBlur);
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('blur', handleWindowBlur);
+
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, [tryoutId]);
@@ -194,7 +212,13 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
 
   // Answer handlers
   const handleSelectOption = (optId: string) => {
-    saveAnswer(tryoutId, currentQuestion.id, 'single_choice', optId, isCurrentFlagged);
+    saveAnswer(
+      tryoutId,
+      currentQuestion.id,
+      'single_choice',
+      optId,
+      isCurrentFlagged
+    );
     setSession((prev) => ({
       ...prev,
       answers: {
@@ -218,7 +242,13 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
       updatedArr = [...prevArr, optId];
     }
 
-    saveAnswer(tryoutId, currentQuestion.id, 'multi_select', updatedArr, isCurrentFlagged);
+    saveAnswer(
+      tryoutId,
+      currentQuestion.id,
+      'multi_select',
+      updatedArr,
+      isCurrentFlagged
+    );
     setSession((prev) => ({
       ...prev,
       answers: {
@@ -234,7 +264,13 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
   };
 
   const handleShortAnswerChange = (val: string) => {
-    saveAnswer(tryoutId, currentQuestion.id, 'short_answer', val, isCurrentFlagged);
+    saveAnswer(
+      tryoutId,
+      currentQuestion.id,
+      'short_answer',
+      val,
+      isCurrentFlagged
+    );
     setSession((prev) => ({
       ...prev,
       answers: {
@@ -301,7 +337,11 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
   // Helper for Question Palette Status Determination (5 statuses)
   const getQuestionPaletteStatus = (q: Question) => {
     const ans = session?.answers[q.id];
-    const isAnswered = ans && (Array.isArray(ans.answer) ? ans.answer.length > 0 : String(ans.answer).trim().length > 0);
+    const isAnswered =
+      ans &&
+      (Array.isArray(ans.answer)
+        ? ans.answer.length > 0
+        : String(ans.answer).trim().length > 0);
     const isFlagged = ans?.isFlagged || false;
     const isVisited = visitedQuestions.has(q.id);
 
@@ -314,39 +354,62 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
 
   const subtestAnsweredCount = subtestQuestions.filter((q) => {
     const ans = session?.answers[q.id];
-    return ans && (Array.isArray(ans.answer) ? ans.answer.length > 0 : String(ans.answer).trim().length > 0);
+    return (
+      ans &&
+      (Array.isArray(ans.answer)
+        ? ans.answer.length > 0
+        : String(ans.answer).trim().length > 0)
+    );
   }).length;
-  const subtestFlaggedCount = subtestQuestions.filter((q) => session?.answers[q.id]?.isFlagged).length;
-  const subtestUnansweredCount = Math.max(0, subtestQuestions.length - subtestAnsweredCount);
+  const subtestFlaggedCount = subtestQuestions.filter(
+    (q) => session?.answers[q.id]?.isFlagged
+  ).length;
+  const subtestUnansweredCount = Math.max(
+    0,
+    subtestQuestions.length - subtestAnsweredCount
+  );
 
   const totalQuestionsAll = tryout.questions.length;
   const totalAnswered = Object.values(session.answers).filter((a) => {
     if (Array.isArray(a.answer)) return a.answer.length > 0;
     return String(a.answer).trim().length > 0;
   }).length;
-  const totalFlagged = Object.values(session.answers).filter((a) => a.isFlagged).length;
+  const totalFlagged = Object.values(session.answers).filter(
+    (a) => a.isFlagged
+  ).length;
   const totalUnanswered = Math.max(0, totalQuestionsAll - totalAnswered);
 
-  const hasStimulus = Boolean(currentQuestion?.stimulus && currentQuestion.stimulus.trim().length > 0);
+  const hasStimulus = Boolean(
+    currentQuestion?.stimulus && currentQuestion.stimulus.trim().length > 0
+  );
 
   // Dynamic Typography Scaling
   const questionTextClass =
     fontSizeLevel === 'large'
       ? 'text-base sm:text-lg'
       : fontSizeLevel === 'xlarge'
-      ? 'text-lg sm:text-xl'
-      : 'text-sm sm:text-base';
+        ? 'text-lg sm:text-xl'
+        : 'text-sm sm:text-base';
 
   const stimulusTextClass =
     fontSizeLevel === 'large'
-      ? 'text-sm sm:text-base'
+      ? 'text-lg'
       : fontSizeLevel === 'xlarge'
-      ? 'text-base sm:text-lg'
-      : 'text-xs sm:text-sm';
+        ? 'text-xl'
+        : 'text-base';
 
   return (
     <div
-      onContextMenu={(e) => e.preventDefault()}
+      onContextMenu={(e) => {
+        if (
+          !(
+            e.target instanceof HTMLElement &&
+            e.target.closest('input, textarea')
+          )
+        ) {
+          e.preventDefault();
+        }
+      }}
       className="cbt-secure-screen min-h-screen bg-[#F8FAFC] flex flex-col justify-between font-sans text-slate-900 pb-20 lg:pb-6"
     >
       {/* ========================================================================= */}
@@ -382,12 +445,14 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
               timerSeconds <= 60
                 ? 'bg-rose-50 text-rose-700 border border-rose-300 animate-pulse'
                 : timerSeconds <= 300
-                ? 'bg-amber-50 text-amber-800 border border-amber-300'
-                : 'bg-slate-900 text-white'
+                  ? 'bg-amber-50 text-amber-800 border border-amber-300'
+                  : 'bg-slate-900 text-white'
             }`}
           >
             <Clock className="w-3.5 h-3.5 shrink-0" />
-            <span className="tracking-wide text-xs sm:text-sm">{formatTime(timerSeconds)}</span>
+            <span className="tracking-wide text-xs sm:text-sm">
+              {formatTime(timerSeconds)}
+            </span>
           </div>
 
           {/* Font Size Adjuster (Desktop Only) */}
@@ -422,7 +487,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
             className="lg:hidden flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-2.5 py-1.5 rounded-xl transition"
           >
             <Grid className="w-3.5 h-3.5 text-blue-600" />
-            <span>Palet ({subtestAnsweredCount}/{subtestQuestions.length})</span>
+            <span>
+              Palet ({subtestAnsweredCount}/{subtestQuestions.length})
+            </span>
           </button>
 
           {/* Desktop Submit Button */}
@@ -453,12 +520,16 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                   isActive
                     ? 'bg-blue-50 text-blue-700 border border-blue-200 font-bold shadow-2xs'
                     : isDone
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
-                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                      : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
                 }`}
               >
-                <span>{idx + 1}. {st.name.split(' ')[0]}</span>
-                {isDone && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
+                <span>
+                  {idx + 1}. {st.name.split(' ')[0]}
+                </span>
+                {isDone && (
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                )}
               </button>
             );
           })}
@@ -483,15 +554,20 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
             const status = getQuestionPaletteStatus(q);
             const isCurrent = idx === currentQuestionIndex;
 
-            let statusStyle = 'bg-white text-slate-700 border border-slate-200 hover:border-slate-400';
+            let statusStyle =
+              'bg-white text-slate-700 border border-slate-200 hover:border-slate-400';
             if (status === 'answered_flagged') {
-              statusStyle = 'bg-emerald-50 text-emerald-900 border-2 border-amber-400 font-bold';
+              statusStyle =
+                'bg-emerald-50 text-emerald-900 border-2 border-amber-400 font-bold';
             } else if (status === 'answered') {
-              statusStyle = 'bg-emerald-600 text-white font-bold border border-emerald-600 shadow-2xs';
+              statusStyle =
+                'bg-emerald-600 text-white font-bold border border-emerald-600 shadow-2xs';
             } else if (status === 'flagged') {
-              statusStyle = 'bg-amber-400 text-slate-950 font-bold border border-amber-500 shadow-2xs';
+              statusStyle =
+                'bg-amber-400 text-slate-950 font-bold border border-amber-500 shadow-2xs';
             } else if (status === 'visited_unanswered') {
-              statusStyle = 'bg-rose-50 text-rose-700 border border-rose-200 font-semibold';
+              statusStyle =
+                'bg-rose-50 text-rose-700 border border-rose-200 font-semibold';
             }
 
             return (
@@ -500,7 +576,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                 type="button"
                 onClick={() => setCurrentQuestionIndex(idx)}
                 className={`w-8 h-8 rounded-lg text-xs shrink-0 flex items-center justify-center transition-all ${statusStyle} ${
-                  isCurrent ? 'ring-2 ring-blue-600 ring-offset-2 scale-110 z-10 font-extrabold shadow-sm' : ''
+                  isCurrent
+                    ? 'ring-2 ring-blue-600 ring-offset-2 scale-110 z-10 font-extrabold shadow-sm'
+                    : ''
                 }`}
                 title={`Lompat ke Soal #${idx + 1}`}
               >
@@ -514,57 +592,34 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
         <div className="hidden md:flex items-center space-x-3 text-[11px] shrink-0 font-medium text-slate-600">
           <span className="flex items-center space-x-1">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
-            <span>Terjawab: <strong className="text-emerald-700">{subtestAnsweredCount}</strong></span>
+            <span>
+              Terjawab:{' '}
+              <strong className="text-emerald-700">
+                {subtestAnsweredCount}
+              </strong>
+            </span>
           </span>
           <span className="flex items-center space-x-1">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
-            <span>Ragu: <strong className="text-amber-700">{subtestFlaggedCount}</strong></span>
+            <span>
+              Ragu:{' '}
+              <strong className="text-amber-700">{subtestFlaggedCount}</strong>
+            </span>
           </span>
           <span className="flex items-center space-x-1">
             <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" />
-            <span>Kosong: <strong className="text-slate-700">{subtestUnansweredCount}</strong></span>
+            <span>
+              Kosong:{' '}
+              <strong className="text-slate-700">
+                {subtestUnansweredCount}
+              </strong>
+            </span>
           </span>
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 3. MOBILE STIMULUS SEGMENTED CONTROL TABS (HANYA MUNCUL DI SMARTPHONE)    */}
-      {/* ========================================================================= */}
-      {hasStimulus && (
-        <div className="lg:hidden bg-slate-100 p-1.5 border-b border-slate-200 sticky top-[57px] z-30 flex items-center justify-center space-x-1 text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => setMobileTab('stimulus')}
-            className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center space-x-1.5 transition ${
-              mobileTab === 'stimulus'
-                ? 'bg-white text-blue-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Wacana / Bacaan</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileTab('question')}
-            className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center space-x-1.5 transition ${
-              mobileTab === 'question'
-                ? 'bg-white text-blue-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>Soal & Jawaban OMR</span>
-          </button>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 4. MAIN WORKSPACE: SMARTPHONE ERGONOMIC VIEW & DESKTOP DOCKED VIEW        */}
-      {/* ========================================================================= */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 select-none">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          
           {/* QUESTION + OPTIONS WORKSPACE (9 COLS ON DESKTOP, FULL ON MOBILE) */}
           <div className="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl border border-slate-200 shadow-card flex flex-col justify-between min-h-[520px]">
             {/* Question Top Subheader */}
@@ -592,79 +647,67 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <Bookmark className={`w-3.5 h-3.5 ${isCurrentFlagged ? 'fill-amber-900 text-amber-900' : 'text-slate-400'}`} />
+                <Bookmark
+                  className={`w-3.5 h-3.5 ${isCurrentFlagged ? 'fill-amber-900 text-amber-900' : 'text-slate-400'}`}
+                />
                 <span>{isCurrentFlagged ? 'Ragu' : 'Tandai Ragu'}</span>
               </button>
             </div>
 
             {/* Content Area */}
             <div className="p-4 sm:p-6 flex-1 space-y-6">
-              {/* If on mobile and stimulus tab active */}
-              {hasStimulus && mobileTab === 'stimulus' ? (
-                <div className="lg:hidden bg-slate-50 rounded-xl border border-slate-200/80 p-4 space-y-3 font-sans text-slate-900 leading-relaxed">
-                  <div className="flex items-center space-x-1.5 pb-2 border-b border-slate-200 text-xs font-bold text-blue-700">
-                    <FileText className="w-4 h-4" />
-                    <span>Wacana Bacaan:</span>
+              <div
+                className={`grid gap-6 items-start ${hasStimulus ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}
+              >
+                {/* Reading stays visible above the answers on mobile. */}
+                {hasStimulus && (
+                  <div
+                    role="region"
+                    aria-label="Wacana"
+                    tabIndex={0}
+                    className="lg:max-h-[460px] lg:overflow-y-auto lg:pr-5 space-y-3 font-sans text-slate-800 leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                  >
+                    <h2 className="text-sm font-semibold text-slate-600">
+                      Wacana
+                    </h2>
+
+                    {currentQuestion.stimulus?.startsWith(
+                      '[IMAGE_STIMULUS]'
+                    ) ? (
+                      <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
+                        <img
+                          src={currentQuestion.stimulus.replace(
+                            '[IMAGE_STIMULUS]',
+                            ''
+                          )}
+                          alt="Stimulus Soal"
+                          className="max-h-72 object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`whitespace-pre-line leading-relaxed font-sans ${stimulusTextClass}`}
+                      >
+                        <MathRenderer
+                          content={currentQuestion.stimulus || ''}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Main Question & Option Selector Cards */}
+                <div className="space-y-5">
+                  {/* Prompt Text */}
+                  <div
+                    className={`font-sans font-semibold text-slate-900 leading-relaxed ${questionTextClass}`}
+                  >
+                    <MathRenderer content={currentQuestion.question} />
                   </div>
 
-                  {currentQuestion.stimulus?.startsWith('[IMAGE_STIMULUS]') ? (
-                    <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
-                      <img
-                        src={currentQuestion.stimulus.replace('[IMAGE_STIMULUS]', '')}
-                        alt="Stimulus Soal"
-                        className="max-h-72 object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className={`whitespace-pre-line leading-relaxed font-sans ${stimulusTextClass}`}>
-                      <MathRenderer content={currentQuestion.stimulus || ''} />
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setMobileTab('question')}
-                    className="w-full mt-4 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5"
-                  >
-                    <span>Lanjut Jawab Soal</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className={`grid gap-6 items-start ${hasStimulus ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
-                  {/* Left Pane on Desktop (Always Visible on Desktop if Stimulus Exists) */}
-                  {hasStimulus && (
-                    <div className="hidden lg:block bg-slate-50 rounded-xl border border-slate-200/80 p-5 max-h-[460px] overflow-y-auto space-y-3 font-sans text-slate-900 leading-relaxed">
-                      <div className="flex items-center space-x-1.5 pb-2 border-b border-slate-200 text-xs font-bold text-blue-700">
-                        <FileText className="w-4 h-4" />
-                        <span>Wacana / Stimulus Bacaan:</span>
-                      </div>
-
-                      {currentQuestion.stimulus?.startsWith('[IMAGE_STIMULUS]') ? (
-                        <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
-                          <img
-                            src={currentQuestion.stimulus.replace('[IMAGE_STIMULUS]', '')}
-                            alt="Stimulus Soal"
-                            className="max-h-72 object-contain"
-                          />
-                        </div>
-                      ) : (
-                        <div className={`whitespace-pre-line leading-relaxed font-sans ${stimulusTextClass}`}>
-                          <MathRenderer content={currentQuestion.stimulus || ''} />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Main Question & Option Selector Cards */}
-                  <div className="space-y-5">
-                    {/* Prompt Text */}
-                    <div className={`font-sans font-semibold text-slate-900 leading-relaxed ${questionTextClass}`}>
-                      <MathRenderer content={currentQuestion.question} />
-                    </div>
-
-                    {/* 1. Format Single Choice: Large Thumb-Friendly OMR Cards */}
-                    {currentQuestion.type === 'single_choice' && currentQuestion.options && (
+                  {/* 1. Format Single Choice: Large Thumb-Friendly OMR Cards */}
+                  {currentQuestion.type === 'single_choice' &&
+                    currentQuestion.options && (
                       <div className="space-y-2.5 pt-1">
                         {currentQuestion.options.map((opt) => {
                           const isSelected = currentAnswerVal === opt.id;
@@ -685,7 +728,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                               >
                                 {opt.id}
                               </span>
-                              <div className={`pt-0.5 font-sans text-slate-900 leading-relaxed ${questionTextClass}`}>
+                              <div
+                                className={`pt-0.5 font-sans text-slate-900 leading-relaxed ${questionTextClass}`}
+                              >
                                 <MathRenderer content={opt.text} />
                               </div>
                             </div>
@@ -694,11 +739,14 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                       </div>
                     )}
 
-                    {/* 2. Format Multi-Select: Ceklis Majemuk */}
-                    {currentQuestion.type === 'multi_select' && currentQuestion.options && (
+                  {/* 2. Format Multi-Select: Ceklis Majemuk */}
+                  {currentQuestion.type === 'multi_select' &&
+                    currentQuestion.options && (
                       <div className="space-y-2.5 pt-1">
                         {currentQuestion.options.map((opt) => {
-                          const arr = Array.isArray(currentAnswerVal) ? currentAnswerVal : [];
+                          const arr = Array.isArray(currentAnswerVal)
+                            ? currentAnswerVal
+                            : [];
                           const isChecked = arr.includes(opt.id);
                           return (
                             <div
@@ -719,7 +767,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                               >
                                 ✓
                               </div>
-                              <div className={`pt-0.5 font-sans text-slate-900 leading-relaxed ${questionTextClass}`}>
+                              <div
+                                className={`pt-0.5 font-sans text-slate-900 leading-relaxed ${questionTextClass}`}
+                              >
                                 <MathRenderer content={opt.text} />
                               </div>
                             </div>
@@ -728,40 +778,24 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                       </div>
                     )}
 
-                    {/* 3. Format Short Answer */}
-                    {currentQuestion.type === 'short_answer' && (
-                      <div className="space-y-2 pt-1 font-mono">
-                        <label className="text-xs text-slate-500 font-semibold block uppercase">
-                          Ketikkan Jawaban Singkat:
-                        </label>
-                        <input
-                          type="text"
-                          value={typeof currentAnswerVal === 'string' ? currentAnswerVal : ''}
-                          onChange={(e) => handleShortAnswerChange(e.target.value)}
-                          placeholder="Contoh: 45 atau 12.5"
-                          className="w-full sm:w-80 p-3 bg-slate-50 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-blue-600 focus:bg-white transition"
-                        />
-                      </div>
-                    )}
-
-                    {/* 4. Format Essay */}
-                    {currentQuestion.type === 'essay' && (
-                      <div className="space-y-2 pt-1">
-                        <label className="text-xs text-slate-500 font-semibold block uppercase">
-                          Lembar Jawaban Esai:
-                        </label>
-                        <textarea
-                          rows={6}
-                          value={typeof currentAnswerVal === 'string' ? currentAnswerVal : ''}
-                          onChange={(e) => handleEssayChange(e.target.value)}
-                          placeholder="Tuliskan argumen penalaran Anda secara sistematis..."
-                          className="w-full p-3.5 bg-slate-50 rounded-xl border border-slate-300 text-sm font-sans leading-relaxed focus:outline-none focus:border-blue-600 focus:bg-white transition"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  {(currentQuestion.type === 'short_answer' ||
+                    currentQuestion.type === 'essay') && (
+                    <WrittenAnswer
+                      type={currentQuestion.type}
+                      value={
+                        typeof currentAnswerVal === 'string'
+                          ? currentAnswerVal
+                          : ''
+                      }
+                      onChange={
+                        currentQuestion.type === 'essay'
+                          ? handleEssayChange
+                          : handleShortAnswerChange
+                      }
+                    />
+                  )}
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Desktop Navigation Footer */}
@@ -775,7 +809,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                     handlePrevSubtest();
                   }
                 }}
-                disabled={currentSubtestIndex === 0 && currentQuestionIndex === 0}
+                disabled={
+                  currentSubtestIndex === 0 && currentQuestionIndex === 0
+                }
                 className={`inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border transition ${
                   currentSubtestIndex === 0 && currentQuestionIndex === 0
                     ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
@@ -787,7 +823,8 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
               </button>
 
               <span className="text-slate-500 text-xs">
-                Butir {currentQuestionIndex + 1} dari {subtestQuestions.length} Soal
+                Butir {currentQuestionIndex + 1} dari {subtestQuestions.length}{' '}
+                Soal
               </span>
 
               <button
@@ -802,7 +839,8 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                 className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition"
               >
                 <span>
-                  {currentQuestionIndex === subtestQuestions.length - 1 && currentSubtestIndex === tryout.subtests.length - 1
+                  {currentQuestionIndex === subtestQuestions.length - 1 &&
+                  currentSubtestIndex === tryout.subtests.length - 1
                     ? 'Selesai Subtest'
                     : 'Soal Berikutnya'}
                 </span>
@@ -820,7 +858,10 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                     Daftar Nomor Soal
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Subtest: <span className="font-bold text-slate-800">{currentSubtest.name}</span>
+                    Subtest:{' '}
+                    <span className="font-bold text-slate-800">
+                      {currentSubtest.name}
+                    </span>
                   </p>
                 </div>
                 <span className="text-xs font-bold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md">
@@ -834,15 +875,20 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                   const status = getQuestionPaletteStatus(q);
                   const isCurrent = idx === currentQuestionIndex;
 
-                  let statusClasses = 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-400';
+                  let statusClasses =
+                    'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-400';
                   if (status === 'answered_flagged') {
-                    statusClasses = 'bg-emerald-50 text-emerald-800 border-2 border-amber-400 font-bold';
+                    statusClasses =
+                      'bg-emerald-50 text-emerald-800 border-2 border-amber-400 font-bold';
                   } else if (status === 'answered') {
-                    statusClasses = 'bg-emerald-600 text-white border-emerald-600 font-bold';
+                    statusClasses =
+                      'bg-emerald-600 text-white border-emerald-600 font-bold';
                   } else if (status === 'flagged') {
-                    statusClasses = 'bg-amber-400 text-slate-950 border-amber-500 font-bold';
+                    statusClasses =
+                      'bg-amber-400 text-slate-950 border-amber-500 font-bold';
                   } else if (status === 'visited_unanswered') {
-                    statusClasses = 'bg-rose-50 text-rose-700 border-rose-200 font-semibold';
+                    statusClasses =
+                      'bg-rose-50 text-rose-700 border-rose-200 font-semibold';
                   }
 
                   return (
@@ -851,7 +897,9 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                       type="button"
                       onClick={() => setCurrentQuestionIndex(idx)}
                       className={`h-9 rounded-lg border text-xs flex items-center justify-center transition-all ${statusClasses} ${
-                        isCurrent ? 'ring-2 ring-slate-900 ring-offset-2 scale-105 z-10' : ''
+                        isCurrent
+                          ? 'ring-2 ring-slate-900 ring-offset-2 scale-105 z-10'
+                          : ''
                       }`}
                     >
                       <span>{idx + 1}</span>
@@ -863,16 +911,28 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
               {/* Real-time Subtest Counter */}
               <div className="py-2.5 px-3 bg-slate-50 rounded-xl border border-slate-200/80 grid grid-cols-3 gap-1 text-xs text-center font-bold">
                 <div>
-                  <span className="text-slate-400 text-[10px] block uppercase">Terjawab</span>
-                  <strong className="text-emerald-600">{subtestAnsweredCount}</strong>
+                  <span className="text-slate-400 text-[10px] block uppercase">
+                    Terjawab
+                  </span>
+                  <strong className="text-emerald-600">
+                    {subtestAnsweredCount}
+                  </strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] block uppercase">Ragu</span>
-                  <strong className="text-amber-600">{subtestFlaggedCount}</strong>
+                  <span className="text-slate-400 text-[10px] block uppercase">
+                    Ragu
+                  </span>
+                  <strong className="text-amber-600">
+                    {subtestFlaggedCount}
+                  </strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] block uppercase">Kosong</span>
-                  <strong className="text-rose-600">{subtestUnansweredCount}</strong>
+                  <span className="text-slate-400 text-[10px] block uppercase">
+                    Kosong
+                  </span>
+                  <strong className="text-rose-600">
+                    {subtestUnansweredCount}
+                  </strong>
                 </div>
               </div>
 
@@ -895,7 +955,7 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
       {/* ========================================================================= */}
       {/* 5. THUMB-FRIENDLY FIXED BOTTOM ACTION BAR (KHUSUS SMARTPHONE / MOBILE)    */}
       {/* ========================================================================= */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2.5 flex items-center justify-between shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+      <div className="answer-bottom-nav lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2.5 flex items-center justify-between shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
         <button
           type="button"
           onClick={() => {
@@ -926,12 +986,15 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
           }`}
         >
-          <Bookmark className={`w-3.5 h-3.5 ${isCurrentFlagged ? 'fill-amber-900 text-amber-900' : ''}`} />
+          <Bookmark
+            className={`w-3.5 h-3.5 ${isCurrentFlagged ? 'fill-amber-900 text-amber-900' : ''}`}
+          />
           <span>{isCurrentFlagged ? 'Ragu ✓' : 'Ragu'}</span>
         </button>
 
         {/* Right: Next / Submit */}
-        {currentQuestionIndex === subtestQuestions.length - 1 && currentSubtestIndex === tryout.subtests.length - 1 ? (
+        {currentQuestionIndex === subtestQuestions.length - 1 &&
+        currentSubtestIndex === tryout.subtests.length - 1 ? (
           <button
             type="button"
             onClick={() => setSubmitModalOpen(true)}
@@ -986,15 +1049,21 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
             {/* Quick Status Stats */}
             <div className="grid grid-cols-3 gap-2 text-center text-xs font-bold py-1">
               <div className="bg-emerald-50 text-emerald-800 p-2 rounded-xl border border-emerald-100">
-                <span className="text-[10px] block opacity-80 uppercase">Terjawab</span>
+                <span className="text-[10px] block opacity-80 uppercase">
+                  Terjawab
+                </span>
                 <span>{subtestAnsweredCount}</span>
               </div>
               <div className="bg-amber-50 text-amber-800 p-2 rounded-xl border border-amber-100">
-                <span className="text-[10px] block opacity-80 uppercase">Ragu</span>
+                <span className="text-[10px] block opacity-80 uppercase">
+                  Ragu
+                </span>
                 <span>{subtestFlaggedCount}</span>
               </div>
               <div className="bg-slate-100 text-slate-700 p-2 rounded-xl border border-slate-200">
-                <span className="text-[10px] block opacity-80 uppercase">Kosong</span>
+                <span className="text-[10px] block opacity-80 uppercase">
+                  Kosong
+                </span>
                 <span>{subtestUnansweredCount}</span>
               </div>
             </div>
@@ -1005,13 +1074,17 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                 const status = getQuestionPaletteStatus(q);
                 const isCurrent = idx === currentQuestionIndex;
 
-                let statusClasses = 'bg-slate-100 text-slate-700 border-slate-200';
+                let statusClasses =
+                  'bg-slate-100 text-slate-700 border-slate-200';
                 if (status === 'answered_flagged') {
-                  statusClasses = 'bg-emerald-50 text-emerald-800 border-2 border-amber-400 font-bold';
+                  statusClasses =
+                    'bg-emerald-50 text-emerald-800 border-2 border-amber-400 font-bold';
                 } else if (status === 'answered') {
-                  statusClasses = 'bg-emerald-600 text-white border-emerald-600 font-bold';
+                  statusClasses =
+                    'bg-emerald-600 text-white border-emerald-600 font-bold';
                 } else if (status === 'flagged') {
-                  statusClasses = 'bg-amber-400 text-slate-950 border-amber-500 font-bold';
+                  statusClasses =
+                    'bg-amber-400 text-slate-950 border-amber-500 font-bold';
                 } else if (status === 'visited_unanswered') {
                   statusClasses = 'bg-rose-50 text-rose-700 border-rose-200';
                 }
@@ -1064,22 +1137,36 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                 <h3 className="font-bold text-base text-slate-900">
                   Konfirmasi Pengumpulan
                 </h3>
-                <p className="text-xs text-slate-500">Periksa kembali ringkasan jawaban Anda</p>
+                <p className="text-xs text-slate-500">
+                  Periksa kembali ringkasan jawaban Anda
+                </p>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 text-center text-xs font-mono">
               <div>
-                <span className="text-[10px] text-slate-400 block font-semibold">TERJAWAB</span>
-                <span className="font-bold text-emerald-600 text-sm">{totalAnswered}</span>
+                <span className="text-[10px] text-slate-400 block font-semibold">
+                  TERJAWAB
+                </span>
+                <span className="font-bold text-emerald-600 text-sm">
+                  {totalAnswered}
+                </span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 block font-semibold">RAGU</span>
-                <span className="font-bold text-amber-600 text-sm">{totalFlagged}</span>
+                <span className="text-[10px] text-slate-400 block font-semibold">
+                  RAGU
+                </span>
+                <span className="font-bold text-amber-600 text-sm">
+                  {totalFlagged}
+                </span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 block font-semibold">KOSONG</span>
-                <span className="font-bold text-rose-600 text-sm">{totalUnanswered}</span>
+                <span className="text-[10px] text-slate-400 block font-semibold">
+                  KOSONG
+                </span>
+                <span className="font-bold text-rose-600 text-sm">
+                  {totalUnanswered}
+                </span>
               </div>
             </div>
 
@@ -1118,16 +1205,25 @@ function CBTExamPlayer({ initialSession }: { initialSession: ExamSession }) {
                 Peringatan Integritas Ujian
               </h3>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Anda terdeteksi berpindah tab, meminimalkan browser, atau membuka aplikasi lain.
+                Anda terdeteksi berpindah tab, meminimalkan browser, atau
+                membuka aplikasi lain.
               </p>
             </div>
 
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono text-xs">
-              Pelanggaran: <strong className="text-rose-600">{antiCheatModal.count} dari 3 batas toleransi</strong>
+              Pelanggaran:{' '}
+              <strong className="text-rose-600">
+                {antiCheatModal.count} dari 3 batas toleransi
+              </strong>
             </div>
 
             <button
-              onClick={() => setAntiCheatModal({ isOpen: false, count: antiCheatModal.count })}
+              onClick={() =>
+                setAntiCheatModal({
+                  isOpen: false,
+                  count: antiCheatModal.count,
+                })
+              }
               className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition"
             >
               Kembali ke Ujian
